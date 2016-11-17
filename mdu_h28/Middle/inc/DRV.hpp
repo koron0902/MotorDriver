@@ -52,6 +52,7 @@ namespace Middle{
 		bool IsVGSLB();
 		bool IsVGSHC();
 		bool IsVGSLC();
+		void ClearFault();
 	}
 }
 

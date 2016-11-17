@@ -177,6 +177,9 @@ namespace Middle {
 
 			Read(DRVRegName::VDS_SENSE_CTRL, &buf);
 			DRVRegisters.mVDSSense = buf;
+
+			if(IsFault())
+				ClearFault();
 		}
 
 		std::string Observe(){
@@ -381,6 +384,13 @@ namespace Middle {
 			VGS_FAULT_T var;
 			var = GetRegValue(DRVRegName::VGS_FAULT);
 			return var.VGS_LC;
+		}
+
+		void ClearFault(){
+			IC_OPERATION_T var;
+			var = GetRegValue(DRVRegName::IC_OPERATION);
+			var.CLR_FLTS = CLEAR_FAULTS;
+			SetConfiguration(DRVRegName::IC_OPERATION, var);
 		}
 	}
 }

@@ -24,7 +24,7 @@ void Init() {
 	//ModeAs(Type::None);
 
 	ModeAs(Type::DCMotor);
-	for(int i = 0;i < 10;i++){
+	for(int i = 0;i < 4;i++){
 		SetDuty(fix32::CreateFloat(0.1 * i));
 		Wait();
 	}
