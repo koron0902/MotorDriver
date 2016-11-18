@@ -178,12 +178,10 @@ namespace Middle {
 			Read(DRVRegName::VDS_SENSE_CTRL, &buf);
 			DRVRegisters.mVDSSense = buf;
 
-			if(IsFault())
-				ClearFault();
 		}
 
 		std::string Observe(){
-			std::string msg;
+			static std::string msg;
 			msg.reserve(256);
 			msg.clear();
 
@@ -219,7 +217,26 @@ namespace Middle {
 				msg.append("reason: VREG is low voltage");
 			if(IsAVDDLow())
 				msg.append("reason: AVDD is low voltage");
-
+			if(IsLSSupply())
+				msg.append("reason: low side gate supply is low");
+			if(IsCHPLow())
+				msg.append("reason: charge pump voltage is low");
+			if(IsCHPHigh())
+				msg.append("reason: charge pump voltage is high");
+			if(IsCHPHighABS())
+				msg.append("reason: charge pump voltage is high with ABS");
+			if(IsVGSHA())
+				msg.append("reason: gate drive fault for high side FET-A");
+			if(IsVGSLA())
+				msg.append("reason: gate drive fault for low side FET-A");
+			if(IsVGSHB())
+				msg.append("reason: gate drive fault for high side FET-B");
+			if(IsVGSLA())
+				msg.append("reason: gate drive fault for low side FET-B");
+			if(IsVGSHC())
+				msg.append("reason: gate drive fault for high side FET-C");
+			if(IsVGSLC())
+				msg.append("reason: gate drive fault for low side FET-C");
 
 			return msg;
 		}
