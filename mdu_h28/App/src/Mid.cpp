@@ -1,21 +1,44 @@
-/*
- * Mid.cpp
- *
- *  Created on: 2016/11/16
- *      Author: hamus
- */
-
 #include "Mid.h"
+#include <motor.hpp>
+#include <stdlib.h>
+#include <text.hpp>
+using namespace Middle;
+using namespace App::File;
+using namespace common;
 
 namespace App {
+namespace Mid{
 
-Mid::Mid() {
-	// TODO Auto-generated constructor stub
-	
+Directory* Create(){
+	auto *mid=Directory::Create("mid");
+	mid->Add(Execute::Create("duty",Duty));
+	mid->Add(Execute::Create("free",Free));
+	mid->Add(Execute::Create("lock",Lock));
+	return mid;
 }
 
-Mid::~Mid() {
-	// TODO Auto-generated destructor stub
+std::string Duty(const common::ShellParameter& arg){
+	if (arg.size()>1){
+		Motor::SetDuty(common::ToFix(arg[1]));
+	}else{
+		Motor::Lock();
+	}
+	return "";
+}
+std::string Free(const common::ShellParameter&){
+	Motor::Free();
+	return "";
+}
+
+std::string Lock(const common::ShellParameter&){
+	Motor::Lock();
+	return "";
+}
+
+
+
+
+
 }
 
 } /* namespace App */
