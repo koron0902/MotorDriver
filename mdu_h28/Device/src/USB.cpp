@@ -1,8 +1,16 @@
+/*
+ * USB.cpp
+ *
+ *  Created on: 2016/11/14
+ *      Author: takumi152
+ */
+
 #include <chip.h>
 #include <string.h>
 #include <USB.hpp>
 #include "usb/app_usbd_cfg.h"
 #include <ring_buffer.h>
+#include <eeprom.h>
 
 using namespace std;
 
@@ -12,14 +20,7 @@ namespace USB {
 
 static USBD_HANDLE_T g_hUsb;
 const USBD_API_T *g_pUsbApi;
-
-/**
- * @brief	Virtual com port init routine
- * @param	hUsb		: Handle to USBD stack instance
- * @param	pDesc		: Pointer to configuration descriptor
- * @param	pUsbParam	: Pointer USB param structure returned by previous init call
- * @return	Always returns LPC_OK.
- */
+//static uint8_t g_rxBuff[256]; // For testing only
 struct VCOM_DATA {
 	USBD_HANDLE_T hUsb;
 	USBD_HANDLE_T hCdc;
@@ -30,6 +31,15 @@ struct VCOM_DATA {
 	volatile uint16_t rx_flags;
 };
 static VCOM_DATA g_vCOM;
+
+/**
+ * @brief	Virtual com port init routine
+ * @param	hUsb		: Handle to USBD stack instance
+ * @param	pDesc		: Pointer to configuration descriptor
+ * @param	pUsbParam	: Pointer USB param structure returned by previous init call
+ * @return	Always returns LPC_OK.
+ */
+
 static USB_INTERFACE_DESCRIPTOR *find_IntfDesc(const uint8_t *pDesc,
 		uint32_t intfClass);
 static ErrorCode_t vcom_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
@@ -70,7 +80,7 @@ void Init() {
 	USBD_API_INIT_PARAM_T usb_param;
 	USB_CORE_DESCS_T desc;
 	ErrorCode_t ret = LPC_OK;
-	//uint32_t prompt = 0, rdCnt = 0;
+	uint32_t prompt = 0, rdCnt = 0;  // For testing only
 
 	//Clock Supply
 	Chip_USB_Init();
@@ -81,7 +91,7 @@ void Init() {
 	// initialize call back structures
 	memset((void *) &usb_param, 0, sizeof(USBD_API_INIT_PARAM_T));
 	usb_param.usb_reg_base = LPC_USB0_BASE;
-	usb_param.max_num_ep = 3 + 1;
+	usb_param.max_num_ep = 5 + 1;
 	usb_param.mem_base = USB_STACK_MEM_BASE;
 	usb_param.mem_size = USB_STACK_MEM_SIZE;
 
@@ -103,6 +113,7 @@ void Init() {
 		// Init VCOM interface
 		ret = vcom_init(g_hUsb, &desc, &usb_param);
 		if (ret == LPC_OK) {
+			msc_init(g_hUsb, &desc, &usb_param);
 			//  enable USB interrupts
 			NVIC_EnableIRQ(USB0_IRQn);
 			// now connect
@@ -112,31 +123,31 @@ void Init() {
 
 	// for testing only
 	/*
-	 while (1) {
-	 // Check if host has connected and opened the VCOM port
-	 if ((Connected() != 0) && (prompt == 0)) {
-	 Write("Hello World!!\r\n", 15);
-	 prompt = 1;
-	 }
-	 // If VCOM port is opened echo whatever we receive back to host.
-	 if (prompt) {
-	 rdCnt = Bread(&g_rxBuff[0], 256);
-	 if (rdCnt) {
-	 Write(&g_rxBuff[0], rdCnt);
-	 }
-	 }
-	 // Sleep until next IRQ happens
-	 __WFI();
-	 }
-	 */
+	while (1) {
+		// Check if host has connected and opened the VCOM port
+		if ((Connected() != 0) && (prompt == 0)) {
+			Write("Hello World!!\r\n", 15);
+			prompt = 1;
+		}
+		// If VCOM port is opened echo whatever we receive back to host.
+		if (prompt) {
+			rdCnt = Bread(&g_rxBuff[0], 256);
+			if (rdCnt) {
+				Write(&g_rxBuff[0], rdCnt);
+			}
+		}
+		// Sleep until next IRQ happens
+		__WFI();
+	}
+	*/
 
 	//RxBuffer
 	RingBuffer_Init(&rxbuf,rxraw,sizeof(rxraw[0]),RxBufferSize);
 }
 
 /* VCOM bulk EP_IN endpoint handler */
-static ErrorCode_t VCOM_bulk_in_hdlr(USBD_HANDLE_T hUsb, void *data,
-		uint32_t event) {
+static ErrorCode_t VCOM_bulk_in_hdlr(USBD_HANDLE_T hUsb, void *data, uint32_t event)
+{
 	VCOM_DATA *pVcom = (VCOM_DATA *) data;
 
 	if (event == USB_EVT_IN) {
@@ -146,14 +157,13 @@ static ErrorCode_t VCOM_bulk_in_hdlr(USBD_HANDLE_T hUsb, void *data,
 }
 
 /* VCOM bulk EP_OUT endpoint handler */
-static ErrorCode_t VCOM_bulk_out_hdlr(USBD_HANDLE_T hUsb, void *data,
-		uint32_t event) {
+static ErrorCode_t VCOM_bulk_out_hdlr(USBD_HANDLE_T hUsb, void *data, uint32_t event)
+{
 	VCOM_DATA *pVcom = (VCOM_DATA *) data;
 
 	switch (event) {
 	case USB_EVT_OUT:
-		pVcom->rx_count = USBD_API->hw->ReadEP(hUsb, USB_CDC_OUT_EP,
-				pVcom->rx_buff);
+		pVcom->rx_count = USBD_API->hw->ReadEP(hUsb, USB_CDC_OUT_EP, pVcom->rx_buff);
 		if (pVcom->rx_flags & VCOM_RX_BUF_QUEUED) {
 			pVcom->rx_flags &= ~VCOM_RX_BUF_QUEUED;
 			if (pVcom->rx_count != 0) {
@@ -227,7 +237,6 @@ ErrorCode_t vcom_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
 			ep_indx = ((USB_CDC_OUT_EP & 0x0F) << 1);
 			ret = USBD_API->core->RegisterEpHandler(hUsb, ep_indx,
 					VCOM_bulk_out_hdlr, &g_vCOM);
-
 		}
 		/* update mem_base and size variables for cascading calls. */
 		pUsbParam->mem_base = cdc_param.mem_base;
@@ -238,7 +247,7 @@ ErrorCode_t vcom_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
 }
 
 /* Virtual com port buffered read routine */
-uint32_t Bread(uint8_t *pBuf, uint32_t buf_len) {
+uint32_t vcom_bread(uint8_t *pBuf, uint32_t buf_len) {
 	VCOM_DATA *pVcom = &g_vCOM;
 	uint16_t cnt = 0;
 	/* read from the default buffer if any data present */
@@ -261,7 +270,7 @@ uint32_t Bread(uint8_t *pBuf, uint32_t buf_len) {
 }
 
 /* Virtual com port read routine */
-ErrorCode_t Read_req(uint8_t *pBuf, uint32_t len) {
+ErrorCode_t vcom_read_req(uint8_t *pBuf, uint32_t len) {
 	VCOM_DATA *pVcom = &g_vCOM;
 
 	/* check if we queued Rx buffer */
@@ -280,7 +289,7 @@ ErrorCode_t Read_req(uint8_t *pBuf, uint32_t len) {
 }
 
 /* Gets current read count. */
-uint32_t Read_cnt(void) {
+uint32_t vcom_read_cnt(void) {
 	VCOM_DATA *pVcom = &g_vCOM;
 	uint32_t ret = 0;
 
@@ -293,7 +302,7 @@ uint32_t Read_cnt(void) {
 }
 
 /* Virtual com port write routine*/
-uint32_t Write(uint8_t *pBuf, uint32_t len) {
+uint32_t vcom_write(uint8_t *pBuf, uint32_t len) {
 	VCOM_DATA *pVcom = &g_vCOM;
 	uint32_t ret = 0;
 
@@ -311,6 +320,60 @@ uint32_t Write(uint8_t *pBuf, uint32_t len) {
 	return ret;
 }
 
+/* Mass storage device init routine */
+ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc, USBD_API_INIT_PARAM_T *pUsbParam){
+	USBD_MSC_INIT_PARAM msc_param;
+	ErrorCode_t ret = LPC_OK;
+
+	/* init MSC params */
+	msc_param.mem_base = pUsbParam->mem_base;
+	msc_param.mem_size = pUsbParam->mem_size;
+	msc_param.intf_desc = (uint8_t*) find_IntfDesc(pDesc->high_speed_desc, USB_DEVICE_CLASS_STORAGE);
+	msc_param.InquiryStr = MSC_SCSI_InquiryString;
+	msc_param.BlockCount = 8;
+	msc_param.BlockSize = 512;
+	msc_param.MemorySize = 4096;
+	/* user defined functions */
+	msc_param.MSC_Write = msc_write;
+	msc_param.MSC_Read = msc_read;
+	msc_param.MSC_Verify = msc_verify;
+
+	ret = USBD_API->msc->init(hUsb, &msc_param);
+
+	return ret;
+}
+
+void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_offset){
+	//TODO: msc write stub
+	/* enter critical section */
+	NVIC_DisableIRQ(USB0_IRQn);
+	Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
+	/* exit critical section */
+	NVIC_EnableIRQ(USB0_IRQn);
+
+}
+
+void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_offset){
+	//TODO: msc read stub
+	/* enter critical section */
+	NVIC_DisableIRQ(USB0_IRQn);
+	Chip_EEPROM_Read(offset, *dst, length*sizeof(uint8_t));
+	/* exit critical section */
+	NVIC_EnableIRQ(USB0_IRQn);
+}
+
+ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length, uint32_t high_offset){
+	//TODO msc verify stub
+	uint8_t tmp[length];
+	/* enter critical section */
+	NVIC_DisableIRQ(USB0_IRQn);
+	Chip_EEPROM_Read(offset, tmp, length*sizeof(uint8_t));
+	/* exit critical section */
+	NVIC_EnableIRQ(USB0_IRQn);
+	if(memcmp(buf, tmp, length*sizeof(uint8_t))==0) return LPC_OK;
+	else return ERR_FAILED;
+}
+
 bool IsConnected() {
 	return g_vCOM.tx_flags & VCOM_TX_CONNECTED;
 }
@@ -319,7 +382,7 @@ static void ReadUpData() {
 	uint8_t buf[RxTempSize];
 	uint32_t len;
 	uint32_t idx;
-	while ((len = Bread(buf, RxTempSize) > 0)) {
+	while ((len = vcom_bread(buf, RxTempSize)) > 0) {
 		RingBuffer_InsertMult(&rxbuf,buf,len);
 	}
 }

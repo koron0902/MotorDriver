@@ -34,6 +34,9 @@
  *
  */
 
+/* MSC Class Code */
+#define MSC_MASS_STORAGE_CLASS          0x08
+
 /* MSC Subclass Codes */
 #define MSC_SUBCLASS_RBC                0x01
 #define MSC_SUBCLASS_SFF8020I_MMC2      0x02

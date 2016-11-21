@@ -1,4 +1,5 @@
 #include <App.hpp>
+#include <DRV.hpp>
 //#include <File.hpp>
 #include <Port.hpp>
 #include <string.h>
@@ -6,7 +7,6 @@
 #include <Uart.hpp>
 #include <USB.hpp>
 #include <text.hpp>
-#include <DRV.hpp>
 #define forever() for(;;)
 
 using namespace Device;
@@ -27,7 +27,6 @@ void Init() {
 
 void CommandLine() {
 
-
 	char c;
 	while (!Uart::IsEmpty()) {
 		c = Uart::ReadByte();
@@ -36,13 +35,13 @@ void CommandLine() {
 			buffer_uart += c;
 
 		} else {
-			Uart::WriteLine(Shell::Call(buffer_uart));
+			USB::WriteLine(Shell::Call(buffer_uart));
 			buffer_uart = "";
 		}
 	}
 
 	if (!usb_flag && USB::IsConnected()) {
-		USB::Write((uint8_t*) "Connected!!\r\n", 15);
+		USB::vcom_write((uint8_t*) "Connected!!\r\n", 15);
 		usb_flag = true;
 	}
 
@@ -63,8 +62,8 @@ void CommandLine() {
 void Run() {
 	string buf;
 
-	Uart::WriteLine("linked　MDU(prototype)");
-	Uart::WriteLine(current->GetAllName());
+	USB::WriteLine("linked　MDU(prototype)");
+	USB::WriteLine(current->GetAllName());
 	forever() {
 
 		CommandLine();

@@ -46,9 +46,9 @@ ALIGNED(4) const uint8_t USB_DeviceDescriptor[] = {
 	USB_DEVICE_DESC_SIZE,				/* bLength */
 	USB_DEVICE_DESCRIPTOR_TYPE,			/* bDescriptorType */
 	WBVAL(0x0200),						/* bcdUSB */
-	0xEF,								/* bDeviceClass */
-	0x02,								/* bDeviceSubClass */
-	0x01,								/* bDeviceProtocol */
+	0x00,								/* bDeviceClass */
+	0x00,								/* bDeviceSubClass */
+	0x00,								/* bDeviceProtocol */
 	USB_MAX_PACKET0,					/* bMaxPacketSize0 */
 	WBVAL(0x1FC9),						/* idVendor */
 	WBVAL(0x0083),						/* idProduct */
@@ -69,15 +69,19 @@ ALIGNED(4) uint8_t USB_FsConfigDescriptor[] = {
 	USB_CONFIGURATION_DESCRIPTOR_TYPE,		/* bDescriptorType */
 	WBVAL(									/* wTotalLength */
 		USB_CONFIGURATION_DESC_SIZE     +
+		/* CDC related class descriptors */
 		USB_INTERFACE_ASSOC_DESC_SIZE   +	/* interface association descriptor */
 		USB_INTERFACE_DESC_SIZE         +	/* communication control interface */
 		0x0013                          +	/* CDC functions */
 		1 * USB_ENDPOINT_DESC_SIZE      +	/* interrupt endpoint */
 		USB_INTERFACE_DESC_SIZE         +	/* communication data interface */
 		2 * USB_ENDPOINT_DESC_SIZE      +	/* bulk endpoints */
+		/* MSC related class descriptors */
+		USB_INTERFACE_DESC_SIZE         +	/* bulk-only data interface */
+		2 * USB_ENDPOINT_DESC_SIZE      +	/* bulk endpoints */
 		0
 		),
-	0x02,									/* bNumInterfaces */
+	0x03,									/* bNumInterfaces */
 	0x01,									/* bConfigurationValue */
 	0x00,									/* iConfiguration */
 	USB_CONFIG_SELF_POWERED,				/* bmAttributes  */
@@ -157,6 +161,30 @@ ALIGNED(4) uint8_t USB_FsConfigDescriptor[] = {
 	USB_ENDPOINT_TYPE_BULK,				/* bmAttributes */
 	WBVAL(64),							/* wMaxPacketSize */
 	0x00,								/* bInterval: ignore for Bulk transfer */
+	/* Interface 2, ALternate Setting 0, Bulk-only data interface descriptor */
+	USB_INTERFACE_DESC_SIZE,			/* bLength */
+	USB_INTERFACE_DESCRIPTOR_TYPE,		/* bDescriptorType */
+	USB_MSC_IF_NUM,						/* bInterfaceNumber: Number of Interface */
+	0x00,								/* bAlternateSetting: no alternate setting */
+	0x02,								/* bNumEndpoints: two endpoints used */
+	MSC_MASS_STORAGE_CLASS,				/* bInterfaceClass: Mass Storage Class */
+	MSC_SUBCLASS_SCSI,					/* bInterfaceSubClass: SCSI */
+	MSC_PROTOCOL_BULK_ONLY,				/* bInterfaceProtocol: Bulk-only transport */
+	0x05,								/* iInterface: */
+	/* Endpoint, EP Bulk Out */
+	USB_ENDPOINT_DESC_SIZE,				/* bLength */
+	USB_ENDPOINT_DESCRIPTOR_TYPE,		/* bDescriptorType */
+	USB_MSC_OUT_EP,						/* bEndpointAddress */
+	USB_ENDPOINT_TYPE_BULK,				/* bmAttributes */
+	WBVAL(USB_FS_MAX_BULK_PACKET),		/* wMaxPacketSize */
+	0x00,								/* bInterval: ignore for Bulk transfer */
+	/* Endpoint, EP Bulk In */
+	USB_ENDPOINT_DESC_SIZE,				/* bLength */
+	USB_ENDPOINT_DESCRIPTOR_TYPE,		/* bDescriptorType */
+	USB_MSC_IN_EP,						/* bEndpointAddress */
+	USB_ENDPOINT_TYPE_BULK,				/* bmAttributes */
+	WBVAL(USB_FS_MAX_BULK_PACKET),		/* wMaxPacketSize */
+	0x00,								/* bInterval: ignore for Bulk transfer */
 	/* Terminator */
 	0									/* bLength */
 };
@@ -203,4 +231,16 @@ ALIGNED(4) const uint8_t USB_StringDescriptor[] = {
 	'C', 0,
 	'O', 0,
 	'M', 0,
+	/* Index 0x05: Interface 2, Alternate Steeing 0 */
+	( 3 * 2 + 2),						/* bLength (3 Char + Type + lenght) */
+	USB_STRING_DESCRIPTOR_TYPE,			/* bDescriptorType */
+	'M', 0,
+	'S', 0,
+	'C', 0,
+};
+
+uint8_t MSC_SCSI_InquiryString[] = {
+	'N', 'X', 'P', ' ', ' ', ' ', ' ', ' ',
+	'L', 'P', 'C', '1', '5', '4', '9', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+	'0', '0', '0', '1',
 };
