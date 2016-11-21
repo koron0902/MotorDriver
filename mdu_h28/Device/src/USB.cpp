@@ -318,7 +318,7 @@ bool IsConnected() {
 static void ReadUpData() {
 	uint8_t buf[RxTempSize];
 	uint32_t len;
-	uint32_t idx;
+	//uint32_t idx;
 	while ((len = Bread(buf, RxTempSize) > 0)) {
 		RingBuffer_InsertMult(&rxbuf,buf,len);
 	}
@@ -350,6 +350,9 @@ string Read() {
 	return s;
 }
 
+void Claer(){
+	RingBuffer_Flush(&rxbuf);
+}
 
 //割り込み
 extern "C" void USB_IRQHandler(void) {

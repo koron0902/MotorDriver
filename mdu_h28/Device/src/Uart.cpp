@@ -115,6 +115,11 @@ string ReadLine() {
 	return move(s);
 }
 
+void Claer(){
+	RingBuffer_Flush(&RxBuf);
+}
+
+
 }
 
 extern "C" void UART0_IRQHandler(void) {

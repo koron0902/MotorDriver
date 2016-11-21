@@ -1,7 +1,7 @@
 #ifndef COMMON_INC_TYPE_HPP_
 #define COMMON_INC_TYPE_HPP_
 
-#include <fix32.hpp>
+#include <fix.hpp>
 #include <functional>
 #include <stdint.h>
 #include <string>

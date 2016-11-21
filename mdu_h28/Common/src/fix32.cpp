@@ -1,4 +1,4 @@
-#include <fix32.hpp>
+#include <fix.hpp>
 #include <string>
 
 using namespace std;
