@@ -1,21 +1,18 @@
-/*
- * Mid.h
- *
- *  Created on: 2016/11/16
- *      Author: hamus
- */
-
 #ifndef APP_MID_H_
 #define APP_MID_H_
 
+#include <File.hpp>
+#include <type.hpp>
 namespace App {
+namespace Mid{
+File::Directory* Create();
 
-class Mid {
-public:
-	Mid();
-	virtual ~Mid();
-};
+std::string Duty(const common::ShellParameter&);
+std::string Free(const common::ShellParameter&);
+std::string Lock(const common::ShellParameter&);
 
+
+}
 } /* namespace App */
 
 #endif /* APP_MID_H_ */

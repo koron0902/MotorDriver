@@ -4,6 +4,7 @@
 #include "TaskManager.hpp"
 #include <Shell.hpp>
 #include <Uart.hpp>
+#include <Mid.h>
 using namespace std;
 using namespace common;
 using namespace App::File;
@@ -24,6 +25,7 @@ void Init() {
 	current = root = Directory::Create("root");
 	root->Add(bin=Bin::Create());
 	root->Add(CreateDev());
+	root->Add(Mid::Create());
 	path.push_back(bin);
 }
 

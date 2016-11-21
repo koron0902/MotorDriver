@@ -1,7 +1,7 @@
 #ifndef COMMON_INC_TYPE_HPP_
 #define COMMON_INC_TYPE_HPP_
 
-#include <fix32.hpp>
+#include <fix.hpp>
 #include <functional>
 #include <stdint.h>
 #include <string>
@@ -14,8 +14,7 @@ namespace common {
 using callback=std::function<void(void)>;
 using callback_ref=std::function<void(void)>&;
 //Shellのコマンド
-using ARG=std::vector<std::string>;
-using ARG_ref=ARG&;
+using ShellParameter=std::vector<std::string>;
 using command=std::function<std::string(std::vector<std::string>&)>;
 
 using q32_t = uint32_t;

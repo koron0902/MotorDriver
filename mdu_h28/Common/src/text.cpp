@@ -1,7 +1,8 @@
 #include <text.hpp>
 #include <memory>
-#include <sstream>
+#include <stack>
 #include <cstdio>
+#include <qmath.hpp>
 
 using namespace std;
 
@@ -45,16 +46,90 @@ string Space(const string& str, unsigned int s) {
 	return ans;
 }
 
-string ToStr(int32_t value){
-	char buf[16];
-	snprintf(buf,sizeof(buf),"%d",value);
-	return string(buf);
+string ToStr(int64_t value) {
+	string ans = "";
+	ans.reserve(64);
+	std::stack<char> sp;
+
+	int a = common::abs(value);
+	bool sign = common::sign(value);
+
+	while (a > 0) {
+		sp.push(ToChar(a % 10));
+		a /= 10;
+	}
+
+	if (sp.empty()) {
+		return "0";
+	} else {
+		if (!sign)ans='-';
+		do{
+			ans+=sp.top();
+			sp.pop();
+		}while (!sp.empty());
+		return ans;
+	}
+
 }
-/*
-string ToStr(float value){
-	char buf[16];
-	snprintf(buf,sizeof(buf),"%f",value);
-	return string(buf);
+
+fix32 ToFix(const std::string& text) {
+	uint32_t idx = 0;
+	bool sign = false; //マイナスならtrue
+	char c;
+	auto next = [&text,&idx]()->char {
+		return text[idx++];
+	};
+	fix32 fix(0);
+	c = next();
+	if (IsSign(c)) {
+		sign = (c == '-');
+		c = next();
+	}
+	while (IsNumber(c)) {
+		fix *= 10;
+		fix += FromNumber(c);
+		c = next();
+	}
+	if (IsPoint(c)) {
+		fix32 s = fix32::CreateInt(1);
+		c = next();
+		while (IsNumber(c)) {
+			s /= 10;
+			fix += s * FromNumber(c);
+			c = next();
+		}
+	}
+
+	if (sign) {
+		fix = -fix;
+	}
+
+	return fix;
 }
-*/
+
+int32_t ToInt(const std::string& text) {
+	uint32_t idx = 0;
+	bool sign = false;
+	char c;
+	auto next = [&text,&idx]()->char {
+		return text[idx++];
+	};
+	int32_t num = 0;
+	c = next();
+	if (IsSign(c)) {
+		sign = (c == '-');
+		c = next();
+	}
+	while (IsNumber(c)) {
+		num *= 10;
+		num += FromNumber(c);
+		c = next();
+	}
+
+	if (sign) {
+		num = -num;
+	}
+
+	return num;
+}
 } /* namespace common */
