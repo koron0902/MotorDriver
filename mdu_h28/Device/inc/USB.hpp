@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-//#include "usb/app_usbd_cfg.h"
+#include "usb/app_usbd_cfg.h"
 #include <text.hpp>
 #include<error.h>
 #include <stddef.h>
@@ -37,14 +37,13 @@ constexpr size_t RxTempSize=16;//二次バッファへ移動する際のバッ�
 // TODO USB header stub
 void Init();
 
-
 /**
  * @brief	Virtual com port buffered read routine
  * @param	pBuf	: Pointer to buffer where read data should be copied
  * @param	buf_len	: Length of the buffer passed
  * @return	Return number of bytes read.
  */
-uint32_t Bread (uint8_t *pBuf, uint32_t buf_len);
+uint32_t vcom_bread (uint8_t *pBuf, uint32_t buf_len);
 
 /**
  * @brief	Virtual com port read routine
@@ -52,13 +51,13 @@ uint32_t Bread (uint8_t *pBuf, uint32_t buf_len);
  * @param	buf_len	: Length of the buffer passed
  * @return	Always returns LPC_OK.
  */
-ErrorCode_t Read_req (uint8_t *pBuf, uint32_t buf_len);
+ErrorCode_t vcom_read_req (uint8_t *pBuf, uint32_t buf_len);
 
 /**
  * @brief	Gets current read count.
  * @return	Returns current read count.
  */
-uint32_t Read_cnt(void);
+uint32_t vcom_read_cnt(void);
 
 /**
  * @brief	Check if Vcom is connected
@@ -75,11 +74,18 @@ static INLINE uint32_t Connected(void) {
  * @param	buf_len	: Length of the buffer passed
  * @return	Number of bytes written
  */
-uint32_t Write (uint8_t *pBuf, uint32_t buf_len);
+uint32_t vcom_write (uint8_t *pBuf, uint32_t buf_len);
 
 /**
  * @}
  */
+
+//Mass storage class declaration
+
+ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc, USBD_API_INIT_PARAM_T *pUsbParam);
+void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_offset);
+void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_offset);
+ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length, uint32_t high_offset);
 
 //自作関数群
 bool IsConnected();
@@ -87,7 +93,7 @@ uint32_t GetDepth();//受信文字数
 bool IsEmpty();
 
 static inline uint32_t Write(const std::string& text){
-return Write((uint8_t*)text.data(),text.length());
+return vcom_write((uint8_t*)text.data(),text.length());
 }
 
 static inline uint32_t WriteLine(const std::string& text){
@@ -95,7 +101,7 @@ static inline uint32_t WriteLine(const std::string& text){
 }
 
 static inline uint32_t Write(char c){//非推奨
-	return Write((uint8_t*)&c,sizeof(c));
+	return vcom_write((uint8_t*)&c,sizeof(c));
 }
 
 char ReadByte();

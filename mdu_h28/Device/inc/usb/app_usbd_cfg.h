@@ -49,7 +49,7 @@ extern "C"
    Since these are the values used for compiling USB stack.
  */
 #define USB_MAX_IF_NUM          8		/*!< Max interface number used for building USBD ROM. DON'T CHANGE. */
-#define USB_MAX_EP_NUM          5		/*!< Max number of EP used for building USBD ROM. DON'T CHANGE. */
+#define USB_MAX_EP_NUM          2		/*!< Max number of EP used for building USBD ROM. DON'T CHANGE. */
 #define USB_MAX_PACKET0         64		/*!< Max EP0 packet size used for building USBD ROM. DON'T CHANGE. */
 #define USB_FS_MAX_BULK_PACKET  64		/*!< MAXP for FS bulk EPs used for building USBD ROM. DON'T CHANGE. */
 #define USB_HS_MAX_BULK_PACKET  512		/*!< MAXP for HS bulk EPs used for building USBD ROM. DON'T CHANGE. */
@@ -64,6 +64,11 @@ extern "C"
 #define USB_CDC_OUT_EP          0x01
 #define USB_CDC_INT_EP          0x82
 
+/* MSC-related config */
+#define USB_MSC_IF_NUM          2
+#define USB_MSC_IN_EP           0x83
+#define USB_MSC_OUT_EP          0x02
+
 /* The following manifest constants are used to define this memory area to be used
    by USBD ROM stack.
  */
@@ -75,6 +80,8 @@ extern const uint8_t USB_DeviceDescriptor[];
 extern uint8_t USB_FsConfigDescriptor[];
 extern const uint8_t USB_StringDescriptor[];
 extern const uint8_t USB_DeviceQualifier[];
+
+extern uint8_t MSC_SCSI_InquiryString[];
 
 /**
  * @brief	Find the address of interface descriptor for given class type.
