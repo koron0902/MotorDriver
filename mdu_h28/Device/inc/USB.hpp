@@ -101,7 +101,7 @@ static inline uint32_t Write(char c){//非推奨
 char ReadByte();
 std::string Read();
 
-
+void Claer();
 
 }
 
