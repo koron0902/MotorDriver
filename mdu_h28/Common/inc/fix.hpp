@@ -22,11 +22,8 @@ struct fix32 {
 	int32_t word;
 
 	//初期化因子
-private:
-	fix32() {
-		word = 0;
-	}
-public:
+	fix32():word(0){}
+
 	constexpr fix32(const fix32& x) = default;
 	constexpr fix32(int32_t x) :
 			word(x) {
@@ -127,19 +124,19 @@ public:
 		return fix32(word /= x);
 	}
 
-	fix32 operator +(const fix32& x) {
+	fix32 operator +(const fix32& x)const {
 		return fix32(word + x.word);
 	}
 
-	fix32 operator +(int32_t x) {
+	fix32 operator +(int32_t x)const {
 		return fix32(word + (x << shift));
 	}
 
-	fix32 operator -(const fix32& x) {
+	fix32 operator -(const fix32& x)const {
 		return fix32(word - x.word);
 	}
 
-	fix32 operator -(int32_t x) {
+	fix32 operator -(int32_t x)const {
 		return fix32(word - (x << shift));
 	}
 
@@ -236,10 +233,11 @@ struct fix16 {
 	const static fix16 Max, Min, Eps, One;
 	int16_t half;
 private:
+	fix16(): half(0) {}
+public:
 	fix16(int16_t value) :
 			half(value) {
 	}
-public:
 	fix16(const fix16&) = default;
 
 	static fix16 CreateInt(int16_t a) {

@@ -22,7 +22,7 @@ void SetAction(uint8_t ch,uint32_t hz,const std::function<void(void)>& action=nu
 
 void ResetSystemTimer();
 clock_t GetSystemTime();//起動してからの大まかな目安
-
+void Delay(clock_t);
 }
 }
 

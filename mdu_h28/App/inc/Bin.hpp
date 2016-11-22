@@ -25,7 +25,7 @@ std::string ls(const std::vector<std::string>&);
 std::string tree(const std::vector<std::string>&);
 
 std::string info(const std::vector<std::string>&);//システムの状態を表示する
-
+std::string repeat(const std::vector<std::string>&);
 }
 } /* namespace Device */
 
