@@ -24,6 +24,8 @@ static inline void WriteLine(const std::string& text){
 
 void Claer();
 
+void Flush();//送信同期
+
 
 
 }

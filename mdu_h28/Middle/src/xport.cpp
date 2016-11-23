@@ -36,5 +36,11 @@ void Claer(){
 	USB::Claer();
 }
 
+void Flush(){
+	if (USB::IsConnected()){
+	USB::Flush();
+	}
+}
+
 }
 }

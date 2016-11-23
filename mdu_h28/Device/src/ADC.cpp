@@ -23,8 +23,8 @@ uint16_t GetVlotB(){return VlotB;}
 uint16_t GetVlotC(){return VlotC;}
 
 void Init() {
-#if 0
 
+#if 0
 	//supply clock
 	Chip_ADC_Init(LPC_ADC0, 0);
 	Chip_ADC_Init(LPC_ADC1, 0);
@@ -38,7 +38,7 @@ void Init() {
 	Chip_ADC_SetupSequencer(LPC_ADC0, ADC_SEQA_IDX, //
 			ADC_SEQ_CTRL_CHANSEL(
 					10) | ADC_SEQ_CTRL_CHANSEL(9) | ADC_SEQ_CTRL_CHANSEL(11) |	//
-					ADC_SEQ_CTRL_BURST);
+					ADC_SEQ_CTRL);
 	//Note 電圧検知(SV(1,2),SV_C(1,3),SV_B(1,5),SV_A(1,4)) 補足 SV_Bは本来LED0の場所である。
 	Chip_ADC_SetupSequencer(LPC_ADC1,
 			ADC_SEQA_IDX, //
@@ -51,8 +51,8 @@ void Init() {
 
 	//補正を掛ける
 	Chip_ADC_StartCalibration(LPC_ADC0);
-	Chip_ADC_StartCalibration(LPC_ADC1);
 	while (!Chip_ADC_IsCalibrationDone(LPC_ADC0));
+	Chip_ADC_StartCalibration(LPC_ADC1);
 	while (!Chip_ADC_IsCalibrationDone(LPC_ADC1));
 
 	//Cross Point、割り込みを作成する場合ここに挿入。
@@ -75,6 +75,7 @@ void Init() {
 #endif
 }
 
+#if 0
 extern "C"
 void ADC0A_IRQHandler(void)
 {
@@ -90,7 +91,8 @@ void ADC0A_IRQHandler(void)
 	AmpC=Chip_ADC_GetDataReg(LPC_ADC0,11);
 
 	/* Clear any pending interrupts */
-	Chip_ADC_ClearFlags(LPC_ADC0, pending);
+	//Chip_ADC_ClearFlags(LPC_ADC0, pending);
+	Chip_ADC_ClearFlags(LPC_ADC0, ADC_FLAGS_SEQA_INT_MASK);
 }
 
 extern "C"
@@ -109,9 +111,10 @@ void ADC1A_IRQHandler(void)
 	VlotC=Chip_ADC_GetDataReg(LPC_ADC1,4);
 
 	/* Clear Sequence A completion interrupt */
-	Chip_ADC_ClearFlags(LPC_ADC1, pending);
+	//Chip_ADC_ClearFlags(LPC_ADC1, pending);
+	Chip_ADC_ClearFlags(LPC_ADC1, ADC_FLAGS_SEQA_INT_MASK);
 }
-
+#endif
 }
 
 } /* namespace Device */

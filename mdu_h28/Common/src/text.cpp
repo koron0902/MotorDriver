@@ -47,25 +47,25 @@ string Space(const string& str, unsigned int s) {
 }
 
 string ToStr(int64_t value) {
-	string ans = "";
-	ans.reserve(64);
-	std::stack<char> sp;
-
-	int a = common::abs(value);
+	string ans;
+	ans.reserve(32);
+	vector<char> sp;
+	sp.reserve(32);
+	int64_t a = common::abs(value);
 	bool sign = common::sign(value);
 
 	while (a > 0) {
-		sp.push(ToChar(a % 10));
+		sp.push_back(ToChar(a % 10));
 		a /= 10;
 	}
 
 	if (sp.empty()) {
 		return "0";
 	} else {
-		if (!sign)ans='-';
+		if (sign)ans='-';
 		do{
-			ans+=sp.top();
-			sp.pop();
+			ans+=sp.back();
+			sp.pop_back();
 		}while (!sp.empty());
 		return ans;
 	}
