@@ -33,6 +33,8 @@ uint32_t GetIndex();
 void SetTimer(uint32_t clock);
 uint32_t GetVelcoity();
 
+extern volatile uint32_t* QEIVel;
+
 }
 
 } /* namespace Device */

@@ -3,6 +3,7 @@
 #include <ADC.hpp>
 #include <text.hpp>
 #include <xport.hpp>
+#include <QEI.hpp>
 using namespace App::File;
 using namespace std;
 using namespace Device;
@@ -14,6 +15,7 @@ Directory* Create(){
 	Directory* dir=Directory::Create("dev");
 	dir->Add(CreateUart());
 	dir->Add(CreateADC());
+	dir->Add(FileInt32::Create("qei", (int32_t*)QEI::QEIVel));
 
 	return dir;
 }
