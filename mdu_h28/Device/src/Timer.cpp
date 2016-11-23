@@ -26,12 +26,26 @@ void Init(){
 
 void SetAction(uint8_t ch,uint32_t hz,const function<void(void)>& action){
 	//hzに0を入れる馬鹿はいないと信じている。
-	auto* p= Chip_MRT_GetRegPtr(ch);
+	auto* p = Chip_MRT_GetRegPtr(ch);
 	lstAction[ch]=action;
 	if (action!=nullptr){
 		Chip_MRT_SetDisabled(p);//一回動作を止める。
-		Chip_MRT_SetInterval(p,SystemCoreClock/hz|MRT_INTVAL_LOAD);//強制書き換え
-		Chip_MRT_SetMode(p,MRT_MODE_REPEAT);
+		Chip_MRT_SetInterval(p, (SystemCoreClock/hz) | MRT_INTVAL_LOAD);//強制書き換え
+		Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
+		Chip_MRT_SetEnabled(p);
+	}else{
+		Chip_MRT_SetDisabled(p);
+	}
+}
+
+void SetAction(uint8_t ch,uint32_t hz,function<void(void)>&& action){
+	//hzに0を入れる馬鹿はいないと信じている。
+	auto* p = Chip_MRT_GetRegPtr(ch);
+	lstAction[ch]=move(action);
+	if (action!=nullptr){
+		Chip_MRT_SetDisabled(p);//一回動作を止める。
+		Chip_MRT_SetInterval(p, (SystemCoreClock/hz) | MRT_INTVAL_LOAD);//強制書き換え
+		Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
 		Chip_MRT_SetEnabled(p);
 	}else{
 		Chip_MRT_SetDisabled(p);
