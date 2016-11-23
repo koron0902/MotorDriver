@@ -144,15 +144,15 @@ struct fix32 {
 		return fix32(((int64_t) word * x.word) >> shift);
 	}
 
-	constexpr fix32 operator *(int32_t x) {
+	constexpr fix32 operator *(int32_t x) const{
 		return fix32(word * x);
 	}
 
-	constexpr fix32 operator /(const fix32& x) {
+	constexpr fix32 operator /(const fix32& x) const{
 		return fix32(((((int64_t) word) << shift) / x.word));
 	}
 
-	constexpr fix32 operator /(int32_t x) {
+	constexpr fix32 operator /(int32_t x)const {
 		return fix32(word / x);
 	}
 
