@@ -13,6 +13,8 @@ template<class T, unsigned int X, unsigned int Y> struct Matrix {
 	using Mat=Matrix<T,X,Y>;
 	constexpr static uint size = X * Y;
 	constexpr static uint None=std::min(X,Y);
+	constexpr static uint Row=X;
+	constexpr static uint Column=Y;
 
 	T dat[X * Y];
 
@@ -153,6 +155,24 @@ template<class T, unsigned int X, unsigned int Y> struct Matrix {
 		}
 		return std::move(temp);
 	}
+
+	Matrix<T,X,1> GetRow(uint n)const{
+		Matrix<T,X,1> temp;
+		for (uint idx=0;idx<X;idx++){
+			temp(idx,0)=(*this)(idx,n);
+		}
+		return std::move(temp);
+	}
+
+	Matrix<T,1,Y> GetColumn(uint m)const{
+		Matrix<T,1,Y> temp;
+		for (uint idx=0;idx<Y;idx++){
+			temp(0,idx)=(*this)(m,idx);
+		}
+		return std::move(temp);
+	}
+
+
 };
 
 extern template class Matrix<fix32,4,1>;

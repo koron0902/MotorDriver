@@ -51,6 +51,7 @@ char ReadByte();
 std::string Read(size_t sz);
 std::string ReadLine();
 void Claer();//Read Bufferを削除
+bool IsBusy();
 }
 
 

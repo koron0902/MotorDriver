@@ -45,7 +45,7 @@ void CommandLine() {
 	}
 
 	if (!usb_flag && USB::IsConnected()) {
-		USB::vcom_write((uint8_t*) "Connected!!\r\n", 15);
+		//USB::Write((uint8_t*) "Connected!!\r\n", 15);
 		usb_flag = true;
 	}
 
@@ -57,6 +57,7 @@ void CommandLine() {
 				buffer_usb+=c;
 			}else{
 				USB::WriteLine(Shell::Call(buffer_usb));
+				USB::Flush();
 				buffer_usb="";
 			}
 		}

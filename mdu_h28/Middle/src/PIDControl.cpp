@@ -14,6 +14,7 @@
 #include <ADC.hpp>
 #include <PWM.hpp>
 #include <motor.hpp>
+#include <region.hpp>
 
 namespace Middle{
 	namespace Controller{

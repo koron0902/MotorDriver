@@ -6,7 +6,9 @@
 #include <stdio.h>
 #include <xport.hpp>
 #include <Shell.hpp>
-#include <Timer.hpp>
+#include <SysTick.hpp>
+#include <cmsis.h>
+#include <core_cm3.h>
 using namespace std;
 using namespace App::File;
 using namespace common;
@@ -24,7 +26,9 @@ Directory* Create() {
 	bin->Add(Execute::Create("ls", ls));
 	bin->Add(Execute::Create("tree", tree));
 	bin->Add(Execute::Create("info", info));
+	bin->Add(Execute::Create("stmp", stmp));
 	bin->Add(Execute::Create("repeat", repeat));
+	bin->Add(Execute::Create("reboot",reboot));
 	return bin;
 }
 
@@ -116,18 +120,26 @@ std::string tree(const std::vector<std::string>& dummy) {
 
 std::string info(const std::vector<std::string>& dummy) {
 	string ss;
+	ss.reserve(64);
 	ss += "System info" + newline;
 	ss += "File Memory[Byte]:" + (FileBase::GetMemorySizeAll()) + ','
 			+ ToStr(FileBase::GetMemorySizeUsed()) + ','
 			+ ToStr(FileBase::GetMemorySizeFree()) + newline;
-	ss = +"Stamp:" + ToStr(Device::Timer::GetSystemTime()) + newline;
+	ss = +"Stamp:" + ToStr(Device::Tick::Tick()) + newline;
 	return ss;
+}
+
+std::string stmp(const std::vector<std::string>& dummy){
+	uint64_t temp=Device::Tick::Tick();
+	return ToStr(temp);
 }
 
 std::string repeat(const std::vector<std::string>& vec) {
 	//この関数は本来、stringに返すことをバッファーがオーバーフローすることを防ぐためXPortで出力する。
+	using namespace Device::Tick;
 	using namespace Middle::XPort;
 	std::vector<std::string> sub;
+	uint64_t w;
 	//一つ目を飛ばして再作成
 	for (unsigned int idx = 1; idx < vec.size(); idx++) {
 		sub.push_back(vec[idx]);
@@ -136,9 +148,16 @@ std::string repeat(const std::vector<std::string>& vec) {
 	WriteLine("!finish before pressing any keys");
 	while (IsEmpty()) {
 		WriteLine(Shell::Call(sub));
-		Device::Timer::Delay(100000); //特に意味はない
+		Flush();
+		w=Tick()+0xFFF;
+		while  (Tick()<w);
 	}
 	return "!Fin";
+}
+
+std::string reboot(const std::vector<std::string>& dummy){
+NVIC_SystemReset();
+return "";//dummy cannot reach here
 }
 
 }
