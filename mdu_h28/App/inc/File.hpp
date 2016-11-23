@@ -13,6 +13,8 @@
 #include <string>
 #include <stdint.h>
 #include <functional>
+#include <fix.hpp>
+
 
 namespace App {
 namespace File{
@@ -24,6 +26,7 @@ enum class FileType:uint16_t{
 	FileInt32,
 	FileFloat,
 	FileString,
+	FileFix,
 };
 
 union FileMode{
@@ -112,7 +115,7 @@ private:
 	int32_t* data;
 	FileInt32(const std::string& filename,int32_t* d);
 public:
-	static FileInt32* Create(const std::string& filename,int32_t* d);
+	static FileInt32* Create(const std::string& filename,int32_t* d=nullptr);
 	std::string GetData();
 	std::string SetData(const std::string&);
 	virtual std::string operator()(std::vector<std::string>&);
@@ -123,7 +126,7 @@ private:
 	float* data;
 	FileFloat(const std::string& filename,float* f);
 public:
-	static FileFloat* Create(const std::string& filename,float* f);
+	static FileFloat* Create(const std::string& filename,float* f=nullptr);
 	std::string GetData();
 	std::string SetData(const std::string&);
 	virtual std::string operator()(std::vector<std::string>&);
@@ -132,13 +135,27 @@ public:
 class FileString:public FileBase{
 private:
 	std::string* data;
-	FileString(const std::string& filename,std::string* str);
+	FileString(const std::string& filename,std::string* str=nullptr);
 public:
 	static FileString* Create(const std::string& filename,std::string* str);
 	std::string GetData();
 	std::string SetData(const std::string&);
 	virtual std::string operator()(std::vector<std::string>&);
 };
+
+
+using namespace common;
+class FileFix:public FileBase{
+private:
+	fix32* data;
+	FileFix(const std::string& filename,fix32* f=nullptr);
+public:
+	static FileFix* Create(const std::string& filename,fix32* f);
+	std::string GetData();
+	std::string SetData(const std::string&);
+	virtual std::string operator()(std::vector<std::string>&);
+};
+
 
 extern Directory *root,*current;
 
