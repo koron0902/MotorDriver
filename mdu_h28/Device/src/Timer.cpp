@@ -41,8 +41,8 @@ void SetAction(uint8_t ch,uint32_t hz,const function<void(void)>& action){
 void SetAction(uint8_t ch,uint32_t hz,function<void(void)>&& action){
 	//hzに0を入れる馬鹿はいないと信じている。
 	auto* p = Chip_MRT_GetRegPtr(ch);
-	lstAction[ch]=move(action);
-	if (action!=nullptr){
+	//lstAction[ch]=move(action);
+	if ((lstAction[ch] = move(action)) != nullptr){
 		Chip_MRT_SetDisabled(p);//一回動作を止める。
 		Chip_MRT_SetInterval(p, (SystemCoreClock/hz) | MRT_INTVAL_LOAD);//強制書き換え
 		Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
@@ -79,7 +79,7 @@ void MRT_IRQHandler(void)
 	
 	for (int ch=0;ch<MRT_CHANNELS_NUM;ch++){
 		if (int_pend&MRTn_INTFLAG(ch)){
-			auto func=lstAction[ch];
+			auto& func=lstAction[ch];
 			if (func!=nullptr)func();
 		}
 	}
