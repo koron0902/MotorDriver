@@ -45,15 +45,14 @@ namespace Middle{
 			};
 			MotorState_t mLastState, mNextState;
 
-			//void Calclate(MotorState_t& last, MotorState_t& next);
 			void Proc(MotorState_t&, MotorState_t&);
+			void SetFreq(fix32 freq);
+			void SetFreq(uint32_t freq);
 		public:
 			PID();
 			PID(const PID&) = default;
 			virtual ~PID();
 			//void Proc();
-			void SetFreq(fix32 freq);
-			void SetFreq(uint32_t freq);
 			void SetGainP(fix32 p);
 			void SetGainP(float p);
 			void SetGainI(fix32 i);
@@ -71,6 +70,8 @@ namespace Middle{
 			void operator ()(void){
 				Proc(mLastState, mNextState);
 			}
+
+
 		};
 	}
 }

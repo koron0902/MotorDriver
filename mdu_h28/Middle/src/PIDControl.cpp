@@ -41,7 +41,7 @@ namespace Middle{
 
 
 		void PID::Proc(MotorState_t& last, MotorState_t& next){
-			mNextState.mRealSpeed = fix32::CreateFloat(Device::QEI::GetVelcoity()) * mFreq / mEncoderResolution;
+			mNextState.mRealSpeed = fix32::CreateFloat(Device::QEI::GetVelcoity()) / mEncoderResolution;
 			const fix32 gains[] = {mKp, mKi, mKd, mKe};
 			const Matrix<fix32, 1, 4> GainMatrix(gains[0]);
 			Matrix<fix32, 4, 1> in_vector;
@@ -50,7 +50,7 @@ namespace Middle{
 			static const fix32 BatteryVoltage = fix32::CreateFloat(16.8f);//Device::ADC::GetVlot();
 			static const fix32 Volt2Duty = fix32::One / BatteryVoltage;
 
-			error = fix32::CreateInt(100);//next.mTargetSpeed - next.mRealSpeed;
+			error = fix32::CreateInt(1);//next.mTargetSpeed - next.mRealSpeed;
 			integ = last.mIntegration + error;
 			static constexpr fix32 min = -150 << fix32::shift;
 			static constexpr fix32 max = 150 << fix32::shift;
@@ -63,7 +63,7 @@ namespace Middle{
 
 			auto output = GainMatrix * in_vector;
 
-			output *= Volt2Duty;
+			output(0, 0) *= Volt2Duty;
 			duty = output(0, 0);
 			duty = regions::one.Fit(duty);
 
