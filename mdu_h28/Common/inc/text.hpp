@@ -1,10 +1,11 @@
 #ifndef COMMON_INC_TEXT_HPP_
 #define COMMON_INC_TEXT_HPP_
-
+#include <type.hpp>
 #include <fix.hpp>
 #include <string>
 #include <vector>
-
+#include <matrix.hpp>
+#include <fix.hpp>
 namespace common {
 
 	constexpr char newline ='\r';
@@ -14,10 +15,13 @@ namespace common {
 	std::string Space(const std::string& str,unsigned int s=0);//cがs個繰り返された文字列
 
 	std::string ToStr(int64_t);
-
+	std::string ToStr(fix32);
+	template <class T,uint X,uint Y>std::string ToStr(const Matrix<T,X,Y>&);
 
 	common::fix32 ToFix(const std::string&);
 	int32_t ToInt(const std::string&);
+
+
 
 
 	//トークン処理用
@@ -41,6 +45,11 @@ namespace common {
 		return '0'+value;
 	}
 
+	//
+
+
+
 } /* namespace common */
 
+#include <text.tpp>
 #endif /* COMMON_INC_TEXT_HPP_ */

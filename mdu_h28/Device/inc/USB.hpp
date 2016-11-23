@@ -31,10 +31,10 @@ namespace USB {
  * Structure containing Virtual Comm port control data
  */
 
-constexpr size_t RxBufferSize=64;//二次バッファの大きさ(受信)
-constexpr size_t TxBufferSize=128;//二次バッファの大きさ(送信)
-//constexpr size_t TxBufferLimit=96;//Flushする時のサイズ 50%以上90％以下を推奨
-constexpr size_t RxTempSize=16;//二次バッファへ移動する際のバッファの大きさ(スタックに乗る)
+constexpr size_t RxBufferSize=128;//二次バッファの大きさ(受信)
+constexpr size_t TxBufferSize=256;//二次バッファの大きさ(送信)
+constexpr size_t TxBufferLimit=128;//Flushする時のサイズ 50%以上90％以下を推奨
+constexpr size_t RxTempSize=32;//二次バッファへ移動する際のバッファの大きさ(スタックに乗る)
 
 // TODO USB header stub
 void Init();

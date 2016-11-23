@@ -11,7 +11,7 @@ namespace common {
 vector<string> Split(const string& text, const string& seq) {
 	vector<string> arg;
 	string line;
-	
+
 	for (char s : text) {
 		bool flag = false; //分割フラグ
 		for (char cmp : seq) {
@@ -47,13 +47,10 @@ string Space(const string& str, unsigned int s) {
 }
 
 string ToStr(int64_t value) {
-	string ans;
-	ans.reserve(32);
+
 	vector<char> sp;
 	sp.reserve(32);
 	int64_t a = common::abs(value);
-	bool sign = common::sign(value);
-
 	while (a > 0) {
 		sp.push_back(ToChar(a % 10));
 		a /= 10;
@@ -62,14 +59,33 @@ string ToStr(int64_t value) {
 	if (sp.empty()) {
 		return "0";
 	} else {
-		if (sign)ans='-';
-		do{
-			ans+=sp.back();
+		string ans=sign(value)?"-":"";
+		do {
+			ans += sp.back();
 			sp.pop_back();
-		}while (!sp.empty());
+		} while (!sp.empty());
 		return ans;
 	}
 
+}
+
+std::string ToStr(fix32 value) {
+	constexpr static int32_t d[] { (1 << 16) / 10, (1 << 16) / 100, (1 << 16)
+			/ 1000, (1 << 16) / 10000 };
+
+	int32_t num, point;
+	fix32 a= abs(value);
+	num = a.GetInt();
+	point = a.GetPoint();
+
+	string ans = ToStr(num) + ".";
+	uint idx;
+	for (idx=0;idx<4-1;idx++) {
+		ans+=ToChar(point/d[idx]);
+		point%=d[idx];
+	}
+	ans+=ToChar(value/d[idx]);
+	return ans;
 }
 
 fix32 ToFix(const std::string& text) {
