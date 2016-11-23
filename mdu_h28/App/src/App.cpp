@@ -7,6 +7,7 @@
 #include <USB.hpp>
 #include <text.hpp>
 #include <DRV.hpp>
+#include <ADC.hpp>
 #define forever() for(;;)
 
 using namespace Device;
@@ -26,8 +27,6 @@ void Init() {
 }
 
 void CommandLine() {
-
-
 	char c;
 	while (!Uart::IsEmpty()) {
 		c = Uart::ReadByte();
@@ -70,6 +69,7 @@ void Run() {
 
 		CommandLine();
 		Middle::DRV::Update();
+		Device::ADC::Trigger();
 	}
 	//can't reach here
 }

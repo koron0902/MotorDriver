@@ -54,7 +54,7 @@ File::Directory* CreateADC(){
 		out+=ToStr(ADC::GetVlotA())+",";
 		out+=ToStr(ADC::GetVlotB())+",";
 		out+=ToStr(ADC::GetVlotC());
-
+		ADC::Trigger();
 		return out;
 	}));
 	Middle::XPort::Write("pass");

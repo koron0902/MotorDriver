@@ -143,12 +143,19 @@ void Init() {
 	//あとで割り込み対応に
 	//DRV(analog)
 	SetAnalog(SA_A);
+	SetFuncFix(SWM_FIXED_ADC0_9);
 	SetAnalog(SA_B);
+	SetFuncFix(SWM_FIXED_ADC0_10);
 	SetAnalog(SA_C);
+	SetFuncFix(SWM_FIXED_ADC0_11);
 	SetAnalog(SV_A);
+	SetFuncFix(SWM_FIXED_ADC1_4);
 	SetAnalog(SV_B);
+	SetFuncFix(SWM_FIXED_ADC1_5);//NOTE 代替ピン
 	SetAnalog(SV_C);
+	SetFuncFix(SWM_FIXED_ADC1_3);
 	SetAnalog(SV);
+	SetFuncFix(SWM_FIXED_ADC1_2);
 	SetOpen(SV_B_Alt);	//Note 代替のため
 
 	//DRV(Other)
