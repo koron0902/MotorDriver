@@ -1,5 +1,5 @@
-#include "Mid.h"
 #include <motor.hpp>
+#include <Mid.hpp>
 #include <stdlib.h>
 #include <text.hpp>
 using namespace Middle;

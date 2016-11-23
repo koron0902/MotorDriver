@@ -11,6 +11,7 @@
 #include "usb/app_usbd_cfg.h"
 #include <ring_buffer.h>
 #include <eeprom.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -45,8 +46,12 @@ static USB_INTERFACE_DESCRIPTOR *find_IntfDesc(const uint8_t *pDesc,
 static ErrorCode_t vcom_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
 		USBD_API_INIT_PARAM_T *pUsbParam);
 
-static uint8_t rxraw[RxBufferSize];
-static RINGBUFF_T rxbuf;
+//キューとして実装
+static uint8_t RxRaw[RxBufferSize];
+static RINGBUFF_T RxBuf;
+//単純配列として実装。
+static char TxBuf[TxBufferSize];
+static size_t TxPos;
 
 /* Find the address of interface descriptor for given class type. */
 USB_INTERFACE_DESCRIPTOR *find_IntfDesc(const uint8_t *pDesc,
@@ -121,28 +126,9 @@ void Init() {
 		}
 	}
 
-	// for testing only
-	/*
-	while (1) {
-		// Check if host has connected and opened the VCOM port
-		if ((Connected() != 0) && (prompt == 0)) {
-			Write("Hello World!!\r\n", 15);
-			prompt = 1;
-		}
-		// If VCOM port is opened echo whatever we receive back to host.
-		if (prompt) {
-			rdCnt = Bread(&g_rxBuff[0], 256);
-			if (rdCnt) {
-				Write(&g_rxBuff[0], rdCnt);
-			}
-		}
-		// Sleep until next IRQ happens
-		__WFI();
-	}
-	*/
+	//Second Buffer
+	RingBuffer_Init(&RxBuf,RxRaw,sizeof(RxRaw[0]),RxBufferSize);
 
-	//RxBuffer
-	RingBuffer_Init(&rxbuf,rxraw,sizeof(rxraw[0]),RxBufferSize);
 }
 
 /* VCOM bulk EP_IN endpoint handler */
@@ -302,7 +288,8 @@ uint32_t vcom_read_cnt(void) {
 }
 
 /* Virtual com port write routine*/
-uint32_t vcom_write(uint8_t *pBuf, uint32_t len) {
+//uint32_t vcom_write(uint8_t *pBuf, uint32_t len) {
+uint32_t WriteDirect(uint8_t *pBuf, uint32_t len) {
 	VCOM_DATA *pVcom = &g_vCOM;
 	uint32_t ret = 0;
 
@@ -381,24 +368,24 @@ bool IsConnected() {
 static void ReadUpData() {
 	uint8_t buf[RxTempSize];
 	uint32_t len;
-	uint32_t idx;
+	//uint32_t idx;
 	while ((len = vcom_bread(buf, RxTempSize)) > 0) {
-		RingBuffer_InsertMult(&rxbuf,buf,len);
+		RingBuffer_InsertMult(&RxBuf,buf,len);
 	}
 }
 
 uint32_t GetDepth(){
-	return RingBuffer_GetCount(&rxbuf);
+	return RingBuffer_GetCount(&RxBuf);
 }
 bool IsEmpty(){
 	ReadUpData();
-	return RingBuffer_IsEmpty(&rxbuf);
+	return RingBuffer_IsEmpty(&RxBuf);
 }
 
 char ReadByte() {
 	ReadUpData();
 	char c;
-	RingBuffer_Pop(&rxbuf,&c);
+	RingBuffer_Pop(&RxBuf,&c);
 	return c;
 }
 
@@ -407,12 +394,40 @@ string Read() {
 	char c;
 	ReadUpData();
 	while (!IsEmpty()) {
-		RingBuffer_Pop(&rxbuf,&c);
+		RingBuffer_Pop(&RxBuf,&c);
 		s+=c;
 	}
 	return s;
 }
 
+void Claer(){
+	RingBuffer_Flush(&RxBuf);
+}
+
+bool IsBusy(){
+	VCOM_DATA *pVcom = &g_vCOM;
+	return pVcom->tx_flags & VCOM_TX_BUSY;
+}
+
+void Flush(){
+	//前提としてまだオーバーフローしていないこと
+	WriteDirect((uint8_t*)TxBuf,TxPos);//TxBufは先でコピーされる
+	TxPos=0;
+}
+
+void Write(const char* byte,size_t size){
+	size_t cs=0;
+	size_t ncs;
+	if (TxPos+size-1>TxBufferSize){
+		cs= TxBufferSize-TxPos-1;//seek分
+		memcpy(&TxBuf[TxPos],byte,cs);
+		Flush();
+	}
+
+	ncs=min(size-cs,TxBufferSize);//コピーする分
+	memcpy(&TxBuf[TxPos],&byte[cs],ncs);
+	TxPos+=ncs;
+}
 
 //割り込み
 extern "C" void USB_IRQHandler(void) {

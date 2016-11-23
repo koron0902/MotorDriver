@@ -9,6 +9,7 @@
 #include <Uart.hpp>
 #include <USB.hpp>
 #include <SPI.hpp>
+#include <SysTick.hpp>
 
 namespace Device {
 
@@ -16,7 +17,7 @@ void Init(){
 	//using module supply clock
 	Chip_SetupXtalClocking();
 	SystemCoreClockUpdate();
-
+	Tick::Init();
 	//Each Function Initialize
 	Port::Init();
 

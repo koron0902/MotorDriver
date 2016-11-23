@@ -115,12 +115,18 @@ string ReadLine() {
 	return move(s);
 }
 
+void Claer(){
+	RingBuffer_Flush(&RxBuf);
+}
+
+bool IsBusy(){
+	return !RingBuffer_IsEmpty(&TxBuf);
 }
 
 extern "C" void UART0_IRQHandler(void) {
 	Chip_UART_IRQRBHandler(LPC_USART0, &RxBuf, &TxBuf);
 }
 
-
+}
 
 } /* namespace Device */

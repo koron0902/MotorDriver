@@ -1,13 +1,5 @@
-/*
- * ADC.h
- *
- *  Created on: 2016/11/06
- *      Author: TERU
- */
 
-#ifndef DEVICE_ADC_H_
-#define DEVICE_ADC_H_
-
+#pragma once
 #include <stdint.h>
 
 namespace Device {
@@ -28,5 +20,3 @@ void Init();
 }
 
 } /* namespace Device */
-
-#endif /* DEVICE_ADC_H_ */

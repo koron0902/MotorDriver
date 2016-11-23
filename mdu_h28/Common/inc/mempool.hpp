@@ -88,6 +88,8 @@ public:
 		return size * CountUsed();
 	}
 
+
+
 };
 
 } /* namespace common */

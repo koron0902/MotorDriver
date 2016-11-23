@@ -23,6 +23,8 @@ using q16_t =uint16_t;
 using q15_t=int16_t;
 using q8_t =uint8_t;
 using q7_t =int8_t;
+
+using uint=unsigned int;
 }
 
 #endif /* COMMON_INC_TYPE_HPP_ */

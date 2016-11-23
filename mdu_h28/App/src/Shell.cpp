@@ -1,10 +1,10 @@
 #include <Bin.hpp>
 #include <Dev.hpp>
+#include <Mid.hpp>
 #include <text.hpp>
 #include "TaskManager.hpp"
 #include <Shell.hpp>
 #include <Uart.hpp>
-#include <Mid.h>
 using namespace std;
 using namespace common;
 using namespace App::File;
@@ -24,8 +24,9 @@ void Init() {
 	Directory* bin;
 	current = root = Directory::Create("root");
 	root->Add(bin=Bin::Create());
-	root->Add(CreateDev());
+	root->Add(Dev::Create());
 	root->Add(Mid::Create());
+
 	path.push_back(bin);
 }
 
@@ -46,6 +47,9 @@ string Call(std::vector<std::string>& arg) {
 	}
 	return "Not Exist";
 }
+
+
+
 
 string Call(const string& text) {
 	auto v = Split(text, " ");
