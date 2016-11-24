@@ -6,7 +6,7 @@
  */
 
 #include <bits.hpp>
-#include <chip.h>
+#include <chip.hpp>
 #include <Port.hpp>
 #include <PWM.hpp>
 #include <unit.hpp>

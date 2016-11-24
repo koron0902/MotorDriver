@@ -1,4 +1,4 @@
-#include <chip.h>
+#include <chip.hpp>
 #include <Timer.hpp>
 #include <array>
 

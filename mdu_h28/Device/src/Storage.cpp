@@ -1,4 +1,4 @@
-#include <chip.h>
+#include <chip.hpp>
 #include <string.h>
 #include <stdio.h>
 #include <Storage.hpp>
@@ -31,13 +31,13 @@ EFile::EFile(EFileID id){
 }
 
 void EFile::Write(const char* data,size_t size){
-	uint8_t ret=
-	Chip_EEPROM_Write(m_base+m_pos,(uint8_t*)data,size);
+	/*uint8_t ret=
+	Chip_EEPROM_Write(m_base+m_pos,(uint8_t*)data,size);*/
 }
 
 void EFile::Read(char* data,size_t size){
-	uint8_t ret=
-	Chip_EEPROM_Read(m_base+m_pos,(uint8_t*)data,size);
+	/*uint8_t ret=
+	Chip_EEPROM_Read(m_base+m_pos,(uint8_t*)data,size);*/
 }
 
 

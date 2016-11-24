@@ -30,10 +30,10 @@
  */
 
 #include <App.hpp>
+#include <chip.hpp>
 #include <Device.hpp>
 #include "FreeRTOS.h"
 #include <Middle.hpp>
-#include "chip.h"
 #include <stdio.h>
 
 

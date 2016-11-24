@@ -5,8 +5,8 @@
  *      Author: hamus
  */
 
+#include <Motor.hpp>
 #include "Middle.hpp"
-#include "motor.hpp"
 namespace Middle {
 
 

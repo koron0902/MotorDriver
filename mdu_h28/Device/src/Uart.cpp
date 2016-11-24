@@ -5,10 +5,9 @@
  *      Author: TERU
  */
 
-#include <chip.h>
+#include <chip.hpp>
+#include <ring_buffer.hpp>
 #include <cstring>
-#include <ring_buffer.h>
-
 #include <TaskManager.hpp>
 #include <Uart.hpp>
 

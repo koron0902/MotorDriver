@@ -1,5 +1,5 @@
 #include <ADC.hpp>
-#include <chip.h>
+#include <chip.hpp>
 #include <unit.hpp>
 using namespace common;
 
@@ -97,10 +97,9 @@ void Trigger() {
 }
 
 extern "C" void ADC0A_IRQHandler(void) {
-	uint32_t pending;
 
 	/* Get pending interrupts */
-	pending = Chip_ADC_GetFlags(LPC_ADC0);
+
 
 //ここで結果を得る。
 //Note 電流感知(SA_B(0,10),SA_A(0,9),SA_C(0,11))
@@ -114,10 +113,7 @@ extern "C" void ADC0A_IRQHandler(void) {
 }
 
 extern "C" void ADC1A_IRQHandler(void) {
-	uint32_t pending;
 
-	/* Get pending interrupts */
-	pending = Chip_ADC_GetFlags(LPC_ADC1);
 
 //ここで結果を得る
 //Note 電圧検知(SV(1,2),SV_C(1,3),SV_B(1,5),SV_A(1,4)) 補足 SV_Bは本来LED0の場所である。

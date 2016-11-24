@@ -1,8 +1,8 @@
-#include <chip.h>
+#include <chip.hpp>
+#include <ring_buffer.hpp>
 #include <string.h>
 #include <USB.hpp>
 #include "usb/app_usbd_cfg.h"
-#include <ring_buffer.h>
 #include <algorithm>
 
 using namespace std;

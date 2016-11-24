@@ -1,4 +1,4 @@
-#include <motor.hpp>
+#include <Motor.hpp>
 #include <PWM.hpp>
 #include "DRV.hpp"
 #include <functional>

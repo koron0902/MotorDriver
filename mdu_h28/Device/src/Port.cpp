@@ -5,7 +5,7 @@
  *      Author: TERU
  */
 
-#include <chip.h>
+#include <chip.hpp>
 #include <Port.hpp>
 
 namespace Device {
