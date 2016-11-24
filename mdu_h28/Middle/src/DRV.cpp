@@ -7,6 +7,8 @@
 
 #include "DRV.hpp"
 #include "SPI.hpp"
+#include <string>
+#include <cstdlib>
 
 #define WRITE		(0 << 15)
 #define READ		(1 << 15)
@@ -75,6 +77,33 @@ namespace Middle {
 			uint16_t buf;
 			uint16_t packet = WRITE | REGISTER(reg) | data;
 			return Device::SPI::ReadWrite(&packet, &buf);
+		}
+
+		const std::string Gain(const std::string& str){
+			int gain = std::atoi(str.c_str());
+			bool status = false;
+
+			if(gain == 10){
+				for(int ch = 0;ch < 3;ch++){
+					status = status | SetGain(ch, GAIN_T::GAIN_10);
+				}
+			}else if(gain == 20){
+				for(int ch = 0;ch < 3;ch++){
+					status = status | SetGain(ch, GAIN_T::GAIN_20);
+				}
+			}else if(gain == 40){
+				for(int ch = 0;ch < 3;ch++){
+					status = status | SetGain(ch, GAIN_T::GAIN_40);
+				}
+			}else if(gain == 80){
+				for(int ch = 0;ch < 3;ch++){
+					status = status | SetGain(ch, GAIN_T::GAIN_80);
+				}
+			}else{
+				return "Not supported gain. Gain change failed";
+			}
+
+			return status == true ? "" : "Gain change failed";
 		}
 
 		bool SetGain(const uint16_t ch, const GAIN_T gain){
