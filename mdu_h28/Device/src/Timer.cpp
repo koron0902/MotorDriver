@@ -1,4 +1,4 @@
-#include <chip.h>
+#include <chip.hpp>
 #include <Timer.hpp>
 #include <array>
 
@@ -50,7 +50,10 @@ clock_t GetSystemTime(){
 	return (clock_t)((uint64_t)p->COUNTER_H<<32)+(uint64_t)p->COUNTER;
 }
 
-
+void Delay(clock_t clk){
+	ResetSystemTimer();
+	while (GetSystemTime()<clk);
+}
 
 extern "C"
 void MRT_IRQHandler(void)

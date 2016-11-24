@@ -28,7 +28,7 @@
  * copyright, permission, and disclaimer notice must appear in all copies of
  * this code.
  */
-#include "chip.h"
+#include <chip.hpp>
 
 /*****************************************************************************
  * Private types/enumerations/variables

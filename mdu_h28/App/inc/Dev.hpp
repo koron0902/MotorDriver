@@ -1,18 +1,15 @@
-/*
- * Dev.h
- *
- *  Created on: 2016/11/14
- *      Author: hamus
- */
+#pragma once
 
-#ifndef APP_INC_DEV_HPP_
-#define APP_INC_DEV_HPP_
 #include <File.hpp>
 
 namespace App {
+namespace Dev{
 
-File::Directory* CreateDev();
+File::Directory* Create();
 File::Directory* CreateUart();
+File::Directory* CreateADC();
+
+
 
 }
-#endif /* APP_INC_DEV_HPP_ */
+}

@@ -1,9 +1,10 @@
-#include <motor.hpp>
+#include <Motor.hpp>
 #include <PWM.hpp>
 #include "DRV.hpp"
 #include <functional>
 #include <utilize.hpp>
 #include <qmath.hpp>
+#include <region.hpp>
 using namespace common;
 using namespace Device;
 

@@ -1,22 +1,28 @@
 #include <Dev.hpp>
 #include <Uart.hpp>
+#include <ADC.hpp>
+#include <text.hpp>
+#include <xport.hpp>
 using namespace App::File;
 using namespace std;
 using namespace Device;
-
+using namespace common;
 namespace App {
+namespace Dev{
 
-Directory* CreateDev() {
-	Directory* dev = Directory::Create("dev");
-	dev->Add(CreateUart());
-	return dev;
+Directory* Create(){
+	Directory* dir=Directory::Create("dev");
+	dir->Add(CreateUart());
+	dir->Add(CreateADC());
+
+	return dir;
 }
 
 Directory* CreateUart() {
 	Directory* uart = Directory::Create("uart");
 
 	uart->Add(Execute::Create("write", [](const vector<string>& arg)->string {
-		if (arg.size()>2); {
+		if (arg.size()>1); {
 			Uart::Write(arg[1]);
 		}
 		return "";
@@ -37,4 +43,28 @@ Directory* CreateUart() {
 	return uart;
 }
 
+File::Directory* CreateADC(){
+	Directory* dir = Directory::Create("ad");
+
+	dir->Add(Execute::Create("dump",[](const vector<string>& dummy)->string{
+
+		string out;
+		out.reserve(64);
+		out=ToStr(ADC::GetVlot())+",";
+		out+=ToStr(ADC::GetVlotA())+",";
+		out+=ToStr(ADC::GetVlotB())+",";
+		out+=ToStr(ADC::GetVlotC());
+		ADC::Trigger();
+		return out;
+	}));
+	Middle::XPort::Write("pass");
+	return dir;
+}
+
+
+
+
+
+
+}
 } /* namespace Device */

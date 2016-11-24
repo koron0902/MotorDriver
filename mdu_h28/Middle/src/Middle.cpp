@@ -8,6 +8,7 @@
 #include <motor.hpp>
 #include <Middle.hpp>
 #include "ff.hpp"
+#include "Middle.hpp"
 namespace Middle {
 
 void Init(){

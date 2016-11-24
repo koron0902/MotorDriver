@@ -25,7 +25,12 @@ std::string ls(const std::vector<std::string>&);
 std::string tree(const std::vector<std::string>&);
 
 std::string info(const std::vector<std::string>&);//システムの状態を表示する
+std::string stmp(const std::vector<std::string>&);
+std::string repeat(const std::vector<std::string>&);
 
+std::string reboot(const std::vector<std::string>&);
+
+std::string test(const std::vector<std::string>&);//実験用
 }
 } /* namespace Device */
 
