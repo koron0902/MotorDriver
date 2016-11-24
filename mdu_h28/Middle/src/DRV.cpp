@@ -7,6 +7,9 @@
 
 #include "DRV.hpp"
 #include "SPI.hpp"
+#include <string>
+#include <cstdlib>
+#include <text.hpp>
 
 #define WRITE		(0 << 15)
 #define READ		(1 << 15)
@@ -77,7 +80,54 @@ namespace Middle {
 			return Device::SPI::ReadWrite(&packet, &buf);
 		}
 
-		bool SetGain(const uint16_t ch, const GAIN_T gain){
+		const std::string SetGain(const std::string& str){
+			int gain = std::atoi(str.c_str());
+			bool status = false;
+
+			if(gain == 10){
+				for(int ch = 1;ch < 4;ch++){
+					status = status | SetGainCh(ch, GAIN_T::GAIN_10);
+				}
+			}else if(gain == 20){
+				for(int ch = 1;ch < 4;ch++){
+					status = status | SetGainCh(ch, GAIN_T::GAIN_20);
+				}
+			}else if(gain == 40){
+				for(int ch = 1;ch < 4;ch++){
+					status = status | SetGainCh(ch, GAIN_T::GAIN_40);
+				}
+			}else if(gain == 80){
+				for(int ch = 1;ch < 4;ch++){
+					status = status | SetGainCh(ch, GAIN_T::GAIN_80);
+				}
+			}else{
+				return "Not supported gain. Gain change failed";
+			}
+
+			return status == true ? "" : "Gain change failed";
+		}
+
+		const std::string GetGain(){
+			std::string buf;
+			buf.reserve(48);
+
+			auto pow2 = [](uint32_t x){
+				uint32_t var = 1;
+				for(uint32_t i = 0;i < x;i++){
+					var *= 2;
+				}
+				return var;
+			};
+			SHUNT_AMPLIFIER_CTRL_T var;
+			var = GetRegValue(DRVRegName::SHUNT_AMPLIFIER_CTRL);
+			buf.append("Phase U:" + common::ToStr(10 * pow2(var.GAIN_CS1)) + "\r\n");
+			buf.append("Phase V:" + common::ToStr(10 * pow2(var.GAIN_CS2)) + "\r\n");
+			buf.append("Phase W:" + common::ToStr(10 * pow2(var.GAIN_CS3)) + "\r\n");
+
+			return buf;
+		}
+
+		bool SetGainCh(const uint16_t ch, const GAIN_T gain){
 			SHUNT_AMPLIFIER_CTRL_T var;
 			var = GetRegValue(DRVRegName::SHUNT_AMPLIFIER_CTRL);
 			if(ch == 1)
@@ -86,7 +136,11 @@ namespace Middle {
 				var.GAIN_CS2 = gain;
 			if(ch == 3)
 				var.GAIN_CS3 = gain;
-			return SetConfiguration(DRVRegName::SHUNT_AMPLIFIER_CTRL, var);
+			if(SetConfiguration(DRVRegName::SHUNT_AMPLIFIER_CTRL, var)){
+				DRVRegisters.mShuntAmp = var;
+				return true;
+			}
+			return false;
 		}
 
 		bool SetPWMMode(const PWM_USES_T mode){

@@ -1,4 +1,4 @@
-#include <chip.h>
+#include <chip.hpp>
 #include <SysTick.hpp>
 
 using namespace common;

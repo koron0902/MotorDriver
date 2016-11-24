@@ -14,7 +14,6 @@ Directory* Create(){
 	Directory* dir=Directory::Create("dev");
 	dir->Add(CreateUart());
 	dir->Add(CreateADC());
-
 	return dir;
 }
 
@@ -54,7 +53,7 @@ File::Directory* CreateADC(){
 		out+=ToStr(ADC::GetVlotA())+",";
 		out+=ToStr(ADC::GetVlotB())+",";
 		out+=ToStr(ADC::GetVlotC());
-
+		ADC::Trigger();
 		return out;
 	}));
 	Middle::XPort::Write("pass");

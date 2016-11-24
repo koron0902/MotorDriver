@@ -5,12 +5,11 @@
  *      Author: takumi152
  */
 
-#include <chip.h>
+#include <chip.hpp>
+#include <ring_buffer.hpp>
 #include <string.h>
 #include <USB.hpp>
 #include "usb/app_usbd_cfg.h"
-#include <ring_buffer.h>
-#include <eeprom.h>
 #include <algorithm>
 
 using namespace std;
@@ -427,6 +426,10 @@ void Write(const char* byte,size_t size){
 	ncs=min(size-cs,TxBufferSize);//コピーする分
 	memcpy(&TxBuf[TxPos],&byte[cs],ncs);
 	TxPos+=ncs;
+	if (TxPos>TxBufferLimit){
+		Flush();
+	}
+
 }
 
 //割り込み

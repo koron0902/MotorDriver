@@ -29,8 +29,8 @@
  * this code.
  */
 
-#include "chip.h"
-#include "stopwatch.h"
+#include <chip.hpp>
+#include <stopwatch.hpp>
 
 /*****************************************************************************
  * Private types/enumerations/variables

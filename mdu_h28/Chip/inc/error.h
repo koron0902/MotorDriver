@@ -43,7 +43,7 @@
  *      - The 16 LSB contains an error code number associated to that peripheral
  *
  */
-typedef enum
+enum ErrorCode
 {
   /**\b 0x00000000*/ LPC_OK=0, /**< enum value returned on Success */
   /**\b 0xFFFFFFFF*/ ERR_FAILED = -1, /**< enum value returned on general failure */
@@ -259,7 +259,8 @@ typedef enum
   /*0x00100002*/	 ERR_DM_UNKNOWN_CMD,
   /*0x00100003*/	 ERR_DM_COMM_FAIL
   
-} ErrorCode_t;
+};
+typedef enum ErrorCode ErrorCode_t;
 
 #ifndef offsetof
 #define offsetof(s, m)   (int) &(((s *) 0)->m)

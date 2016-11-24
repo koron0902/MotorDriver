@@ -4,11 +4,12 @@
 #include <Timer.hpp>
 #include <text.hpp>
 #include <stdio.h>
-#include <xport.hpp>
 #include <Shell.hpp>
 #include <SysTick.hpp>
 #include <cmsis.h>
 #include <core_cm3.h>
+#include <fix.hpp>
+#include <XPort.hpp>
 using namespace std;
 using namespace App::File;
 using namespace common;
@@ -29,6 +30,9 @@ Directory* Create() {
 	bin->Add(Execute::Create("stmp", stmp));
 	bin->Add(Execute::Create("repeat", repeat));
 	bin->Add(Execute::Create("reboot",reboot));
+
+
+	bin->Add(Execute::Create("test",test));
 	return bin;
 }
 
@@ -70,44 +74,48 @@ string echo(const std::vector<std::string>& arg) {
 
 string get(const std::vector<std::string>& arg) {
 	//TODO: get stub
-	if (arg.size() == 1) {
-		return string { "get: no file selected" };
-	} else if (arg[1].empty()) {
-		return string { "get: no file selected" };
+	int idx;
+	int length=arg.size();
+	string text;
+	bool flag=false;
+	text.reserve(64);
+	for (idx=1;idx<length;idx++){
+		auto* file = File::current->Search(arg[idx]);
+		if (file!=nullptr){
+			auto mode=file->GetMode();
+			if (mode.IsReadable()){
+				text+=flag?","+file->GetData():file->GetData();
+				flag=true;
+			}else{
+				return "Access Error";
+			}
+		}else{
+			return "found out";
+		}
 	}
-	auto* file = File::current->Search(arg[1]);
-	if (file != nullptr) {
-		auto flag = file->GetFlag();
-		if (flag != FileType::FileInt32 && flag != FileType::FileFloat
-				&& flag != FileType::FileString)
-			return string { "get: not a file" };
-		return file->GetData();
-	} else {
-		return string { "get: file not found" };
-	}
+
+	return text;
+
 }
 
 string set(const std::vector<std::string>& arg) {
 	//TODO: set stub
-	if (arg.size() == 1) {
-		return string { "set: no file selected" };
-	} else if (arg[1].empty()) {
-		return string { "set: no file selected" };
-	} else if (arg.size() == 2) {
-		return string { "set: no value entered" };
-	} else if (arg[2].empty()) {
-		return string { "set: no value entered" };
+	int idx;
+	int lenght=arg.size();
+	for (idx=1;idx+1<lenght;idx+=2){
+		auto* file = File::current->Search(arg[idx]);
+		if (file!=nullptr){
+			auto mode=file->GetMode();
+			if (mode.IsWritable()){
+				file->SetData(arg[idx+1]);
+			}else{
+				return "Access Error";
+			}
+		}else{
+			return "found out";
+		}
 	}
-	auto* file = File::current->Search(arg[1]);
-	if (file != nullptr) {
-		if (file->GetFlag() != FileType::FileInt32
-				&& file->GetFlag() != FileType::FileFloat
-				&& file->GetFlag() != FileType::FileString)
-			return string { "set: not a file" };
-		return file->SetData(arg[2]);
-	} else {
-		return string { "set: file not found" };
-	}
+	return "";
 }
 
 std::string ls(const std::vector<std::string>& dummy) {
@@ -155,10 +163,18 @@ std::string repeat(const std::vector<std::string>& vec) {
 	return "!Fin";
 }
 
+std::string test(const std::vector<std::string>& dummy){
+	auto a=fix32::CreateFloat(2.75f);
+	return ToStr(a);
+}
+
+
 std::string reboot(const std::vector<std::string>& dummy){
 NVIC_SystemReset();
 return "";//dummy cannot reach here
 }
+
+
 
 }
 } /* namespace Device */
