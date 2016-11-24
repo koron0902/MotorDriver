@@ -87,11 +87,11 @@ static void SetFuncFix(CHIP_SWM_PIN_FIXED_T pin) {
 }
 
 static void SetOpen(PortData data) {
-	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin, IOCON_ADMODE_EN); //アナログ化することで解放にする。
+	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin, IOCON_ADMODE_EN|IOCON_MODE_PULLDOWN); //アナログ化することで解放にする。
 }
 
 static void SetAnalog(AnalogData data) {
-	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin, IOCON_ADMODE_EN);
+	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin, IOCON_ADMODE_EN|IOCON_MODE_PULLDOWN);
 }
 
 void Init() {
