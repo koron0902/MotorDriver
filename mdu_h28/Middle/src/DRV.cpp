@@ -9,6 +9,7 @@
 #include "SPI.hpp"
 #include <string>
 #include <cstdlib>
+#include <text.hpp>
 
 #define WRITE		(0 << 15)
 #define READ		(1 << 15)
@@ -79,7 +80,7 @@ namespace Middle {
 			return Device::SPI::ReadWrite(&packet, &buf);
 		}
 
-		const std::string Gain(const std::string& str){
+		const std::string SetGain(const std::string& str){
 			int gain = std::atoi(str.c_str());
 			bool status = false;
 
@@ -104,6 +105,26 @@ namespace Middle {
 			}
 
 			return status == true ? "" : "Gain change failed";
+		}
+
+		const std::string GetGain(){
+			std::string buf;
+			buf.reserve(48);
+
+			auto pow2 = [](uint32_t x){
+				uint32_t var = 1;
+				for(uint32_t i = 0;i < x;i++){
+					var *= x;
+				}
+				return var;
+			};
+			SHUNT_AMPLIFIER_CTRL_T var;
+			var = GetRegValue(DRVRegName::SHUNT_AMPLIFIER_CTRL);
+			buf.append("Phase U:" + common::ToStr(10 * pow2(var.GAIN_CS1)) + "\r\n");
+			buf.append("Phase V:" + common::ToStr(10 * pow2(var.GAIN_CS2)) + "\r\n");
+			buf.append("Phase W:" + common::ToStr(10 * pow2(var.GAIN_CS3)) + "\r\n");
+
+			return buf;
 		}
 
 		bool SetGain(const uint16_t ch, const GAIN_T gain){
