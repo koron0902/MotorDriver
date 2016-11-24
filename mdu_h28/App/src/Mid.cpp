@@ -2,6 +2,7 @@
 #include <Motor.hpp>
 #include <stdlib.h>
 #include <text.hpp>
+#include <DRV.hpp>
 using namespace Middle;
 using namespace App::File;
 using namespace common;
@@ -14,6 +15,7 @@ Directory* Create(){
 	mid->Add(Execute::Create("duty",Duty));
 	mid->Add(Execute::Create("free",Free));
 	mid->Add(Execute::Create("lock",Lock));
+	mid->Add(FileProperty::Create("gain", *Middle::DRV::GetGain, *Middle::DRV::SetGain));
 	return mid;
 }
 

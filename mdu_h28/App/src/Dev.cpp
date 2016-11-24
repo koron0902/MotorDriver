@@ -14,7 +14,6 @@ Directory* Create(){
 	Directory* dir=Directory::Create("dev");
 	dir->Add(CreateUart());
 	dir->Add(CreateADC());
-
 	return dir;
 }
 
