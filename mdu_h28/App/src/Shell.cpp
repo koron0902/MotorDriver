@@ -24,10 +24,6 @@ void Init() {
 	root->Add(bin = Bin::Create());
 	root->Add(Dev::Create());
 	root->Add(Mid::Create());
-	root->Add(p=FileProperty::CreateReadOnly("data",[](void)->string{
-		return "a";
-	}));
-
 	path.push_back(bin);
 }
 

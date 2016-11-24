@@ -35,7 +35,10 @@ void CommandLine() {
 			buffer_uart += c;
 
 		} else {
-			Uart::WriteLine(Shell::Call(buffer_uart));
+			string temp = Shell::Call(buffer_uart);
+			if (temp != "") {
+				Uart::WriteLine();
+			}
 			buffer_uart = "";
 		}
 	}
@@ -46,15 +49,18 @@ void CommandLine() {
 	}
 
 	if (usb_flag) {
-		while (!USB::IsEmpty()){
-			c=USB::ReadByte();
+		while (!USB::IsEmpty()) {
+			c = USB::ReadByte();
 			Port::Toggle(Port::LED3);
-			if (c!=common::newline){
-				buffer_usb+=c;
-			}else{
-				USB::WriteLine(Shell::Call(buffer_usb));
-				USB::Flush();
-				buffer_usb="";
+			if (c != common::newline) {
+				buffer_usb += c;
+			} else {
+				string temp = Shell::Call(buffer_usb);
+				if (temp != "") {
+					USB::WriteLine(temp);
+					USB::Flush();
+				}
+				buffer_usb = "";
 			}
 		}
 	}

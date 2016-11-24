@@ -95,23 +95,7 @@ string get(const std::vector<std::string>& arg) {
 	}
 
 	return text;
-	/*
-	if (arg.size() == 1) {
-		return string { "get: no file selected" };
-	} else if (arg[1].empty()) {
-		return string { "get: no file selected" };
-	}
-	auto* file = File::current->Search(arg[1]);
-	if (file != nullptr) {
-		auto flag = file->GetFlag();
-		if (flag != FileType::FileInt32 && flag != FileType::FileFloat
-				&& flag != FileType::FileString)
-			return string { "get: not a file" };
-		return file->GetData();
-	} else {
-		return string { "get: file not found" };
-	}
-	*/
+
 }
 
 string set(const std::vector<std::string>& arg) {
@@ -132,27 +116,6 @@ string set(const std::vector<std::string>& arg) {
 		}
 	}
 	return "";
-	/*
-	if (arg.size() == 1) {
-		return string { "set: no file selected" };
-	} else if (arg[1].empty()) {
-		return string { "set: no file selected" };
-	} else if (arg.size() == 2) {
-		return string { "set: no value entered" };
-	} else if (arg[2].empty()) {
-		return string { "set: no value entered" };
-	}
-
-	if (file != nullptr) {
-		if (file->GetFlag() != FileType::FileInt32
-				&& file->GetFlag() != FileType::FileFloat
-				&& file->GetFlag() != FileType::FileString)
-			return string { "set: not a file" };
-		return file->SetData(arg[2]);
-	} else {
-		return string { "set: file not found" };
-	}
-	*/
 }
 
 std::string ls(const std::vector<std::string>& dummy) {
