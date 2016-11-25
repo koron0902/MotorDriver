@@ -12,6 +12,8 @@
 #include <ring_buffer.h>
 #include <eeprom.h>
 #include <algorithm>
+#include <iap.h>
+#include <port.hpp>
 
 using namespace std;
 
@@ -317,9 +319,9 @@ ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc, USBD_API_INIT_
 	msc_param.mem_size = pUsbParam->mem_size;
 	msc_param.intf_desc = (uint8_t*) find_IntfDesc(pDesc->high_speed_desc, USB_DEVICE_CLASS_STORAGE);
 	msc_param.InquiryStr = MSC_SCSI_InquiryString;
-	msc_param.BlockCount = 8;
+	msc_param.BlockCount = 32;
 	msc_param.BlockSize = 512;
-	msc_param.MemorySize = 4096;
+	msc_param.MemorySize = 16384;
 	/* user defined functions */
 	msc_param.MSC_Write = msc_write;
 	msc_param.MSC_Read = msc_read;
@@ -334,17 +336,33 @@ void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_of
 	//TODO: msc write stub
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
+	if(length<256){ //small length (64, 128)
+		uint8_t* tmp;
+		uint8_t buf[256];
+		tmp = (uint8_t*)((uint32_t)0x0003C000+(offset&0xFFFFFF00));
+		memcpy(buf, tmp, 256); //copy page data
+		memcpy(&buf[offset%256], *src, length*sizeof(uint8_t)); //insert source data
+		Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
+		Chip_IAP_PreSectorForReadWrite(0x3C+((offset&0xFFFFFF00))/0x1000, 0x3C+(offset+length-1)/0x1000);
+		Chip_IAP_CopyRamToFlash(0x0003C000+(offset&0xFFFFFF00),(uint32_t*)buf,256);
+	}else{ //large length(256, 512, 1024)
+		Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
+		Chip_IAP_PreSectorForReadWrite(0x3C+offset/0x1000, 0x3C+(offset+length-1)/0x1000);
+		Chip_IAP_CopyRamToFlash(0x0003C000+offset,(uint32_t*)*src,length*sizeof(uint8_t));
+	}
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
-
 }
 
 void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_offset){
 	//TODO: msc read stub
+	void* src;
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Read(offset, *dst, length*sizeof(uint8_t));
+	//Chip_EEPROM_Read(offset, *dst, length*sizeof(uint8_t));
+	//Chip_IAP_PreSectorForReadWrite(0x3C+offset/0x1000, 0x3C+(offset+length)/0x1000);
+	src = (void*)((uint32_t)0x0003C000+offset);
+	memcpy(*dst, src, length*sizeof(uint8_t));
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
 }
@@ -352,9 +370,13 @@ void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_off
 ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length, uint32_t high_offset){
 	//TODO msc verify stub
 	uint8_t tmp[length];
+	void* src;
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Read(offset, tmp, length*sizeof(uint8_t));
+	//Chip_EEPROM_Read(offset, tmp, length*sizeof(uint8_t));
+	//Chip_IAP_PreSectorForReadWrite(0x3C+offset/0x1000, 0x3C+(offset+length)/0x1000);
+	src = (void*)((uint32_t)0x0003C000+offset);
+	memcpy(tmp, src, length*sizeof(uint8_t));
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
 	if(memcmp(buf, tmp, length*sizeof(uint8_t))==0) return LPC_OK;

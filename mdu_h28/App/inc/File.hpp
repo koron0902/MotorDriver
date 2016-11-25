@@ -41,8 +41,8 @@ union FileMode{
 
 class FileBase {
 public:
-	static constexpr int MaxNumber = 32; //ファイルの最大数
-	static constexpr int MaxSize = 64; //派生先を含むクラスの最大サイズ
+	static constexpr int MaxNumber = 64; //ファイルの最大数
+	static constexpr int MaxSize = 80; //派生先を含むクラスの最大サイズ
 private:
 	std::string name;
 	//本当はスマートポインタを使うはずだった..

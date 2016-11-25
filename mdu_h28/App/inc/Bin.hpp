@@ -29,6 +29,8 @@ std::string stmp(const std::vector<std::string>&);
 std::string repeat(const std::vector<std::string>&);
 
 std::string reboot(const std::vector<std::string>&);
+
+std::string mkfs(const std::vector<std::string>&);
 }
 } /* namespace Device */
 

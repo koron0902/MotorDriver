@@ -9,6 +9,8 @@
 #include <SysTick.hpp>
 #include <cmsis.h>
 #include <core_cm3.h>
+#include <iap.h>
+#include <ff.hpp>
 using namespace std;
 using namespace App::File;
 using namespace common;
@@ -29,6 +31,7 @@ Directory* Create() {
 	bin->Add(Execute::Create("stmp", stmp));
 	bin->Add(Execute::Create("repeat", repeat));
 	bin->Add(Execute::Create("reboot",reboot));
+	bin->Add(Execute::Create("mkfs",mkfs));
 	return bin;
 }
 
@@ -160,5 +163,12 @@ NVIC_SystemReset();
 return "";//dummy cannot reach here
 }
 
+std::string mkfs(const std::vector<std::string>& dummy){
+	uint8_t work[512];
+	Chip_IAP_PreSectorForReadWrite(0x3C,0x3F);
+	Chip_IAP_EraseSector(0x3C,0x3F);
+	Middle::FatFs::f_mkfs("0", (FM_FAT | FM_SFD), 0, work, 512);
+	return "";
+}
 }
 } /* namespace Device */
