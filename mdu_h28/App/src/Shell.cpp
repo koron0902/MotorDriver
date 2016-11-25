@@ -19,7 +19,7 @@ static std::vector<std::string> history; //過去の命令をひとつだけ保�
 static std::vector<File::Directory*> path; //省略用
 
 void Init() {
-	Directory* bin;FileProperty *p;
+	Directory* bin;Property *p;
 	current = root = Directory::Create("root");
 	root->Add(bin = Bin::Create());
 	root->Add(Dev::Create());

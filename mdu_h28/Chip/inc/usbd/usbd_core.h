@@ -24,7 +24,7 @@
 #ifndef __MW_USBD_CORE_H__
 #define __MW_USBD_CORE_H__
 
-#include "error.h"
+#include <error.hpp>
 #include "usbd.h"
 //#include "app_usbd_cfg.h"
 #include <usb/app_usbd_cfg.h>

@@ -60,7 +60,7 @@ void SystemCoreClockUpdate(void)
 
 void Chip_USB_Init(void)
 {
-	/* Set USB PLL input to internal rc */
+	/* Set USB PLL input to main oscillator */
 	Chip_Clock_SetUSBPLLSource(SYSCTL_PLLCLKSRC_MAINOSC);
 	/* Setup USB PLL  (FCLKIN = 12MHz) * 4 = 48MHz
 	   MSEL = 3 (this is pre-decremented), PSEL = 1 (for P = 2)

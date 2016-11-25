@@ -1,6 +1,7 @@
 #pragma once
 
 #include <eeprom.hpp>
+#include <error.hpp>
 #include <rom_adc_15xx.hpp>
 #include <rom_can_15xx.hpp>
 #include <rom_dma_15xx.hpp>
@@ -9,7 +10,6 @@
 #include <rom_spi_15xx.hpp>
 #include <rom_uart_15xx.hpp>
 #include "iap.h"
-#include "error.h"
 
 
 /** @defgroup ROMAPI_15XX CHIP: LPC15xx ROM API declarations and functions

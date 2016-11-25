@@ -38,64 +38,64 @@ public:
 
 };
 
-class FileInt32: public FileBase {
+class Integer: public FileBase {
 private:
 	int32_t* data;
-	FileInt32(const std::string& filename, int32_t* d);
+	Integer(const std::string& filename, int32_t* d);
 public:
-	static FileInt32* Create(const std::string& filename, int32_t* d = nullptr);
+	static Integer* Create(const std::string& filename, int32_t* d = nullptr);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
 	//virtual std::string operator()(std::vector<std::string>&);
 };
 
-class FileFloat: public FileBase {
+class Float: public FileBase {
 private:
 	float* data;
-	FileFloat(const std::string& filename, float* f);
+	Float(const std::string& filename, float* f);
 public:
-	static FileFloat* Create(const std::string& filename, float* f = nullptr);
+	static Float* Create(const std::string& filename, float* f = nullptr);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
 	//virtual std::string operator()(std::vector<std::string>&);
 };
 
-class FileString: public FileBase {
+class String: public FileBase {
 private:
 	std::string* data;
-	FileString(const std::string& filename, std::string* str = nullptr);
+	String(const std::string& filename, std::string* str = nullptr);
 public:
-	static FileString* Create(const std::string& filename, std::string* str);
+	static String* Create(const std::string& filename, std::string* str);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
 	//virtual std::string operator()(std::vector<std::string>&);
 };
 
-class FileFix: public FileBase {
+class Fix: public FileBase {
 private:
 	fix32* data;
-	FileFix(const std::string& filename, fix32* f = nullptr);
+	Fix(const std::string& filename, fix32* f = nullptr);
 public:
-	static FileFix* Create(const std::string& filename, fix32* f);
+	static Fix* Create(const std::string& filename, fix32* f);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
 	//virtual std::string operator()(std::vector<std::string>&);
 };
 
-class FileProperty: public FileBase {
+class Property: public FileBase {
 private:
 	std::function<std::string(void)> fget;
 	std::function<std::string(const std::string&)> fset;
-	FileProperty(const std::string& filename,
+	Property(const std::string& filename,
 			const std::function<std::string(void)>& get,
 			const std::function<std::string(const std::string&)>& set);
 public:
-	static FileProperty* Create(const std::string& filename,
+	static Property* Create(const std::string& filename,
 			const std::function<std::string(void)>& get,
 			const std::function<std::string(const std::string&)>& set);
-	static FileProperty* CreateReadOnly(const std::string& filename,
+	static Property* CreateReadOnly(const std::string& filename,
 			const std::function<std::string(void)>& get);
-	static FileProperty* CreateWriteOnly(const std::string& filename,
+	static Property* CreateWriteOnly(const std::string& filename,
 			const std::function<std::string(const std::string&)>& set);
 	 virtual std::string GetData();
 	 virtual std::string SetData(const std::string&);

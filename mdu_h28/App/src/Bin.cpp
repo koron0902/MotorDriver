@@ -29,10 +29,9 @@ Directory* Create() {
 	bin->Add(Execute::Create("info", info));
 	bin->Add(Execute::Create("stmp", stmp));
 	bin->Add(Execute::Create("repeat", repeat));
-	bin->Add(Execute::Create("reboot",reboot));
+	bin->Add(Execute::Create("reboot", reboot));
 
-
-	bin->Add(Execute::Create("test",test));
+	bin->Add(Execute::Create("test", test));
 	return bin;
 }
 
@@ -75,21 +74,21 @@ string echo(const std::vector<std::string>& arg) {
 string get(const std::vector<std::string>& arg) {
 	//TODO: get stub
 	int idx;
-	int length=arg.size();
+	int length = arg.size();
 	string text;
-	bool flag=false;
+	bool flag = false;
 	text.reserve(64);
-	for (idx=1;idx<length;idx++){
+	for (idx = 1; idx < length; idx++) {
 		auto* file = File::current->Search(arg[idx]);
-		if (file!=nullptr){
-			auto mode=file->GetMode();
-			if (mode.IsReadable()){
-				text+=flag?","+file->GetData():file->GetData();
-				flag=true;
-			}else{
+		if (file != nullptr) {
+			auto mode = file->GetMode();
+			if (mode.IsReadable()) {
+				text += flag ? "," + file->GetData() : file->GetData();
+				flag = true;
+			} else {
 				return "Access Error";
 			}
-		}else{
+		} else {
 			return "found out";
 		}
 	}
@@ -101,17 +100,17 @@ string get(const std::vector<std::string>& arg) {
 string set(const std::vector<std::string>& arg) {
 	//TODO: set stub
 	int idx;
-	int lenght=arg.size();
-	for (idx=1;idx+1<lenght;idx+=2){
+	int lenght = arg.size();
+	for (idx = 1; idx + 1 < lenght; idx += 2) {
 		auto* file = File::current->Search(arg[idx]);
-		if (file!=nullptr){
-			auto mode=file->GetMode();
-			if (mode.IsWritable()){
-				file->SetData(arg[idx+1]);
-			}else{
+		if (file != nullptr) {
+			auto mode = file->GetMode();
+			if (mode.IsWritable()) {
+				file->SetData(arg[idx + 1]);
+			} else {
 				return "Access Error";
 			}
-		}else{
+		} else {
 			return "found out";
 		}
 	}
@@ -128,17 +127,17 @@ std::string tree(const std::vector<std::string>& dummy) {
 
 std::string info(const std::vector<std::string>& dummy) {
 	string ss;
-	ss.reserve(64);
-	ss += "System info" + newline;
-	ss += "File Memory[Byte]:" + (FileBase::GetMemorySizeAll()) + ','
-			+ ToStr(FileBase::GetMemorySizeUsed()) + ','
-			+ ToStr(FileBase::GetMemorySizeFree()) + newline;
-	ss = +"Stamp:" + ToStr(Device::Tick::Tick()) + newline;
+	ss.reserve(256);
+	ss = string("System info") + newline;
+	ss += string("File Memory[Byte]:") +ToStr(FileBase::GetMemorySizeAll()) + ',';
+	ss += ToStr(FileBase::GetMemorySizeUsed()) + ',';
+	ss +=ToStr(FileBase::GetMemorySizeFree()) + newline;
+	ss += "Stamp:" + ToStr(Device::Tick::TickUs());
 	return ss;
 }
 
-std::string stmp(const std::vector<std::string>& dummy){
-	uint64_t temp=Device::Tick::Tick();
+std::string stmp(const std::vector<std::string>& dummy) {
+	uint64_t temp = Device::Tick::TickUs();
 	return ToStr(temp);
 }
 
@@ -157,24 +156,22 @@ std::string repeat(const std::vector<std::string>& vec) {
 	while (IsEmpty()) {
 		WriteLine(Shell::Call(sub));
 		Flush();
-		w=Tick()+0xFFF;
-		while  (Tick()<w);
+		w = Tick() + 0xFFF;
+		while (Tick() < w)
+			;
 	}
 	return "!Fin";
 }
 
-std::string test(const std::vector<std::string>& dummy){
-	auto a=fix32::CreateFloat(2.75f);
+std::string test(const std::vector<std::string>& dummy) {
+	auto a = fix32::CreateFloat(2.75f);
 	return ToStr(a);
 }
 
-
-std::string reboot(const std::vector<std::string>& dummy){
-NVIC_SystemReset();
-return "";//dummy cannot reach here
+std::string reboot(const std::vector<std::string>& dummy) {
+	NVIC_SystemReset();
+	return ""; //dummy cannot reach here
 }
-
-
 
 }
 } /* namespace Device */

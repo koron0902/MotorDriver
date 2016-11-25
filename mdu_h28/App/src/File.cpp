@@ -53,18 +53,18 @@ string Execute::operator()(std::vector<std::string>& v) {
 	}
 }
 
-FileInt32::FileInt32(const string& filename, int32_t* d) :
+Integer::Integer(const string& filename, int32_t* d) :
 		FileBase(filename) {
 	SetMode(FileMode::WriteAndRead);
 	SetFlag(FileType::FileInt32);
 	data = d;
 }
 
-FileInt32* FileInt32::Create(const string& filename, int32_t* d) {
-	return new FileInt32(filename, d);
+Integer* Integer::Create(const string& filename, int32_t* d) {
+	return new Integer(filename, d);
 }
 
-string FileInt32::GetData() {
+string Integer::GetData() {
 	if (data != nullptr) {
 		return ToStr(*data);
 	} else {
@@ -72,7 +72,7 @@ string FileInt32::GetData() {
 	}
 }
 
-string FileInt32::SetData(const std::string& str) {
+string Integer::SetData(const std::string& str) {
 	if (str.empty())
 		return "null"; //NPE prevention
 	if (data != nullptr) {
@@ -87,18 +87,18 @@ string FileInt32::SetData(const std::string& str) {
  return "Error:(File)";
  }
  */
-FileFloat::FileFloat(const string& filename, float* f) :
+Float::Float(const string& filename, float* f) :
 		FileBase(filename) {
 	SetMode(FileMode::WriteAndRead);
 	SetFlag(FileType::FileFloat);
 	data = f;
 }
 
-FileFloat* FileFloat::Create(const string& filename, float* f) {
-	return new FileFloat(filename, f);
+Float* Float::Create(const string& filename, float* f) {
+	return new Float(filename, f);
 }
 
-string FileFloat::GetData() {
+string Float::GetData() {
 	if (data != nullptr) {
 		stringstream ss;
 		int d1 = (*data);
@@ -111,7 +111,7 @@ string FileFloat::GetData() {
 	}
 }
 
-string FileFloat::SetData(const std::string& str) {
+string Float::SetData(const std::string& str) {
 	if (data != nullptr) {
 		if (str.empty()) {
 			return "null"; //NPE prevention
@@ -128,18 +128,18 @@ string FileFloat::SetData(const std::string& str) {
  return "Error:(File)";
  }
  */
-FileString::FileString(const string& filename, std::string* str) :
+String::String(const string& filename, std::string* str) :
 		FileBase(filename) {
 	SetMode(FileMode::WriteAndRead);
 	SetFlag(FileType::FileString);
 	data = str;
 }
 
-FileString* FileString::Create(const string& filename, std::string* str) {
-	return new FileString(filename, str);
+String* String::Create(const string& filename, std::string* str) {
+	return new String(filename, str);
 }
 
-string FileString::GetData() {
+string String::GetData() {
 	if (data != nullptr) {
 		return *data;
 	} else {
@@ -147,7 +147,7 @@ string FileString::GetData() {
 	}
 }
 
-string FileString::SetData(const std::string& str) {
+string String::SetData(const std::string& str) {
 	if (data != nullptr) {
 		if (str.empty())
 			return "null"; //NPE prevention
@@ -162,18 +162,18 @@ string FileString::SetData(const std::string& str) {
  return "Error:(File)";
  }
  */
-FileFix::FileFix(const string& filename, fix32* f) :
+Fix::Fix(const string& filename, fix32* f) :
 		FileBase(filename) {
 	SetMode(FileMode::WriteAndRead);
 	SetFlag(FileType::FileFix);
 	data = f;
 }
 
-FileFix* FileFix::Create(const string& filename, fix32* f) {
-	return new FileFix(filename, f);
+Fix* Fix::Create(const string& filename, fix32* f) {
+	return new Fix(filename, f);
 }
 
-string FileFix::GetData() {
+string Fix::GetData() {
 	if (data != nullptr) {
 		return ToStr(*data);
 	} else {
@@ -181,7 +181,7 @@ string FileFix::GetData() {
 	}
 }
 
-string FileFix::SetData(const std::string& str) {
+string Fix::SetData(const std::string& str) {
 	if (data != nullptr) {
 		if (str.empty())
 			return "null"; //NPE prevention
@@ -196,7 +196,7 @@ string FileFix::SetData(const std::string& str) {
  return "Error:(File)";
  }
  */
-FileProperty::FileProperty(const std::string& filename,
+Property::Property(const std::string& filename,
 		const std::function<std::string(void)>& get,
 		const std::function<std::string(const std::string&)>& set) :
 		FileBase(filename), fget(get), fset(set) {
@@ -210,23 +210,23 @@ FileProperty::FileProperty(const std::string& filename,
 	SetMode(mode);
 }
 
-FileProperty* FileProperty::Create(const string& filename,
+Property* Property::Create(const string& filename,
 		const function<string(void)>& get,
 		const function<string(const string&)>& set) {
-	return new FileProperty(filename, get, set);
+	return new Property(filename, get, set);
 }
 
-FileProperty* FileProperty::CreateReadOnly(const std::string& filename,
+Property* Property::CreateReadOnly(const std::string& filename,
 		const std::function<std::string(void)>& get) {
-	return new FileProperty(filename, get, nullptr);
+	return new Property(filename, get, nullptr);
 }
 
-FileProperty* FileProperty::CreateWriteOnly(const std::string& filename,
+Property* Property::CreateWriteOnly(const std::string& filename,
 		const std::function<std::string(const std::string&)>& set) {
-	return new FileProperty(filename, nullptr, set);
+	return new Property(filename, nullptr, set);
 }
 
-string FileProperty::GetData() {
+string Property::GetData() {
 	if (fget != nullptr) {
 		return fget();
 	} else {
@@ -234,7 +234,7 @@ string FileProperty::GetData() {
 	}
 }
 
-string FileProperty::SetData(const string& data) {
+string Property::SetData(const string& data) {
 	if (fset != nullptr) {
 		return fset(data);
 	} else {

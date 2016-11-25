@@ -25,6 +25,25 @@ uint64_t TickSub(){
 	return bit24-(p->LOAD);
 }
 
+uint64_t TickUs(){
+	return Tick()*1_MHz/SystemCoreClock;
+}
+
+uint64_t TickMs(){
+	return Tick()*1_KHz/SystemCoreClock;
+}
+
+void DelayUs(uint64_t us){
+	uint64_t time= TickUs()+us;
+	while (TickUs()<time);
+}
+
+void DelayMs(uint64_t ms){
+	uint64_t time=TickMs()+ms;
+	while (TickMs()<time);
+}
+
+
 extern "C" void SysTick_Handler() {
 	SysTick_Config(mask);
 	tick+=bit24;

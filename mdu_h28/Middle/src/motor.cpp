@@ -84,8 +84,11 @@ void DCMotor::Lock() {
 void DCMotor::SetDuty(fix32 duty) {
 	using namespace PWM;
 	using namespace common;
+	constexpr uint32_t eps = 5;
 	fix32 c = regions::one.Fit(duty);
 	fix32 a = abs(c);
+	if(a == fix32::One)
+		a -= fix32::CreateRaw(eps);
 	q32_t q = a.GetRaw() << 16; //小数部のみにする。
 	bool s = sign(c);
 

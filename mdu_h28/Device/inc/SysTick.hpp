@@ -15,5 +15,9 @@ void Init();
 uint64_t Tick();
 uint64_t TickSub();
 
+uint64_t TickUs();//マイクロ秒単位
+uint64_t TickMs();//ミリ秒
+void DelayUs(uint64_t);//マイクロ秒単位で待つ
+void DelayMs(uint64_t);//ミリ秒単位で待つ
 }
 }

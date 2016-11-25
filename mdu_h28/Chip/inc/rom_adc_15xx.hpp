@@ -5,7 +5,7 @@
  * @{
  */
 
-#include <error.h>
+#include <error.hpp>
 /**
  * @brief ADC handle type
  */

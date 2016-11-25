@@ -1,19 +1,11 @@
-/*
- * USB.h
- *
- *  Created on: 2016/11/14
- *      Author: takumi152
- */
+#pragma once
 
-#ifndef DEVICE_INC_USB_HPP_
-#define DEVICE_INC_USB_HPP_
-
+#include <error.hpp>
 #include <stdint.h>
 #include <string>
 #include <vector>
-//#include "usb/app_usbd_cfg.h"
+#include "usb/app_usbd_cfg.h"
 #include <text.hpp>
-#include<error.h>
 #include <stddef.h>
 namespace Device {
 
@@ -32,13 +24,12 @@ namespace USB {
  */
 
 constexpr size_t RxBufferSize=128;//二次バッファの大きさ(受信)
-constexpr size_t TxBufferSize=256;//二次バッファの大きさ(送信)
-constexpr size_t TxBufferLimit=128;//Flushする時のサイズ 50%以上90％以下を推奨
+constexpr int TxBufferSize=256;
+constexpr int TxBufferLimit=64;
 constexpr size_t RxTempSize=32;//二次バッファへ移動する際のバッファの大きさ(スタックに乗る)
 
 // TODO USB header stub
 void Init();
-
 
 /**
  * @brief	Virtual com port buffered read routine
@@ -46,7 +37,7 @@ void Init();
  * @param	buf_len	: Length of the buffer passed
  * @return	Return number of bytes read.
  */
-uint32_t Bread (uint8_t *pBuf, uint32_t buf_len);
+uint32_t vcom_bread (uint8_t *pBuf, uint32_t buf_len);
 
 /**
  * @brief	Virtual com port read routine
@@ -54,13 +45,13 @@ uint32_t Bread (uint8_t *pBuf, uint32_t buf_len);
  * @param	buf_len	: Length of the buffer passed
  * @return	Always returns LPC_OK.
  */
-ErrorCode_t Read_req (uint8_t *pBuf, uint32_t buf_len);
+ErrorCode_t vcom_read_req (uint8_t *pBuf, uint32_t buf_len);
 
 /**
  * @brief	Gets current read count.
  * @return	Returns current read count.
  */
-uint32_t Read_cnt(void);
+uint32_t vcom_read_cnt(void);
 
 /**
  * @brief	Check if Vcom is connected
@@ -83,10 +74,19 @@ uint32_t WriteDirect (uint8_t *pBuf, uint32_t buf_len);
  * @}
  */
 
+//Mass storage class declaration
+
+ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc, USBD_API_INIT_PARAM_T *pUsbParam);
+void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_offset);
+void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_offset);
+ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length, uint32_t high_offset);
+
 //自作関数群
 bool IsConnected();
 uint32_t GetDepth();//受信文字数
 bool IsEmpty();
+
+
 
 char ReadByte();
 std::string Read();
@@ -96,7 +96,7 @@ bool IsBusy();//送信中？
 void Flush();
 void Write(const char* byte,size_t size);
 static inline void Write(const std::string& text){
- Write(text.data(),text.length());
+	Write(text.data(),text.length());
 }
 
 static inline void WriteLine(const std::string& text){
@@ -112,4 +112,3 @@ static inline void Write(char c){//非推奨
 
 }
 
-#endif /* DEVICE_INC_USB_HPP_ */

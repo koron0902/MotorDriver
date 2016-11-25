@@ -22,8 +22,8 @@ static string buffer_usb;
 
 void Init() {
 	Shell::Init();
-	buffer_uart.reserve(32);
-	buffer_usb.reserve(32);
+	buffer_uart.reserve(128);
+	buffer_usb.reserve(128);
 }
 
 void CommandLine() {
@@ -75,7 +75,7 @@ void Run() {
 
 		CommandLine();
 		Middle::DRV::Update();
-		Device::ADC::Trigger();
+		//Device::ADC::Trigger();
 	}
 	//can't reach here
 }

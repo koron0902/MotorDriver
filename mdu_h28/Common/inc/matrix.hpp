@@ -148,12 +148,12 @@ template<class T, unsigned int X, unsigned int Y> struct Matrix {
 			for ( j = 0; j < Z; j++) {
 				sum = T(0);
 				for ( k = 0; k < Y; k++) {
-					sum = (*this)(i, k) + inst(k, j);
+					sum +=  (*this)(i, k) * inst(k, j);
 				}
-				temp(i, k) = sum;
+				temp(i, j) = sum;
 			}
 		}
-		return move(temp);
+		return std::move(temp);
 	}
 
 	Matrix<T,X,1> GetRow(uint n)const{

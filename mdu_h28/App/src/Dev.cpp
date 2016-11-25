@@ -3,17 +3,19 @@
 #include <ADC.hpp>
 #include <text.hpp>
 #include <xport.hpp>
+#include <QEI.hpp>
 using namespace App::File;
 using namespace std;
 using namespace Device;
 using namespace common;
 namespace App {
-namespace Dev{
+namespace Dev {
 
-Directory* Create(){
-	Directory* dir=Directory::Create("dev");
+Directory* Create() {
+	Directory* dir = Directory::Create("dev");
 	dir->Add(CreateUart());
 	dir->Add(CreateADC());
+	dir->Add(Integer::Create("qei", (int32_t*) QEI::QEIVel));
 
 	return dir;
 }
@@ -27,12 +29,12 @@ Directory* CreateUart() {
 		}
 		return "";
 	}));
-	
+
 	uart->Add(Execute::Create("band", [](const vector<string>& arg)->string {
-		if (arg.size()>2){
+		if (arg.size()>2) {
 			//int band=atoi(arg[2].c_str());
 			//if (band!=0){
-				//後日実装予定
+			//後日実装予定
 			//}else{
 
 			//}
@@ -43,28 +45,28 @@ Directory* CreateUart() {
 	return uart;
 }
 
-File::Directory* CreateADC(){
-	Directory* dir = Directory::Create("ad");
+File::Directory* CreateADC() {
+	Directory* dir = Directory::Create("adc");
 
-	dir->Add(Execute::Create("dump",[](const vector<string>& dummy)->string{
-
-		string out;
-		out.reserve(64);
-		out=ToStr(ADC::GetVlot())+",";
-		out+=ToStr(ADC::GetVlotA())+",";
-		out+=ToStr(ADC::GetVlotB())+",";
-		out+=ToStr(ADC::GetVlotC());
-		ADC::Trigger();
-		return out;
+	dir->Add(Property::CreateReadOnly("batt", [] {
+		return ToStr(ADC::GetVlot());
 	}));
-	Middle::XPort::Write("pass");
+
+	dir->Add(
+			Property::CreateReadOnly("vlot",
+					[] {
+						return ToStr(ADC::GetVlotU())+" "+ToStr(ADC::GetVlotV())+" "+ToStr(ADC::GetVlotU());
+					}));
+
+	dir->Add(
+			Property::CreateReadOnly("amp",
+					[] {
+						return ToStr(ADC::GetAmpU())+" "+ToStr(ADC::GetAmpV())+" "+ToStr(ADC::GetAmpU());
+					}));
+
+
 	return dir;
 }
-
-
-
-
-
 
 }
 } /* namespace Device */
