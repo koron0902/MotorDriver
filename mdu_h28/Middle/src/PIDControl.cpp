@@ -32,26 +32,21 @@ namespace Middle{
 
 		PID::~PID(){
 			//Device::Timer::SetAction(1, mFreq.word, nullptr);
+			Middle::Motor::ModeAs(Middle::Motor::Type::None);
 			Device::Port::Set(Device::Port::PWMEN, false);
 		}
 
-		//void PID::Proc(){
-
-			//Calclate(mLastState, mNextState);
-		//}
-
-
 		void PID::Proc(MotorState_t& last, MotorState_t& next){
-			mNextState.mRealSpeed = fix32::CreateFloat(Device::QEI::GetVelcoity()) / mEncoderResolution;
+			mNextState.mRealSpeed = fix32::CreateFloat(Device::QEI::GetVelcoity()) * mFreq / mEncoderResolution;
 			const fix32 gains[] = {mKp, mKi, mKd, mKe};
 			const Matrix<fix32, 1, 4> GainMatrix(gains[0]);
 			Matrix<fix32, 4, 1> in_vector;
 
 			fix32 error, integ, duty;
-			static const fix32 BatteryVoltage = fix32::CreateFloat(16.8f);//Device::ADC::GetVlot();
-			static const fix32 Volt2Duty = fix32::One / BatteryVoltage;
+			static const fix32 BatteryVoltage = Device::ADC::GetVlot() * 100;//Device::ADC::GetVlot();
+			static const fix32 Volt2Duty = fix32::One * 6.25 / BatteryVoltage >> 4;
 
-			error = fix32::CreateInt(1);//next.mTargetSpeed - next.mRealSpeed;
+			error = next.mTargetSpeed - next.mRealSpeed;
 			integ = last.mIntegration + error;
 			static constexpr fix32 min = -150 << fix32::shift;
 			static constexpr fix32 max = 150 << fix32::shift;

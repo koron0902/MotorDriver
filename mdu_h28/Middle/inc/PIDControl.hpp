@@ -70,8 +70,6 @@ namespace Middle{
 			void operator ()(void){
 				Proc(mLastState, mNextState);
 			}
-
-
 		};
 	}
 }
