@@ -16,7 +16,6 @@ Directory* Create(){
 	dir->Add(CreateUart());
 	dir->Add(CreateADC());
 	dir->Add(FileInt32::Create("qei", (int32_t*)QEI::QEIVel));
-
 	return dir;
 }
 
@@ -56,7 +55,7 @@ File::Directory* CreateADC(){
 		out+=ToStr(ADC::GetVlotA())+",";
 		out+=ToStr(ADC::GetVlotB())+",";
 		out+=ToStr(ADC::GetVlotC());
-
+		ADC::Trigger();
 		return out;
 	}));
 	Middle::XPort::Write("pass");

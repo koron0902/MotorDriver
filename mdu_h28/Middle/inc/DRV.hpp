@@ -17,7 +17,9 @@ namespace Middle{
 		void Init();	// 言わずもがな初期化関数
 
 		bool SetConfiguration(const DRVRegName reg, const uint16_t data);	// レジスタに設定を書き込むための関数
-		bool SetGain(const uint16_t ch, const GAIN_T gain);		// 直接ゲインを書き換える
+		bool SetGainCh(const uint16_t ch, const GAIN_T gain);		// 直接ゲインを書き換える
+		const std::string SetGain(const std::string& str); // shellに渡すやつ
+		const std::string GetGain();
 		bool SetPWMMode(const PWM_USES_T mode);	// 直接PWMモードを書き換える
 
 		uint16_t GetRegValue(const DRVRegName reg);	// updateにより読み出されているレジスタ値をこれで取得する

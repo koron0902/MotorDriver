@@ -5,12 +5,11 @@
  *      Author: takumi152
  */
 
-#include <chip.h>
+#include <chip.hpp>
+#include <ring_buffer.hpp>
 #include <string.h>
 #include <USB.hpp>
 #include "usb/app_usbd_cfg.h"
-#include <ring_buffer.h>
-#include <eeprom.h>
 #include <algorithm>
 
 using namespace std;
@@ -125,7 +124,6 @@ void Init() {
 			USBD_API->hw->Connect(g_hUsb, 1);
 		}
 	}
-
 	//Second Buffer
 	RingBuffer_Init(&RxBuf,RxRaw,sizeof(RxRaw[0]),RxBufferSize);
 

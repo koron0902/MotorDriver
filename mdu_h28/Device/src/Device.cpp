@@ -1,5 +1,5 @@
 #include <ADC.hpp>
-#include <chip.h>
+#include <chip.hpp>
 #include <Device.hpp>
 #include <Port.hpp>
 #include <PWM.hpp>
