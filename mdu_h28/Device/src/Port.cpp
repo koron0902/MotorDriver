@@ -57,8 +57,8 @@ const PortData Rx{0, 13 };
 //他にも二個ピンがあるが使わないので定義しない。
 
 //QEI
-const PortData QEI_X{0, 22 };
-const PortData QEI_Y{0, 23 };
+const PortData QEI_X{0, 15 };
+const PortData QEI_Y{0, 16 };
 const PortData QEI_Z{1, 7 };
 
 //USB
