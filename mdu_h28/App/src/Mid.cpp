@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <text.hpp>
 #include <DRV.hpp>
+#include <Trapezium.hpp>
 using namespace Middle;
 using namespace App::File;
 using namespace common;
@@ -15,8 +16,24 @@ Directory* Create(){
 	mid->Add(Execute::Create("duty",Duty));
 	mid->Add(Execute::Create("free",Free));
 	mid->Add(Execute::Create("lock",Lock));
-	mid->Add(FileProperty::Create("gain", *Middle::DRV::GetGain, *Middle::DRV::SetGain));
+	mid->Add(CreateDRV());
+	mid->Add(CreateTrap());
 	return mid;
+}
+
+Directory* CreateDRV(){
+	auto* drv = Directory::Create("drv");
+	drv->Add(FileProperty::Create("gain", *Middle::DRV::GetGain, *Middle::DRV::SetGain));
+
+	return drv;
+}
+
+Directory* CreateTrap(){
+	auto* trap = Directory::Create("trap");
+	trap->Add(FileProperty::Create("duty", *Controller::Trapezium::GetNowDuty, *Controller::Trapezium::SetTargetDuty));
+	trap->Add(FileProperty::Create("step", *Controller::Trapezium::GetStep, Controller::Trapezium::SetStep));
+
+	return trap;
 }
 
 std::string Duty(const common::ShellParameter& arg){

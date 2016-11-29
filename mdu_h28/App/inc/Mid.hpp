@@ -6,6 +6,8 @@
 namespace App {
 namespace Mid{
 File::Directory* Create();
+File::Directory* CreateDRV();
+File::Directory* CreateTrap();
 
 std::string Duty(const common::ShellParameter&);
 std::string Free(const common::ShellParameter&);
