@@ -34,6 +34,7 @@ void Directory::Add(FileBase* p) {
  return "Error:(Directory)";
  }
  */
+/*
 Execute::Execute(const string& filename, const command& _func) :
 		FileBase(filename) {
 	func = _func;
@@ -52,7 +53,7 @@ string Execute::operator()(std::vector<std::string>& v) {
 		return "Error:(CMD is Nothing)";
 	}
 }
-
+*/
 Integer::Integer(const string& filename, int32_t* d) :
 		FileBase(filename) {
 	SetMode(FileMode::WriteAndRead);

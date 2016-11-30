@@ -14,23 +14,26 @@ namespace App {
 namespace Bin {
 
 File::Directory* Create();
-
+using iterator=File::iterator;
+using command=int(*)(iterator,iterator);
 //基本命令
-std::string pwd(const std::vector<std::string>&);
-std::string cd(const std::vector<std::string>&);
-std::string echo(const std::vector<std::string>&);
-std::string get(const std::vector<std::string>&);
-std::string set(const std::vector<std::string>&);
-std::string ls(const std::vector<std::string>&);
-std::string tree(const std::vector<std::string>&);
+File::FileBase* CreatePWD();
+File::FileBase* CreateCD();
+File::FileBase* CreateECHO();
+File::FileBase* CreateGET();
+File::FileBase* CreateSET();
+File::FileBase* CreateLS();
+File::FileBase* CreateTree();
 
-std::string info(const std::vector<std::string>&);//システムの状態を表示する
-std::string stmp(const std::vector<std::string>&);
-std::string repeat(const std::vector<std::string>&);
+int info(iterator begin,iterator end);//システムの状態を表示する
+int stmp(iterator begin,iterator end);
 
-std::string reboot(const std::vector<std::string>&);
+File::FileBase* CreateRepeat();
 
-std::string test(const std::vector<std::string>&);//実験用
+
+int reboot(iterator begin,iterator end);
+
+int test(iterator begin,iterator end);//実験用
 }
 } /* namespace Device */
 

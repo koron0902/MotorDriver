@@ -9,6 +9,7 @@
 using namespace std;
 using namespace common;
 using namespace App::File;
+using namespace Middle;
 
 namespace App {
 
@@ -19,7 +20,8 @@ static std::vector<std::string> history; //過去の命令をひとつだけ保�
 static std::vector<File::Directory*> path; //省略用
 
 void Init() {
-	Directory* bin;Property *p;
+	Directory* bin;
+	Property *p;
 	current = root = Directory::Create("root");
 	root->Add(bin = Bin::Create());
 	root->Add(Dev::Create());
@@ -27,44 +29,79 @@ void Init() {
 	path.push_back(bin);
 }
 
-string Call(std::vector<std::string>& arg) {
+int Call(iterator begin, iterator end) {
+	if (distance(begin, end) >= 1) {
+		FileBase* file = current->Search(*begin);
+		if (file != nullptr) {
+			if (file->GetMode().IsExecutable()) {
+				return (*file)(begin, end);
+			} else {
+				XPort::WriteLine("NonExecute");
+				return -1;
+			}
+		}
+
+		for (auto dir : path) {
+			if ((file = dir->Search(*begin)) != nullptr) {
+				if (file->GetMode().IsExecutable()) {
+					return (*file)(begin, end);
+				} else {
+					XPort::WriteLine("NonExecute");
+					return -1;
+				}
+			}
+		}
+		return -1;
+	} else {
+		return -1;
+	}
+}
+
+int Call(std::vector<std::string>& arg) {
+	/*
 	if (arg.empty())
-		return "";
+		return -1;
 	history = arg;
 	auto& method = arg[0];
 	FileBase* file;
 
 	if ((file = current->Search(method)) != nullptr) {
 		if (file->GetMode().IsExecutable()) {
-			return (*file)(arg);
+			return (*file)(arg.begin, arg.end());
 		} else {
-			return "NonExecute";
+			XPort::WriteLine("NonExecute");
+			return -1;
 		}
 	}
 
 	for (auto dir : path) {
 		if ((file = dir->Search(method)) != nullptr) {
 			if (file->GetMode().IsExecutable()) {
-				return (*file)(arg);
+				return (*file)(arg.begin, arg.end());
 			} else {
-				return "NonExecute";
+				XPort::WriteLine("NonExecute");
+				return -1;
 			}
 		}
 	}
 	return "Not Exist";
+	*/
+	return Call(arg.begin(),arg.end());
 }
 
-string Call(const string& text) {
+int Call(const string& text) {
 	string buf = "";
 	buf.reserve(64);
-	bool flag=false;
+	bool flag = false;
 	auto lst = Split(text, ":");
 	for (auto &commmand : lst) {
 		auto sp = Split(commmand, " ");
-		buf += flag?Call(sp)+":":Call(sp);
+		if (flag)XPort::Write(":");
+		Call(sp);
+		flag=true;
 	}
-	return buf;
-}
+	return 0;
+	}
 
 }
 }

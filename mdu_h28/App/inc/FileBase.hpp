@@ -7,7 +7,7 @@
 
 namespace App {
 namespace File {
-
+using iterator=std::vector<std::string>::iterator;
 enum class FileType
 	:uint16_t {
 		None = 0, //エラー用の空集合
@@ -63,6 +63,7 @@ class FileBase {
 public:
 	static constexpr int MaxNumber = 32; //ファイルの最大数
 	static constexpr int MaxSize = 80; //派生先を含むクラスの最大サイズ
+
 private:
 	std::string name;
 	//本当はスマートポインタを使うはずだった..
@@ -86,7 +87,8 @@ public:
 	FileBase(const std::string& name); //本来はprotected
 	virtual ~FileBase();
 
-	virtual std::string operator()(std::vector<std::string>&);
+	//virtual std::string operator()(std::vector<std::string>&);
+	virtual int operator ()(iterator begin,iterator end);
 	FileType GetFlag() const {
 		return type;
 	}

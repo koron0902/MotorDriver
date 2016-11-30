@@ -35,10 +35,7 @@ void CommandLine() {
 			buffer_uart += c;
 
 		} else {
-			string temp = Shell::Call(buffer_uart);
-			if (temp != "") {
-				Uart::WriteLine();
-			}
+			Shell::Call(buffer_uart);
 			buffer_uart = "";
 		}
 	}
@@ -55,11 +52,8 @@ void CommandLine() {
 			if (c != common::newline) {
 				buffer_usb += c;
 			} else {
-				string temp = Shell::Call(buffer_usb);
-				if (temp != "") {
-					USB::WriteLine(temp);
-					USB::Flush();
-				}
+				Shell::Call(buffer_usb);
+				USB::Flush();
 				buffer_usb = "";
 			}
 		}

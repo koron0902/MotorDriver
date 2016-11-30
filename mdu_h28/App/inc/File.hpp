@@ -25,18 +25,41 @@ public:
 	//virtual std::string operator()(std::vector<std::string>&);
 };
 
+template<class Func> //インライン展開しやすいように変更
 class Execute: public FileBase {
-public:
-	using command= std::function<std::string(std::vector<std::string>&)>;
 private:
-	command func;
-	Execute(const std::string& name, const command& func = nullptr);
+	Func m_func;
+	Execute(const std::string& name, const Func& func) :
+			FileBase(name), m_func(func) {
+	}
 public:
-	static Execute* Create(const std::string& filename, const command& cmd =
-			nullptr);
-	virtual std::string operator()(std::vector<std::string>& v);
-
+	static Execute<Func>* Create(const std::string& filename, const Func& func) {
+		return new Execute<Func> (filename, func);
+	}
+	virtual int operator()(iterator begin, iterator end) {
+		return m_func(begin, end);
+	}
 };
+
+//互換性を保つために作成した関数ポインター版(非推奨)
+using func_ptr = int(*)(iterator,iterator);
+template<> class Execute<func_ptr>:public FileBase {
+	func_ptr m_func;
+	Execute(const std::string& name, func_ptr func) :
+			FileBase(name), m_func(func) {
+	}
+public:
+	static Execute<func_ptr>* Create(const std::string& filename, const func_ptr& func) {
+		return new Execute<func_ptr>(filename, func);
+	}
+	virtual int operator()(iterator begin, iterator end) {
+		return m_func(begin, end);
+	}
+};
+//毎回書くのが面倒なので省略形
+template <class T> FileBase* CreateExecute(const std::string& filename,const T& obj){
+	return Execute<T>::Create(filename,obj);
+}
 
 class Integer: public FileBase {
 private:
@@ -46,7 +69,6 @@ public:
 	static Integer* Create(const std::string& filename, int32_t* d = nullptr);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
-	//virtual std::string operator()(std::vector<std::string>&);
 };
 
 class Float: public FileBase {
@@ -57,7 +79,6 @@ public:
 	static Float* Create(const std::string& filename, float* f = nullptr);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
-	//virtual std::string operator()(std::vector<std::string>&);
 };
 
 class String: public FileBase {
@@ -68,7 +89,6 @@ public:
 	static String* Create(const std::string& filename, std::string* str);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
-	//virtual std::string operator()(std::vector<std::string>&);
 };
 
 class Fix: public FileBase {
@@ -79,7 +99,6 @@ public:
 	static Fix* Create(const std::string& filename, fix32* f);
 	virtual std::string GetData();
 	virtual std::string SetData(const std::string&);
-	//virtual std::string operator()(std::vector<std::string>&);
 };
 
 class Property: public FileBase {
@@ -97,8 +116,8 @@ public:
 			const std::function<std::string(void)>& get);
 	static Property* CreateWriteOnly(const std::string& filename,
 			const std::function<std::string(const std::string&)>& set);
-	 virtual std::string GetData();
-	 virtual std::string SetData(const std::string&);
+	virtual std::string GetData();
+	virtual std::string SetData(const std::string&);
 
 };
 

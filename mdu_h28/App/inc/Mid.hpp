@@ -3,14 +3,14 @@
 
 #include <File.hpp>
 #include <type.hpp>
+#include <vector>
+#include <string>
 namespace App {
 namespace Mid{
+
+using iterator = App::File::iterator;
+
 File::Directory* Create();
-
-std::string Duty(const common::ShellParameter&);
-std::string Free(const common::ShellParameter&);
-std::string Lock(const common::ShellParameter&);
-
 
 }
 } /* namespace App */

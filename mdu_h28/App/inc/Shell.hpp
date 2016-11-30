@@ -15,10 +15,10 @@ namespace Shell{
 	//Initialize
 	void Init();
 	//shellの呼び出し
-	std::string Call(std::vector<std::string>&);
-	std::string Call(const std::string&);
-
-
+	using iterator=File::iterator;
+	int Call(iterator begin,iterator end);
+	int Call(const std::vector<std::string>&);
+	int Call(const std::string&);
 }
 }
 

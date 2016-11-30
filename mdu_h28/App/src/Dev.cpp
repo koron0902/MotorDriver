@@ -1,3 +1,4 @@
+#include <iterator>
 #include <Dev.hpp>
 #include <Uart.hpp>
 #include <ADC.hpp>
@@ -21,31 +22,24 @@ Directory* Create() {
 }
 
 Directory* CreateUart() {
+	using iterator = std::vector<std::string>::iterator;
 	Directory* uart = Directory::Create("uart");
 
-	uart->Add(Execute::Create("write", [](const vector<string>& arg)->string {
-		if (arg.size()>1); {
-			Uart::Write(arg[1]);
+	auto write = [](iterator begin,iterator end)->int {
+		if (std::distance(begin,end)>=1) {
+			begin++;
+			Uart::Write(*begin);
 		}
-		return "";
-	}));
+		return 0;
+	};
 
-	uart->Add(Execute::Create("band", [](const vector<string>& arg)->string {
-		if (arg.size()>2) {
-			//int band=atoi(arg[2].c_str());
-			//if (band!=0){
-			//後日実装予定
-			//}else{
-
-			//}
-		}
-		return "Standby";
-	}));
+	uart->Add(Execute<decltype(write)>::Create("write", write));
 
 	return uart;
 }
 
 File::Directory* CreateADC() {
+	using iterator =App::File::FileBase;
 	Directory* dir = Directory::Create("adc");
 
 	dir->Add(Property::CreateReadOnly("batt", [] {
@@ -54,16 +48,15 @@ File::Directory* CreateADC() {
 
 	dir->Add(
 			Property::CreateReadOnly("vlot",
-					[] {
+					[] () {
 						return ToStr(ADC::GetVlotU())+" "+ToStr(ADC::GetVlotV())+" "+ToStr(ADC::GetVlotU());
 					}));
 
 	dir->Add(
 			Property::CreateReadOnly("amp",
-					[] {
+					[] () {
 						return ToStr(ADC::GetAmpU())+" "+ToStr(ADC::GetAmpV())+" "+ToStr(ADC::GetAmpU());
 					}));
-
 
 	return dir;
 }

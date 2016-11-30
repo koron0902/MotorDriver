@@ -1,8 +1,10 @@
 #include "FileBase.hpp"
 #include <mempool.hpp>
 #include <text.hpp>
+#include <XPort.hpp>
 using namespace common;
 using namespace std;
+using namespace Middle;
 namespace App {
 namespace File {
 
@@ -50,10 +52,17 @@ void FileBase::Add(FileBase* ptr) {
 	child = ptr;
 	ptr->parent = this;
 }
-
-string FileBase::operator()(std::vector<std::string>& s) {
-	return "NonSupport:Type=[" + ToStr((int) type) + "]+Mode=["
-			+ ToStr((int) mode) + "]";
+/*
+ string FileBase::operator()(std::vector<std::string>& s) {
+ return "NonSupport:Type=[" + ToStr((int) type) + "]+Mode=["
+ + ToStr((int) mode) + "]";
+ }
+ */
+int FileBase::operator()(iterator begin, iterator end) {
+	XPort::WriteLine(
+			"NonSupport:Type=[" + ToStr((int) type) + "]+Mode=["
+					+ ToStr((int) mode) + "]");
+	return -1;
 }
 
 string FileBase::GetData() {

@@ -13,164 +13,203 @@
 using namespace std;
 using namespace App::File;
 using namespace common;
+using namespace Middle;
 
 namespace App {
 namespace Bin {
 
 Directory* Create() {
 	Directory *bin = Directory::Create("bin");
-	bin->Add(Execute::Create("pwd", pwd));
-	bin->Add(Execute::Create("cd", cd));
-	bin->Add(Execute::Create("echo", echo));
-	bin->Add(Execute::Create("get", get));
-	bin->Add(Execute::Create("set", set));
-	bin->Add(Execute::Create("ls", ls));
-	bin->Add(Execute::Create("tree", tree));
-	bin->Add(Execute::Create("info", info));
-	bin->Add(Execute::Create("stmp", stmp));
-	bin->Add(Execute::Create("repeat", repeat));
-	bin->Add(Execute::Create("reboot", reboot));
+	bin->Add(CreatePWD());
+	bin->Add(CreateCD());
+	bin->Add(CreateECHO());
+	bin->Add(CreateGET());
+	bin->Add(CreateSET());
+	bin->Add(CreateLS());
+	bin->Add(CreateTree());
+	bin->Add(Execute<command>::Create("info", info));
+	bin->Add(Execute<command>::Create("stmp", stmp));
+	bin->Add(Execute<command>::Create("repeat", repeat));
+	bin->Add(Execute<command>::Create("reboot", reboot));
 
-	bin->Add(Execute::Create("test", test));
+	bin->Add(Execute<command>::Create("test", test));
 	return bin;
 }
 
-string pwd(const std::vector<std::string>& dummy) {
-	return current->GetPathName();
+FileBase* CreatePWD() {
+	auto pwd = [](iterator begin, iterator end)->int {
+		XPort::WriteLine(current->GetPathName());
+		return 0;
+	};
+	return Execute<decltype(pwd)>::Create("pwd", pwd);
 }
 
-string cd(const std::vector<std::string>& arg) {
-	if (arg.size() <= 1) {
-		File::current = File::root;
-		return "";
-	} else if (arg[1].empty()) {
-		File::current = File::root;
-
-		return "";
-	} else {
-		auto* file = File::current->Search(arg[1]);
-		if (file != nullptr) {
-			if (file->GetFlag() != FileType::Directory)
-				return string { "cd: not a directory" };
-			File::current = (Directory*) file;
-			return "";
+FileBase* CreateCD() {
+	auto cd = [](iterator begin, iterator end) {
+		iterator path = begin + 1;
+		if (std::distance(begin, end) <= 1) {
+			File::current = File::root;
+			return 0;
+		} else if ((*path) == "") {
+			File::current = File::root;
+			return -1;
 		} else {
-			return string { "cd: directory not found" };
-		}
-	}
-	return "";
-}
-
-string echo(const std::vector<std::string>& arg) {
-	string str;
-	for (unsigned int i = 1; i < arg.size(); i++) {
-		str += arg[i];
-		if (i < arg.size())
-			str += " ";
-	}
-	return str;
-}
-
-string get(const std::vector<std::string>& arg) {
-	//TODO: get stub
-	int idx;
-	int length = arg.size();
-	string text;
-	bool flag = false;
-	text.reserve(64);
-	for (idx = 1; idx < length; idx++) {
-		auto* file = File::current->Search(arg[idx]);
-		if (file != nullptr) {
-			auto mode = file->GetMode();
-			if (mode.IsReadable()) {
-				text += flag ? "," + file->GetData() : file->GetData();
-				flag = true;
+			auto* file = File::current->Search(*path);
+			if (file != nullptr) {
+				if (file->GetFlag() != FileType::Directory) {
+					XPort::WriteLine("cd: not a directory");
+					return -1;
+				} else {
+					File::current = (Directory*) file;
+					return 0;
+				}
 			} else {
-				return "Access Error";
+				XPort::WriteLine("cd: directory not found");
+				return -1;
 			}
-		} else {
-			return "found out";
 		}
-	}
-
-	return text;
-
+	};
+	return Execute<decltype(cd)>::Create("cd", cd);
 }
 
-string set(const std::vector<std::string>& arg) {
-	//TODO: set stub
-	int idx;
-	int lenght = arg.size();
-	for (idx = 1; idx + 1 < lenght; idx += 2) {
-		auto* file = File::current->Search(arg[idx]);
-		if (file != nullptr) {
-			auto mode = file->GetMode();
-			if (mode.IsWritable()) {
-				file->SetData(arg[idx + 1]);
-			} else {
-				return "Access Error";
+File::FileBase* CreateECHO() {
+	auto echo = [](iterator begin, iterator end) {
+
+		if (distance(begin, end) <= 1) {
+			for (auto it = begin + 1; it != end; it++) {
+				XPort::Write(*it);
 			}
+			return 0;
 		} else {
-			return "found out";
+			return -1;
 		}
-	}
-	return "";
+	};
+	return Execute<decltype(echo)>::Create("echo", echo);
 }
 
-std::string ls(const std::vector<std::string>& dummy) {
-	return current->GetChildrenName();
+File::FileBase* CreateGET() {
+	return File::CreateExecute("get", [](iterator begin, iterator end)->int {
+		if (distance(begin, end) >= 1) {
+			string text;
+			bool flag = false;
+			begin++;
+			while (distance(begin, end) >= 1) {
+				auto* file = File::current->Search(*begin);
+				if (file != nullptr) {
+					auto mode = file->GetMode();
+					if (mode.IsReadable()) {
+						XPort::Write(
+								flag ? "," + file->GetData() : file->GetData());
+						flag = true;
+					} else {
+						XPort::WriteLine("Access Error");
+						return -1;
+					}
+				} else {
+					XPort::WriteLine("Found Out");
+					return -1;
+				}
+				begin += 1;
+			}
+			XPort::WriteLine();
+			return 0;
+		} else {
+			XPort::WriteLine("Error:Empty");
+			return -1;
+		}
+	});
+
 }
 
-std::string tree(const std::vector<std::string>& dummy) {
-	return current->GetAllName();
+File::FileBase* CreateSET() {
+	return File::CreateExecute("set", [](iterator begin, iterator end) ->int {
+		if (distance(begin, end) >= 1) {
+			begin++;
+			while (distance(begin, end) >= 2) {
+				auto* file = File::current->Search(*(begin + 1));
+				if (file != nullptr) {
+					auto mode = file->GetMode();
+					if (mode.IsWritable()) {
+						file->SetData(*begin);
+					} else {
+						XPort::WriteLine("Access Error");
+						return -1;
+					}
+				} else {
+					XPort::WriteLine("found out");
+					return -1;
+				}
+			}
+			return 0;
+		} else {
+			XPort::WriteLine("Error:Empty");
+			return -1;
+		}
+	});
+}
+File::FileBase* CreateLS() {
+	return File::CreateExecute("ls", [](iterator begin, iterator end) {
+		XPort::WriteLine(current->GetChildrenName());
+		return 0;
+	});
 }
 
-std::string info(const std::vector<std::string>& dummy) {
+File::FileBase* CreateTree() {
+	return File::CreateExecute("tree", [](iterator begin, iterator end) {
+		XPort::WriteLine(current->GetAllName());
+		return 0;
+	});
+
+}
+
+int info(iterator begin, iterator end) {
 	string ss;
 	ss.reserve(256);
 	ss = string("System info") + newline;
-	ss += string("File Memory[Byte]:") +ToStr(FileBase::GetMemorySizeAll()) + ',';
+	ss += string("File Memory[Byte]:") + ToStr(FileBase::GetMemorySizeAll())
+			+ ',';
 	ss += ToStr(FileBase::GetMemorySizeUsed()) + ',';
-	ss +=ToStr(FileBase::GetMemorySizeFree()) + newline;
+	ss += ToStr(FileBase::GetMemorySizeFree()) + newline;
 	ss += "Stamp:" + ToStr(Device::Tick::TickUs());
-	return ss;
+	XPort::WriteLine(ss);
+	return 0;
 }
 
-std::string stmp(const std::vector<std::string>& dummy) {
+int stmp(iterator begin, iterator end) {
 	uint64_t temp = Device::Tick::TickUs();
-	return ToStr(temp);
+	XPort::WriteLine(ToStr(temp));
+	return 0;
 }
 
-std::string repeat(const std::vector<std::string>& vec) {
-	//この関数は本来、stringに返すことをバッファーがオーバーフローすることを防ぐためXPortで出力する。
-	using namespace Device::Tick;
-	using namespace Middle::XPort;
-	std::vector<std::string> sub;
-	uint64_t w;
-	//一つ目を飛ばして再作成
-	for (unsigned int idx = 1; idx < vec.size(); idx++) {
-		sub.push_back(vec[idx]);
-	}
+File::FileBase* CreateRepeat() {
+	return File::CreateExecute("repeat", [](iterator begin, iterator end) {
+//この関数は本来、stringに返すことをバッファーがオーバーフローすることを防ぐためXPortで出力する。
+			using namespace Device::Tick;
+			uint64_t w;
+//一つ目を飛ばして再作成
+			XPort::WriteLine("!finish before pressing any keys");
+			begin++;
+			while (XPort::IsEmpty()) {
+				Shell::Call(begin, end);
+				XPort::Flush();
+				w = Tick() + 0xFFF;
+				while (Tick() < w)
+				;
+			}
+			XPort::WriteLine("!Fin");
+			return 0;
+		});
 
-	WriteLine("!finish before pressing any keys");
-	while (IsEmpty()) {
-		WriteLine(Shell::Call(sub));
-		Flush();
-		w = Tick() + 0xFFF;
-		while (Tick() < w)
-			;
-	}
-	return "!Fin";
 }
-
-std::string test(const std::vector<std::string>& dummy) {
+int test(iterator begin, iterator end) {
 	auto a = fix32::CreateFloat(2.75f);
-	return ToStr(a);
+	XPort::WriteLine(ToStr(a));
+	return 0;
 }
 
-std::string reboot(const std::vector<std::string>& dummy) {
+int reboot(iterator begin, iterator end) {
 	NVIC_SystemReset();
-	return ""; //dummy cannot reach here
+	return 0; //dummy cannot reach here
 }
 
 }
