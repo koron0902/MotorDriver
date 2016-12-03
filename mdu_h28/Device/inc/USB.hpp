@@ -25,7 +25,7 @@ namespace USB {
 
 constexpr size_t RxBufferSize=128;//二次バッファの大きさ(受信)
 constexpr int TxBufferSize=256;
-constexpr int TxBufferLimit=64;
+constexpr int TxBufferLimit=196;
 constexpr size_t RxTempSize=32;//二次バッファへ移動する際のバッファの大きさ(スタックに乗る)
 
 // TODO USB header stub

@@ -39,21 +39,21 @@ Directory* CreateUart() {
 }
 
 File::Directory* CreateADC() {
-	using iterator =App::File::FileBase;
+	using iterator =App::File::iterator;
 	Directory* dir = Directory::Create("adc");
 
-	dir->Add(Property::CreateReadOnly("batt", [] {
+	dir->Add(File::CreateReadOnlyProperty("batt", [](){
 		return ToStr(ADC::GetVlot());
 	}));
 
 	dir->Add(
-			Property::CreateReadOnly("vlot",
+			File::CreateReadOnlyProperty("vlot",
 					[] () {
 						return ToStr(ADC::GetVlotU())+" "+ToStr(ADC::GetVlotV())+" "+ToStr(ADC::GetVlotU());
 					}));
 
 	dir->Add(
-			Property::CreateReadOnly("amp",
+			File::CreateReadOnlyProperty("amp",
 					[] () {
 						return ToStr(ADC::GetAmpU())+" "+ToStr(ADC::GetAmpV())+" "+ToStr(ADC::GetAmpU());
 					}));

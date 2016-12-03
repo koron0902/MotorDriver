@@ -17,8 +17,7 @@ Directory *root { nullptr }, *current { nullptr };
 
 Directory::Directory(const string& _name) :
 		FileBase(_name) {
-	SetMode(FileMode::None);
-	SetFlag(FileType::Directory);
+	SetType(FileType::Directory);
 }
 
 Directory* Directory::Create(const string& name) {
@@ -56,8 +55,7 @@ string Execute::operator()(std::vector<std::string>& v) {
 */
 Integer::Integer(const string& filename, int32_t* d) :
 		FileBase(filename) {
-	SetMode(FileMode::WriteAndRead);
-	SetFlag(FileType::FileInt32);
+	SetType(FileType::FileInt32);
 	data = d;
 }
 
@@ -90,8 +88,7 @@ string Integer::SetData(const std::string& str) {
  */
 Float::Float(const string& filename, float* f) :
 		FileBase(filename) {
-	SetMode(FileMode::WriteAndRead);
-	SetFlag(FileType::FileFloat);
+	SetType(FileType::FileFloat);
 	data = f;
 }
 
@@ -131,8 +128,8 @@ string Float::SetData(const std::string& str) {
  */
 String::String(const string& filename, std::string* str) :
 		FileBase(filename) {
-	SetMode(FileMode::WriteAndRead);
-	SetFlag(FileType::FileString);
+
+	SetType(FileType::FileString);
 	data = str;
 }
 
@@ -165,8 +162,8 @@ string String::SetData(const std::string& str) {
  */
 Fix::Fix(const string& filename, fix32* f) :
 		FileBase(filename) {
-	SetMode(FileMode::WriteAndRead);
-	SetFlag(FileType::FileFix);
+
+	SetType(FileType::FileFix);
 	data = f;
 }
 
@@ -197,6 +194,7 @@ string Fix::SetData(const std::string& str) {
  return "Error:(File)";
  }
  */
+/*
 Property::Property(const std::string& filename,
 		const std::function<std::string(void)>& get,
 		const std::function<std::string(const std::string&)>& set) :
@@ -242,6 +240,6 @@ string Property::SetData(const string& data) {
 		return "null";
 	}
 }
-
+*/
 }
 } /* namespace App */

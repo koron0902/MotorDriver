@@ -20,68 +20,26 @@ enum class FileType
 	FileFix,
 };
 
-struct FileMode {
-	const static FileMode None, Execute, WriteOnly, ReadOnly, WriteAndRead,
-			Protect;
-private:
-	uint8_t flag;
-public:
-	constexpr FileMode(uint8_t res = 0) :
-			flag(res) {
-	}
-	constexpr FileMode(const FileMode&) = default;
-
-	constexpr FileMode operator |(FileMode m) const {
-		return FileMode(flag | m.flag);
-	}
-	constexpr FileMode operator |=(FileMode m) {
-		return FileMode(flag |= m.flag);
-	}
-	operator int() const {
-		return flag;
-	}
-
-	FileMode operator =(FileMode m){
-		return FileMode(flag=m.flag);
-	}
-
-	bool IsExecutable() const {
-		return flag & Execute;
-	}
-	bool IsWritable() const {
-		return flag & WriteOnly;
-	}
-	bool IsReadable() const {
-		return flag & ReadOnly;
-	}
-	bool IsProtected() {
-		return flag & Protect;
-	}
-};
-
 class FileBase {
 public:
-	static constexpr int MaxNumber = 32; //ファイルの最大数
-	static constexpr int MaxSize = 80; //派生先を含むクラスの最大サイズ
-
+	static constexpr uint32_t MaxNumber = 128; //ファイルの最大数
+	static constexpr size_t MaxSize = 32; //派生先を含むクラスの最大サイズ[Byte]
+	static constexpr size_t MaxText=256;//ファイルシステムで使う文字列の合計数[Byte]
 private:
-	std::string name;
+	//std::string name;
+	const char* name;
 	//本当はスマートポインタを使うはずだった..
 	FileBase* parent { nullptr };
 	FileBase* child { nullptr };
 	FileBase* next { nullptr };
 	FileType type { FileType::None };
-	FileMode mode{FileMode::None};
 protected:
 	static void* operator new(size_t);
 	static void operator delete(void*);
-
-	void SetFlag(FileType _flag) {
+	void SetType(FileType _flag) {
 		type = _flag;
 	}
-	void SetMode(FileMode _mode) {
-		mode = _mode;
-	}
+
 	void Add(FileBase*); //子要素として追加
 public:
 	FileBase(const std::string& name); //本来はprotected
@@ -93,11 +51,7 @@ public:
 		return type;
 	}
 
-	FileMode GetMode() const {
-		return mode;
-	}
-
-	const std::string& GetName() const {
+	const char* GetName() const {
 		return name;
 	}
 	FileBase* SearchChilren(const std::string& name);
@@ -112,6 +66,10 @@ public:
 	static size_t GetMemorySizeAll();
 	static size_t GetMemorySizeUsed();
 	static size_t GetMemorySizeFree();
+	static size_t MaxItemSize();
+	static size_t GetTextSizeUsed();
+	static size_t GetTextSizeFree();
+	static size_t GetTextSizeAll();
 private:
 	std::string GetChildrenNameSub() const;
 };

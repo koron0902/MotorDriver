@@ -21,7 +21,7 @@ static std::vector<File::Directory*> path; //省略用
 
 void Init() {
 	Directory* bin;
-	Property *p;
+
 	current = root = Directory::Create("root");
 	root->Add(bin = Bin::Create());
 	root->Add(Dev::Create());
@@ -33,22 +33,12 @@ int Call(iterator begin, iterator end) {
 	if (distance(begin, end) >= 1) {
 		FileBase* file = current->Search(*begin);
 		if (file != nullptr) {
-			if (file->GetMode().IsExecutable()) {
-				return (*file)(begin, end);
-			} else {
-				XPort::WriteLine("NonExecute");
-				return -1;
-			}
+			return (*file)(begin, end);
 		}
 
 		for (auto dir : path) {
 			if ((file = dir->Search(*begin)) != nullptr) {
-				if (file->GetMode().IsExecutable()) {
-					return (*file)(begin, end);
-				} else {
-					XPort::WriteLine("NonExecute");
-					return -1;
-				}
+				return (*file)(begin, end);
 			}
 		}
 		return -1;
@@ -59,34 +49,34 @@ int Call(iterator begin, iterator end) {
 
 int Call(std::vector<std::string>& arg) {
 	/*
-	if (arg.empty())
-		return -1;
-	history = arg;
-	auto& method = arg[0];
-	FileBase* file;
+	 if (arg.empty())
+	 return -1;
+	 history = arg;
+	 auto& method = arg[0];
+	 FileBase* file;
 
-	if ((file = current->Search(method)) != nullptr) {
-		if (file->GetMode().IsExecutable()) {
-			return (*file)(arg.begin, arg.end());
-		} else {
-			XPort::WriteLine("NonExecute");
-			return -1;
-		}
-	}
+	 if ((file = current->Search(method)) != nullptr) {
+	 if (file->GetMode().IsExecutable()) {
+	 return (*file)(arg.begin, arg.end());
+	 } else {
+	 XPort::WriteLine("NonExecute");
+	 return -1;
+	 }
+	 }
 
-	for (auto dir : path) {
-		if ((file = dir->Search(method)) != nullptr) {
-			if (file->GetMode().IsExecutable()) {
-				return (*file)(arg.begin, arg.end());
-			} else {
-				XPort::WriteLine("NonExecute");
-				return -1;
-			}
-		}
-	}
-	return "Not Exist";
-	*/
-	return Call(arg.begin(),arg.end());
+	 for (auto dir : path) {
+	 if ((file = dir->Search(method)) != nullptr) {
+	 if (file->GetMode().IsExecutable()) {
+	 return (*file)(arg.begin, arg.end());
+	 } else {
+	 XPort::WriteLine("NonExecute");
+	 return -1;
+	 }
+	 }
+	 }
+	 return "Not Exist";
+	 */
+	return Call(arg.begin(), arg.end());
 }
 
 int Call(const string& text) {
@@ -96,12 +86,13 @@ int Call(const string& text) {
 	auto lst = Split(text, ":");
 	for (auto &commmand : lst) {
 		auto sp = Split(commmand, " ");
-		if (flag)XPort::Write(":");
+		if (flag)
+			XPort::Write(":");
 		Call(sp);
-		flag=true;
+		flag = true;
 	}
 	return 0;
-	}
+}
 
 }
 }

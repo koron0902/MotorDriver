@@ -29,7 +29,7 @@ Directory* Create() {
 	bin->Add(CreateTree());
 	bin->Add(Execute<command>::Create("info", info));
 	bin->Add(Execute<command>::Create("stmp", stmp));
-	bin->Add(Execute<command>::Create("repeat", repeat));
+	bin->Add(CreateRepeat());
 	bin->Add(Execute<command>::Create("reboot", reboot));
 
 	bin->Add(Execute<command>::Create("test", test));
@@ -96,15 +96,9 @@ File::FileBase* CreateGET() {
 			while (distance(begin, end) >= 1) {
 				auto* file = File::current->Search(*begin);
 				if (file != nullptr) {
-					auto mode = file->GetMode();
-					if (mode.IsReadable()) {
-						XPort::Write(
-								flag ? "," + file->GetData() : file->GetData());
-						flag = true;
-					} else {
-						XPort::WriteLine("Access Error");
-						return -1;
-					}
+					XPort::Write(
+							flag ? "," + file->GetData() : file->GetData());
+					flag = true;
 				} else {
 					XPort::WriteLine("Found Out");
 					return -1;
@@ -126,19 +120,14 @@ File::FileBase* CreateSET() {
 		if (distance(begin, end) >= 1) {
 			begin++;
 			while (distance(begin, end) >= 2) {
-				auto* file = File::current->Search(*(begin + 1));
+				auto* file = File::current->Search(*(begin));
 				if (file != nullptr) {
-					auto mode = file->GetMode();
-					if (mode.IsWritable()) {
-						file->SetData(*begin);
-					} else {
-						XPort::WriteLine("Access Error");
-						return -1;
-					}
+					file->SetData(*(begin+1));
 				} else {
 					XPort::WriteLine("found out");
 					return -1;
 				}
+				begin+=2;
 			}
 			return 0;
 		} else {
@@ -163,15 +152,16 @@ File::FileBase* CreateTree() {
 }
 
 int info(iterator begin, iterator end) {
-	string ss;
-	ss.reserve(256);
-	ss = string("System info") + newline;
-	ss += string("File Memory[Byte]:") + ToStr(FileBase::GetMemorySizeAll())
-			+ ',';
-	ss += ToStr(FileBase::GetMemorySizeUsed()) + ',';
-	ss += ToStr(FileBase::GetMemorySizeFree()) + newline;
-	ss += "Stamp:" + ToStr(Device::Tick::TickUs());
-	XPort::WriteLine(ss);
+	XPort::WriteLine(
+			string("File Memory[Byte]:") + ToStr(FileBase::GetMemorySizeAll())
+					+ ',' + ToStr(FileBase::GetMemorySizeUsed()) + ','
+					+ ToStr(FileBase::GetMemorySizeFree()));
+	XPort::WriteLine(
+				string("Text Memory[Byte]:") + ToStr(FileBase::GetTextSizeAll())
+						+ ',' + ToStr(FileBase::GetTextSizeUsed()) + ','
+						+ ToStr(FileBase::GetTextSizeFree()));
+	XPort::WriteLine("File Size@Item:" + ToStr(FileBase::MaxItemSize()));
+	XPort::WriteLine( "Stamp:" + ToStr(Device::Tick::TickUs()));
 	return 0;
 }
 

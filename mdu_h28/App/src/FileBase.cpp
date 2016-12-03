@@ -2,25 +2,23 @@
 #include <mempool.hpp>
 #include <text.hpp>
 #include <XPort.hpp>
+#include <algorithm>
 using namespace common;
 using namespace std;
 using namespace Middle;
 namespace App {
 namespace File {
 
-const FileMode FileMode::None(0b0000);
-const FileMode FileMode::Execute(0b0001);
-const FileMode FileMode::WriteOnly(0b0010);
-const FileMode FileMode::ReadOnly(0b0100);
-const FileMode FileMode::WriteAndRead(0b0110);
-const FileMode FileMode::Protect(0b0110);
-
 static MemPool<FileBase::MaxSize, FileBase::MaxNumber> pool;
+static LockedPool<FileBase::MaxText> text_pool;
+static size_t size=0;
+
 
 void* FileBase::operator new(size_t sz) {
 	if (sz > MaxSize) {
 		return NULL; //クラスの大きさが不正
 	}
+	size=max(sz,size);
 	return pool.CreatePointer();
 }
 
@@ -28,8 +26,11 @@ void FileBase::operator delete(void* ptr) {
 	pool.ReleasePointer(ptr);
 }
 
-FileBase::FileBase(const string& _name) {
-	name = _name;
+FileBase::FileBase(const string& _name) :
+	name(text_pool.Clone(_name.c_str()))
+		{
+
+
 }
 
 FileBase::~FileBase() {
@@ -60,19 +61,16 @@ void FileBase::Add(FileBase* ptr) {
  */
 int FileBase::operator()(iterator begin, iterator end) {
 	XPort::WriteLine(
-			"NonSupport:Type=[" + ToStr((int) type) + "]+Mode=["
-					+ ToStr((int) mode) + "]");
+			"AccessError");
 	return -1;
 }
 
 string FileBase::GetData() {
-	return "NonSupport:Type=[" + ToStr((int) type) + "]+Mode=["
-			+ ToStr((int) mode) + "]";
+	return "AccessError";
 }
 
 string FileBase::SetData(const string& str) {
-	return "NonSupport:Type=[" + ToStr((int) type) + "]+Mode=["
-			+ ToStr((int) mode) + "]";
+	return "AccessError";
 }
 
 FileBase* FileBase::SearchChilren(const string& name) {
@@ -142,6 +140,22 @@ std::string FileBase::GetChildrenNameSub() const {
 	} else {
 		return name;
 	}
+}
+
+size_t FileBase::MaxItemSize(){
+	return size;
+}
+
+size_t FileBase::GetTextSizeUsed(){
+	return text_pool.CountUsedByte();
+}
+
+size_t FileBase::GetTextSizeFree(){
+	return text_pool.CountFreeByte();
+}
+
+size_t FileBase::GetTextSizeAll(){
+	return text_pool.CountAllByte();
 }
 
 }
