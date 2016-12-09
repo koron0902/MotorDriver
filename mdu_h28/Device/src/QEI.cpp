@@ -107,13 +107,14 @@ static constexpr QEI_T* QEI = (QEI_T*) LPC_QEI_BASE;
 
 static constexpr uint32_t FilterFrequency=1_MHz;//デジタルフィルタの周波数
 static constexpr uint32_t MeasureFrequency=100_Hz;//速度を計測する周波数
+volatile uint32_t* QEIVel;
 
 static inline void Reset() {
 	//Positionを初期化する
 	SetFilter(FilterFrequency/SystemCoreClock);
 	SetTimer(MeasureFrequency/SystemCoreClock);
 	QEI->CON = 0b1111;
-
+	QEIVel = &(QEI->VEL);
 }
 
 void Init() {

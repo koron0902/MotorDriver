@@ -140,19 +140,19 @@ struct fix32 {
 		return fix32(word - (x << shift));
 	}
 
-	constexpr fix32 operator *(const fix32& x) {
+	fix32 operator *(const fix32& x)const {
 		return fix32(((int64_t) word * x.word) >> shift);
 	}
 
-	constexpr fix32 operator *(int32_t x) const{
+	fix32 operator *(int32_t x)const {
 		return fix32(word * x);
 	}
 
-	constexpr fix32 operator /(const fix32& x) const{
+	fix32 operator /(const fix32& x)const {
 		return fix32(((((int64_t) word) << shift) / x.word));
 	}
 
-	constexpr fix32 operator /(int32_t x)const {
+	fix32 operator /(int32_t x)const {
 		return fix32(word / x);
 	}
 
@@ -238,6 +238,7 @@ public:
 	fix16(int16_t value) :
 			half(value) {
 	}
+
 	fix16(const fix16&) = default;
 
 	static fix16 CreateInt(int16_t a) {
@@ -264,9 +265,9 @@ public:
 		return half>> shift;
 	}
 
-	fix16 operator =(const fix16& v) {
-		return fix16(half = v.half);
-	}
+	//fix16 operator =(const fix16& v) {
+	//	return fix16(half = v.half);
+	//}
 
 	int16_t GetRaw() const {
 		return half;
