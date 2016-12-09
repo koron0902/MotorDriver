@@ -115,7 +115,7 @@
 					</folderInfo>
 					<fileInfo id="com.crt.advproject.config.exe.debug.1080860020.1015753976" name="TaskManager.hpp" rcbsApplicability="disable" resourcePath="Device/inc/TaskManager.hpp" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="Device/inc/TaskManager.hpp|Device/src/TaskManager.cpp|FreeRTOS|usb|DriverOld" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="FreeRTOS" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
