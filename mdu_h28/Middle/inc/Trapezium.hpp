@@ -38,6 +38,10 @@ namespace Middle {
 			Trapezium(const Trapezium&) = default;
 			virtual ~Trapezium();
 
+			uint32_t GetFreq(){
+				return (int32_t)mFreq;
+			}
+
 			void StaticInitializer();
 
 			void operator ()(void){

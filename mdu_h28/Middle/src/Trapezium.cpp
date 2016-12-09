@@ -20,8 +20,8 @@ namespace Middle {
 
 
 		Trapezium::~Trapezium() {
-			Device::Port::Set(Device::Port::PWMEN, false);
-			Middle::Motor::ModeAs(Middle::Motor::Type::None);
+			//Device::Port::Set(Device::Port::PWMEN, false);
+			//Middle::Motor::ModeAs(Middle::Motor::Type::None);
 		}
 
 		void Trapezium::Proc(MotorInfo_t& motor){

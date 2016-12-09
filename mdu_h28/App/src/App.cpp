@@ -9,6 +9,7 @@
 #include <USB.hpp>
 #include <text.hpp>
 #include <PIDControl.hpp>
+#include <Trapezium.hpp>
 #include <Timer.hpp>
 #define forever() for(;;)
 
@@ -21,13 +22,13 @@ namespace App {
 static bool usb_flag = false;
 static string buffer_uart;
 static string buffer_usb;
-Middle::Controller::PID* pid;
+Middle::Controller::Trapezium* trap;
 void Init() {
 	Shell::Init();
 	buffer_uart.reserve(32);
 	buffer_usb.reserve(32);
-	pid = new Middle::Controller::PID();
-	Device::Timer::SetAction(1, pid->GetFreq(), std::move(*pid));
+	trap = new Middle::Controller::Trapezium();
+	Device::Timer::SetAction(1, trap->GetFreq(), std::move(*trap));
 }
 
 void CommandLine() {
