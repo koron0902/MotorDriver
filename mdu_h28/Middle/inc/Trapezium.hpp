@@ -28,8 +28,8 @@ namespace Middle {
 
 			fix32 mFreq;
 
-			static constexpr fix32 FREQ_DEFAULT = (5_KHz << fix32::shift);
-			static constexpr fix32 STEP_DEFAULT = (0.05 * fix32::gain);
+			static constexpr fix32 FREQ_DEFAULT = (30_KHz << fix32::shift);
+			static constexpr fix32 STEP_DEFAULT = (0.002 * fix32::gain);
 
 			void Proc(MotorInfo_t& motor);
 
