@@ -92,7 +92,7 @@ void DCMotor::SetDuty(fix32 duty) {
 	q32_t q = a.GetRaw() << 16; //小数部のみにする。
 	bool s = sign(c);
 
-	if (s) {
+	if (!s) {
 		//正転
 		SetSignal(Signal::AB);
 	} else {

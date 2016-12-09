@@ -69,8 +69,9 @@ string FileBase::GetData() {
 	return "AccessError";
 }
 
-string FileBase::SetData(const string& str) {
-	return "AccessError";
+int FileBase::SetData(const string& str) {
+	XPort::WriteLine("AccessError");
+	return -2;
 }
 
 FileBase* FileBase::SearchChilren(const string& name) {

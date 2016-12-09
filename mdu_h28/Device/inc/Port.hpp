@@ -74,21 +74,27 @@ extern const PortData PWRGD;
 //Communication
 extern const PortData Tx;
 extern const PortData Rx;
-//他にも二個ピンがあるが使わないので定義しない。
 
 //QEI
 extern const PortData QEI_X;
 extern const PortData QEI_Y;
-extern const PortData QEI_Z;
+//extern const PortData QEI_Z;
 
 //USB
 extern const PortData UID;
+
+//Hole Sensors
+extern const PortData HoleU;
+extern const PortData HoleV;
+extern const PortData HoleW;
 
 void Init();
 
 void Set(PortData,bool);
 bool Get(PortData);
 void Toggle(PortData);
+
+
 
 
 }

@@ -8,6 +8,11 @@
 namespace App {
 namespace File {
 using iterator=std::vector<std::string>::iterator;
+
+using execute_fp = int(*)(iterator,iterator);
+using set_fp=int(*)(const std::string&);
+using get_fp=std::string(*)(void);
+
 enum class FileType
 	:uint16_t {
 		None = 0, //エラー用の空集合
@@ -22,7 +27,7 @@ enum class FileType
 
 class FileBase {
 public:
-	static constexpr uint32_t MaxNumber = 128; //ファイルの最大数
+	static constexpr uint32_t MaxNumber = 64; //ファイルの最大数
 	static constexpr size_t MaxSize = 32; //派生先を含むクラスの最大サイズ[Byte]
 	static constexpr size_t MaxText=256;//ファイルシステムで使う文字列の合計数[Byte]
 private:
@@ -51,14 +56,14 @@ public:
 		return type;
 	}
 
-	const char* GetName() const {
+	std::string GetName() const {
 		return name;
 	}
 	FileBase* SearchChilren(const std::string& name);
 	FileBase* Search(const std::vector<std::string>&);
 	FileBase* Search(const std::string&);
 	virtual std::string GetData();
-	virtual std::string SetData(const std::string&);
+	virtual int SetData(const std::string&);
 	std::string GetPathName() const;
 	std::string GetChildrenName() const;
 	std::string GetAllName(unsigned int sp = 0) const;

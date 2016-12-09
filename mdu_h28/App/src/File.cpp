@@ -6,9 +6,11 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
+#include <XPort.hpp>
 
 using namespace common;
 using namespace std;
+using namespace Middle;
 
 namespace App {
 namespace File {
@@ -34,25 +36,25 @@ void Directory::Add(FileBase* p) {
  }
  */
 /*
-Execute::Execute(const string& filename, const command& _func) :
-		FileBase(filename) {
-	func = _func;
-	SetMode(FileMode::Execute);
-	SetFlag(FileType::Execute);
-}
+ Execute::Execute(const string& filename, const command& _func) :
+ FileBase(filename) {
+ func = _func;
+ SetMode(FileMode::Execute);
+ SetFlag(FileType::Execute);
+ }
 
-Execute* Execute::Create(const string& filename, const command& cmd) {
-	return new Execute(filename, cmd);
-}
+ Execute* Execute::Create(const string& filename, const command& cmd) {
+ return new Execute(filename, cmd);
+ }
 
-string Execute::operator()(std::vector<std::string>& v) {
-	if (func != nullptr) {
-		return func(v);
-	} else {
-		return "Error:(CMD is Nothing)";
-	}
-}
-*/
+ string Execute::operator()(std::vector<std::string>& v) {
+ if (func != nullptr) {
+ return func(v);
+ } else {
+ return "Error:(CMD is Nothing)";
+ }
+ }
+ */
 Integer::Integer(const string& filename, int32_t* d) :
 		FileBase(filename) {
 	SetType(FileType::FileInt32);
@@ -71,14 +73,16 @@ string Integer::GetData() {
 	}
 }
 
-string Integer::SetData(const std::string& str) {
-	if (str.empty())
-		return "null"; //NPE prevention
-	if (data != nullptr) {
+int Integer::SetData(const std::string& str) {
+	if (str.empty()) {
+		XPort::WriteLine("Null");
+		return -1; //NPE prevention
+	} else if (data != nullptr) {
 		*data = ToInt(str);
-		return "";
+		return 0;
 	} else {
-		return "found out";
+		XPort::WriteLine("found out");
+		return -1;
 	}
 }
 /*
@@ -109,16 +113,18 @@ string Float::GetData() {
 	}
 }
 
-string Float::SetData(const std::string& str) {
+int Float::SetData(const std::string& str) {
 	if (data != nullptr) {
 		if (str.empty()) {
-			return "null"; //NPE prevention
+			XPort::WriteLine("Null");
+			return -1; //NPE prevention
 		} else {
 			*data = (float) std::atof(str.data());
-			return "";
+			return 0;
 		}
 	} else {
-		return "found out";
+		XPort::WriteLine("found out");
+		return -1;
 	}
 }
 /*
@@ -145,14 +151,13 @@ string String::GetData() {
 	}
 }
 
-string String::SetData(const std::string& str) {
+int String::SetData(const std::string& str) {
 	if (data != nullptr) {
-		if (str.empty())
-			return "null"; //NPE prevention
 		*data = str;
-		return "";
+		return 0;
 	} else {
-		return "found out";
+		XPort::WriteLine("Null");
+		return -1;
 	}
 }
 /*
@@ -162,7 +167,6 @@ string String::SetData(const std::string& str) {
  */
 Fix::Fix(const string& filename, fix32* f) :
 		FileBase(filename) {
-
 	SetType(FileType::FileFix);
 	data = f;
 }
@@ -179,67 +183,19 @@ string Fix::GetData() {
 	}
 }
 
-string Fix::SetData(const std::string& str) {
+int Fix::SetData(const std::string& str) {
 	if (data != nullptr) {
-		if (str.empty())
-			return "null"; //NPE prevention
+		if (str.empty()) {
+			XPort::WriteLine("Null");
+			return -5; //NPE prevention
+		}
 		*data = ToFix(str);
-		return "";
+		return 0;
 	} else {
-		return "found out";
-	}
-}
-/*
- string FileFix::operator()(std::vector<std::string>& s) {
- return "Error:(File)";
- }
- */
-/*
-Property::Property(const std::string& filename,
-		const std::function<std::string(void)>& get,
-		const std::function<std::string(const std::string&)>& set) :
-		FileBase(filename), fget(get), fset(set) {
-	FileMode mode;
-	if (get != nullptr) {
-		mode |= FileMode::ReadOnly;
-	}
-	if (set != nullptr) {
-		mode |= FileMode::WriteOnly;
-	}
-	SetMode(mode);
-}
-
-Property* Property::Create(const string& filename,
-		const function<string(void)>& get,
-		const function<string(const string&)>& set) {
-	return new Property(filename, get, set);
-}
-
-Property* Property::CreateReadOnly(const std::string& filename,
-		const std::function<std::string(void)>& get) {
-	return new Property(filename, get, nullptr);
-}
-
-Property* Property::CreateWriteOnly(const std::string& filename,
-		const std::function<std::string(const std::string&)>& set) {
-	return new Property(filename, nullptr, set);
-}
-
-string Property::GetData() {
-	if (fget != nullptr) {
-		return fget();
-	} else {
-		return "null";
+		XPort::WriteLine("FoundOut");
+		return -3;
 	}
 }
 
-string Property::SetData(const string& data) {
-	if (fset != nullptr) {
-		return fset(data);
-	} else {
-		return "null";
-	}
-}
-*/
 }
 } /* namespace App */

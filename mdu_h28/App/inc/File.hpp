@@ -44,18 +44,17 @@ public:
 };
 
 //互換性を保つために作成した関数ポインター版(非推奨)
-using func_ptr = int(*)(iterator,iterator);
-template<> class Execute<func_ptr> : public FileBase {
-	func_ptr m_func;
-	Execute(const std::string& name, func_ptr func) :
+template<> class Execute<execute_fp> : public FileBase {
+	execute_fp m_func;
+	Execute(const std::string& name, execute_fp func) :
 			FileBase(name), m_func(func) {
 		SetType(FileType::Execute);
 
 	}
 public:
-	static Execute<func_ptr>* Create(const std::string& filename,
-			const func_ptr& func) {
-		return new Execute<func_ptr>(filename, func);
+	static Execute<execute_fp>* Create(const std::string& filename,
+			const execute_fp& func) {
+		return new Execute<execute_fp>(filename, func);
 	}
 	virtual int operator()(iterator begin, iterator end) {
 		return m_func(begin, end);
@@ -74,7 +73,7 @@ private:
 public:
 	static Integer* Create(const std::string& filename, int32_t* d = nullptr);
 	virtual std::string GetData();
-	virtual std::string SetData(const std::string&);
+	virtual int SetData(const std::string&);
 };
 
 class Float: public FileBase {
@@ -84,7 +83,7 @@ private:
 public:
 	static Float* Create(const std::string& filename, float* f = nullptr);
 	virtual std::string GetData();
-	virtual std::string SetData(const std::string&);
+	virtual int SetData(const std::string&);
 };
 
 class String: public FileBase {
@@ -94,7 +93,7 @@ private:
 public:
 	static String* Create(const std::string& filename, std::string* str);
 	virtual std::string GetData();
-	virtual std::string SetData(const std::string&);
+	virtual int SetData(const std::string&);
 };
 
 class Fix: public FileBase {
@@ -104,28 +103,8 @@ private:
 public:
 	static Fix* Create(const std::string& filename, fix32* f);
 	virtual std::string GetData();
-	virtual std::string SetData(const std::string&);
+	virtual int SetData(const std::string&);
 };
-/*
- class Property: public FileBase {
- private:
- std::function<std::string(void)> fget;
- std::function<std::string(const std::string&)> fset;
- Property(const std::string& filename,
- const std::function<std::string(void)>& get,
- const std::function<std::string(const std::string&)>& set);
- public:
- static Property* Create(const std::string& filename,
- const std::function<std::string(void)>& get,
- const std::function<std::string(const std::string&)>& set);
- static Property* CreateReadOnly(const std::string& filename,
- const std::function<std::string(void)>& get);
- static Property* CreateWriteOnly(const std::string& filename,
- const std::function<std::string(const std::string&)>& set);
- virtual std::string GetData();
- virtual std::string SetData(const std::string&);
- };
- */
 
 template<class FSet, class FGet> class Property: public FileBase {
 private:
@@ -149,10 +128,29 @@ public:
 	}
 };
 
-template<class FSet, class FGet> Property<FSet, FGet>* CreateProperty(
-		const std::string & name, const FSet& set, const FGet& get) {
-	return new Property<FSet, FGet>(name, set, get);
-}
+//関数ポインタ版[互換性のため]
+template <>class Property<set_fp,get_fp>: public FileBase {
+private:
+	set_fp m_set;
+	get_fp m_get;
+	Property(const std::string& filename, const set_fp& set, const get_fp& get) :
+			FileBase(filename), m_set(set), m_get(get) {
+			SetType(FileType::Properties);
+
+	}
+public:
+	static Property<set_fp, get_fp>* Create(const std::string& filename,
+			const set_fp& set, const get_fp& get) {
+		return new Property<set_fp, get_fp>(filename, set, get);
+	}
+	virtual std::string GetData() {
+		return m_get();
+	}
+	virtual int SetData(const std::string& value) {
+		return m_set(value);
+	}
+};
+
 
 template<class FGet> class ReadOnlyProperty: public FileBase {
 private:
@@ -172,10 +170,23 @@ public:
 	}
 };
 
-template<class FGet> ReadOnlyProperty<FGet>*CreateReadOnlyProperty(
-		const std::string& name, const FGet& get) {
-	return ReadOnlyProperty<FGet>::Create(name, get);
-}
+template <>class ReadOnlyProperty<get_fp>: public FileBase {
+private:
+	get_fp m_get;
+	ReadOnlyProperty(const std::string filename, const get_fp& get) :
+			FileBase(filename), m_get(get) {
+		SetType(FileType::Properties);
+
+	}
+public:
+	static ReadOnlyProperty<get_fp>* Create(const std::string & filename,
+			const get_fp& get) {
+		return new ReadOnlyProperty<get_fp>(filename, get);
+	}
+	virtual std::string GetData() {
+		return m_get();
+	}
+};
 
 template<class FSet> class WriteOnlyProperty: public FileBase {
 private:
@@ -195,33 +206,40 @@ public:
 	}
 };
 
+template<> class WriteOnlyProperty<set_fp>: public FileBase {
+private:
+	set_fp m_set;
+	WriteOnlyProperty(const std::string& name, const set_fp& set) :
+			FileBase(name), m_set(set) {
+		SetType(FileType::Properties);
+
+	}
+public:
+	static WriteOnlyProperty<set_fp>* Create(const std::string & filename,
+			const set_fp& set) {
+		return new WriteOnlyProperty<set_fp>(filename, set);
+	}
+	virtual int SetData(const std::string& value){
+		return m_set(value);
+	}
+};
+
+template<class FSet, class FGet> Property<FSet, FGet>* CreateProperty(
+		const std::string & name, const FSet& set, const FGet& get) {
+	return new Property<FSet, FGet>(name, set, get);
+}
+
+template<class FGet> ReadOnlyProperty<FGet>*CreateReadOnlyProperty(
+		const std::string& name, const FGet& get) {
+	return ReadOnlyProperty<FGet>::Create(name, get);
+}
+
 template<class FSet> WriteOnlyProperty<FSet>*CreateWriteOnlyProperty(
 		const std::string& name, const FSet& set) {
 	return WriteOnlyProperty<FSet>::Create(name, set);
 }
 
 
-/*
- template<> class Property<>: public FileBase {
- private:
- FSet m_set;
- FGet m_get;
- Property(const std::string& filename, const FSet& set, const FGet& get) :
- FileBase(filename), m_set(set), m_get(get) {
- }
- public:
- static Property<FSet, FGet>* Create(const std::string& filename,
- const FSet& set, const FGet& get) {
- return new Property<FSet, FGet>(filename, set, get);
- }
- virtual std::string GetData() {
- return m_get();
- }
- virtual std::string SetData(const std::string& value) {
- return m_set(value);
- }
- };
- */
 
 
 extern Directory *root, *current;

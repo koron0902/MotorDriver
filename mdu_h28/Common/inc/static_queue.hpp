@@ -11,8 +11,9 @@ class StaticQueue {
 public:
 	constexpr static uint32_t Mask = size - 1;
 private:
-	T m_data[size];
 	uint32_t m_start, m_end, m_depth;
+	T m_data[size];
+
 public:
 	void Reset() {
 		m_start = m_end = m_depth = 0;
@@ -65,6 +66,7 @@ public:
 	bool IsEmpty() const {
 		return m_depth == 0;
 	}
+
 
 };
 }

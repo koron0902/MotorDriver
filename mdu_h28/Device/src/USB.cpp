@@ -28,6 +28,8 @@ struct VCOM_DATA {
 	uint8_t *rx_buff;
 	uint16_t rx_rd_count;
 	uint16_t rx_count;
+	uint16_t tx_buff_count;		//
+	uint8_t *tx_buff;
 	volatile uint16_t tx_flags;
 	volatile uint16_t rx_flags;
 };
@@ -289,12 +291,23 @@ uint32_t vcom_read_cnt(void) {
 
 /* Virtual com port write routine*/
 //uint32_t vcom_write(uint8_t *pBuf, uint32_t len) {
-uint32_t WriteDirect(uint8_t *pBuf, uint32_t len) {
+uint32_t vcom_write(const uint8_t *pBuf, uint32_t len) {
 	VCOM_DATA *pVcom = &g_vCOM;
 	uint32_t ret = 0;
 
 	if ((pVcom->tx_flags & VCOM_TX_CONNECTED)
 			&& ((pVcom->tx_flags & VCOM_TX_BUSY) == 0)) {
+		while (pVcom->tx_flags & VCOM_TX_BUSY)
+			;
+		/*if (!(pVcom->tx_flags & VCOM_TX_BUSY)) {*/
+		pVcom->tx_flags |= VCOM_TX_BUSY;
+		/* enter critical section */
+		NVIC_DisableIRQ(USB0_IRQn);
+		ret = USBD_API->hw->WriteEP(pVcom->hUsb, USB_CDC_IN_EP, (uint8_t*)pBuf, len);
+		/* exit critical section */
+		NVIC_EnableIRQ(USB0_IRQn);
+		/*}*/
+#if 0
 		pVcom->tx_flags |= VCOM_TX_BUSY;
 
 		/* enter critical section */
@@ -302,6 +315,7 @@ uint32_t WriteDirect(uint8_t *pBuf, uint32_t len) {
 		ret = USBD_API->hw->WriteEP(pVcom->hUsb, USB_CDC_IN_EP, pBuf, len);
 		/* exit critical section */
 		NVIC_EnableIRQ(USB0_IRQn);
+#endif
 	}
 
 	return ret;
@@ -396,6 +410,21 @@ char ReadByte() {
 	return c;
 }
 
+std::string ReadLine(){
+	if (IsLine()){
+		string text;
+		char c;
+		c=ReadByte();
+		while (c!=common::newline){
+			text+=c;
+			c=ReadByte();
+		}
+		return text;
+	}
+return "";
+}
+
+
 string Read() {
 	string s = "";
 	char c;
@@ -416,20 +445,19 @@ bool IsBusy() {
 	return pVcom->tx_flags & VCOM_TX_BUSY;
 }
 
-void Flush() {
-	VCOM_DATA *pVcom = &g_vCOM;
-	uint8_t temp[TxBufferSize];
-	size_t sz = RingBuffer_PopMult(&TxBuf, (void*)temp, TxBufferSize);
-	WriteDirect(temp, sz); //TxBufは先でコピーされる
-	while(IsBusy());
+void Write(const uint8_t* byte, size_t size) {
+	vcom_write(byte,size);
 }
 
-void Write(const char* byte, size_t size) {
-	RingBuffer_InsertMult(&TxBuf, (uint8_t*) byte, size);
-	if (RingBuffer_GetCount(&TxBuf) > TxBufferLimit) {
-		Flush();
+bool IsExist(char c){
+	char* data=(char*)RxRaw;
+	for (unsigned int i=RxBuf.tail;i!=RxBuf.head;i=(i+1)%RxBuf.count){
+		if (data[i]==c)return true;
 	}
+	return false;
 }
+
+
 
 //割り込み
 extern "C" void USB_IRQHandler(void) {

@@ -19,13 +19,13 @@ using command=int(*)(iterator,iterator);
 //基本命令
 File::FileBase* CreatePWD();
 File::FileBase* CreateCD();
-File::FileBase* CreateECHO();
-File::FileBase* CreateGET();
-File::FileBase* CreateSET();
-File::FileBase* CreateLS();
+File::FileBase* CreateEcho();
+File::FileBase* CreateGet();
+File::FileBase* CreateSet();
+File::FileBase* CreateLs();
 File::FileBase* CreateTree();
-
-int info(iterator begin,iterator end);//システムの状態を表示する
+File::FileBase* CreateInfo();
+File::FileBase* CreateStmp();
 int stmp(iterator begin,iterator end);
 
 File::FileBase* CreateRepeat();
