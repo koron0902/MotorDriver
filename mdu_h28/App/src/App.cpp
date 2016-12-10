@@ -12,7 +12,7 @@
 using namespace Device;
 using namespace std;
 using namespace Middle;
-using namespace common::errors;
+
 namespace App {
 
 void Init() {
@@ -28,9 +28,7 @@ void CommandLine() {
 			int code;
 			buf = XPort::ReadLine();
 			code=Shell::Call(buf);
-			if (IsError(code)){
-				XPort::WriteLine(GetMessage(code));
-			}
+
 		}
 		XPort::Flush();
 	};

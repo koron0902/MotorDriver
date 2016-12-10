@@ -24,11 +24,11 @@ void Init() {
 			sizeof(rxbuf_raw) / sizeof(rxbuf_raw[0]));
 }
 
-inline PortFlag GetPort() {
+PortFlag GetPort() {
 	return port;
 }
 
-inline void SetPort(PortFlag v) {
+void SetPort(PortFlag v) {
 	port = v;
 }
 
