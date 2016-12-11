@@ -450,6 +450,7 @@ void Write(const uint8_t* byte, size_t size) {
 }
 
 bool IsExist(char c){
+	ReadUpData();
 	char* data=(char*)RxRaw;
 	for (unsigned int i=RxBuf.tail;i!=RxBuf.head;i=(i+1)%RxBuf.count){
 		if (data[i]==c)return true;

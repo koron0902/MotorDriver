@@ -22,6 +22,7 @@ void Init() {
 void CommandLine() {
 
 	string buf;
+	buf.reserve(128);
 	auto call = [&buf]() {
 
 		while (XPort::IsLine()) {
@@ -33,7 +34,7 @@ void CommandLine() {
 		XPort::Flush();
 	};
 
-	buf.reserve(128);
+
 	auto temp = XPort::GetPort();
 	XPort::SetPort(XPort::PortFlag::UART);
 	call();
