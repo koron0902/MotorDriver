@@ -13,7 +13,10 @@ namespace Middle {
 	namespace Controller {
 		Trapezium::MotorInfo_t Trapezium::mMotorState;
 
-		Trapezium::Trapezium(): mFreq(FREQ_DEFAULT) {
+		Trapezium::Trapezium() {
+			CallProc = [this](){
+				this->Proc(mMotorState);
+			};
 			Device::Port::Set(Device::Port::PWMEN, true);
 			Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
 		}

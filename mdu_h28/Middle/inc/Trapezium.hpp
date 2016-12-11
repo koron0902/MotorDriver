@@ -12,11 +12,12 @@
 #include <fix.hpp>
 #include <unit.hpp>
 #include <text.hpp>
+#include <ControllerBase.h>
 
 namespace Middle {
 	namespace Controller {
 		using namespace common;
-		class Trapezium {
+		class Trapezium: public ControllerBase {
 		private:
 			typedef struct MotorInfo_t{
 				fix32 mLastDuty;
@@ -26,11 +27,6 @@ namespace Middle {
 			}MotorInfo_t;
 			static MotorInfo_t mMotorState;
 
-			fix32 mFreq;
-
-			static constexpr fix32 FREQ_DEFAULT = (30_KHz << fix32::shift);
-			static constexpr fix32 STEP_DEFAULT = (0.002 * fix32::gain);
-
 			void Proc(MotorInfo_t& motor);
 
 		public:
@@ -38,15 +34,10 @@ namespace Middle {
 			Trapezium(const Trapezium&) = default;
 			virtual ~Trapezium();
 
-			uint32_t GetFreq(){
-				return (int32_t)mFreq;
-			}
 
-			void StaticInitializer();
-
-			void operator ()(void){
+			/*void operator ()(void){
 				Proc(mMotorState);
-			};
+			};*/
 
 			static const std::string SetTargetDuty(const std::string& duty){
 				mMotorState.mTargetDuty = common::ToFix(duty);
