@@ -18,13 +18,13 @@ namespace Middle {
 		using namespace common;
 		class ControllerBase {
 		private:
+
+		protected:
+			fix32 mFreq;
 			static constexpr fix32 FREQ_DEFAULT = (30_KHz << fix32::shift);
 			static constexpr fix32 STEP_DEFAULT = (0.002 * fix32::gain);
 
 			std::function<void(void)> CallProc = nullptr;
-
-		protected:
-			fix32 mFreq;
 
 		public:
 			ControllerBase();
