@@ -18,7 +18,7 @@
 
 namespace Middle{
 	namespace Controller{
-		PID::PID():mFreq(FREQUENCY_DEFAULT),
+		PID::PID()://mFreq(FREQUENCY_DEFAULT),
 				mGearRate(GEAR_RATE_DEFAULT),
 				mRadius(RADIUS_DEFAULT),
 				mEncoderResolution(ENCODER_RESOLUTION_DEFAULT),
@@ -26,14 +26,18 @@ namespace Middle{
 				mKi(K_I_DEFAULT),
 				mKd(K_D_DEFAULT),
 				mKe(K_E_DEFAULT){
+			CallProc = [this](){
+				this->Proc(mLastState, mNextState);
+			};
+
 			Device::Port::Set(Device::Port::PWMEN, true);
 			Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
 		}
 
 		PID::~PID(){
 			//Device::Timer::SetAction(1, mFreq.word, nullptr);
-			Middle::Motor::ModeAs(Middle::Motor::Type::None);
-			Device::Port::Set(Device::Port::PWMEN, false);
+			//Middle::Motor::ModeAs(Middle::Motor::Type::None);
+			//Device::Port::Set(Device::Port::PWMEN, false);
 		}
 
 		void PID::Proc(MotorState_t& last, MotorState_t& next){

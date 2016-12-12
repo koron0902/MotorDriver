@@ -10,13 +10,14 @@
 
 #include <fix.hpp>
 #include <unit.hpp>
+#include <ControllerBase.h>
 
 namespace Middle{
 	namespace Controller{
 		using namespace common;
-		class PID{
+		class PID: public ControllerBase{
 		private:
-			fix32 mFreq;
+			//fix32 mFreq;
 			fix32 mGearRate;	// モータ側 /　タイヤ側
 			fix32 mRadius;
 			fix32 mEncoderResolution;
@@ -52,7 +53,6 @@ namespace Middle{
 			PID();
 			PID(const PID&) = default;
 			virtual ~PID();
-			//void Proc();
 			void SetGainP(fix32 p);
 			void SetGainP(float p);
 			void SetGainI(fix32 i);
@@ -63,13 +63,6 @@ namespace Middle{
 			void SetGearRate(uint32_t g);
 			void SetTargetSpeed(fix32 speed);
 			void SetTargetSpeed(float speed);
-			const int32_t GetFreq(){
-				return mFreq;
-			}
-
-			void operator ()(void){
-				Proc(mLastState, mNextState);
-			}
 		};
 	}
 }

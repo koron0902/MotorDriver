@@ -14,7 +14,6 @@
 
 namespace Middle {
 	namespace Controller {
-
 		using namespace common;
 		class ControllerBase {
 		private:
