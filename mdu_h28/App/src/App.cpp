@@ -7,6 +7,7 @@
 #include <Uart.hpp>
 #include <USB.hpp>
 #include <text.hpp>
+#include <QEI.hpp>
 #define forever() for(;;)
 
 using namespace Device;

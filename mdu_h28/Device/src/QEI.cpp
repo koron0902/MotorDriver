@@ -48,7 +48,7 @@ struct QEI_T {
 			__O unsigned RESPI :1;	//
 			__O unsigned RESV :1;	//
 			__O unsigned RESI :1;	//
-			__O unsigned :24;	//
+			__O unsigned :28;	//
 		};
 	};
 	union {
@@ -66,8 +66,9 @@ struct QEI_T {
 			__IO unsigned CAPMODE :1;	//
 			__IO unsigned INVINX :1;	//
 			__IO unsigned CRESPI :1;	//
-			__IO unsigned :10;	//
+			__IO unsigned :11;	//
 			__IO unsigned INXGATE :4;	//
+			__IO unsigned :12;
 		};
 	};
 	//Status Register
