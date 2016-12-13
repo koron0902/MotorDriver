@@ -12,12 +12,12 @@
 
 namespace App {
 namespace Shell{
+using namespace common;
 	//Initialize
 	void Init();
 	//shellの呼び出し
-	using iterator=File::iterator;
-	int Call(iterator begin,iterator end);
-	int Call(const std::vector<std::string>&);
+	int Call(text_iterator begin,text_iterator end);
+	int Call(const text_vector&);
 	int Call(const std::string&);
 }
 }

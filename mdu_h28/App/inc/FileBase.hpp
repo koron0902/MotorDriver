@@ -1,15 +1,10 @@
 #pragma once
 
-#include <stdint.h>
-#include <stddef.h>
-#include <vector>
-#include <string>
-
+#include <type.hpp>
 namespace App {
 namespace File {
-using iterator=std::vector<std::string>::iterator;
-
-using execute_fp = int(*)(iterator,iterator);
+using namespace common;
+using execute_fp = int(*)(text_iterator,text_iterator);
 using set_fp=int(*)(const std::string&);
 using get_fp=std::string(*)(void);
 
@@ -51,7 +46,7 @@ public:
 	virtual ~FileBase();
 
 	//virtual std::string operator()(std::vector<std::string>&);
-	virtual int operator ()(iterator begin,iterator end);
+	virtual int operator ()(text_iterator begin,text_iterator end);
 	FileType GetFlag() const {
 		return type;
 	}
@@ -60,7 +55,7 @@ public:
 		return name;
 	}
 	FileBase* SearchChilren(const std::string& name);
-	FileBase* Search(const std::vector<std::string>&);
+	FileBase* Search(const text_vector&);
 	FileBase* Search(const std::string&);
 	virtual std::string GetData();
 	virtual int SetData(const std::string&);
@@ -78,6 +73,20 @@ public:
 private:
 	std::string GetChildrenNameSub() const;
 };
+
+class Directory: public FileBase {
+private:
+	Directory(const std::string& name);
+public:
+	virtual ~Directory() = default;
+	static Directory* Create(const std::string& name);
+	void Add(FileBase* p);
+	//virtual std::string operator()(std::vector<std::string>&);
+};
+
+
+extern Directory *root, *current;
+
 }
 }
 

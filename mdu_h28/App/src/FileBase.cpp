@@ -12,7 +12,7 @@ namespace File {
 static MemPool<FileBase::MaxSize, FileBase::MaxNumber> pool;
 static LockedPool<FileBase::MaxText> text_pool;
 static size_t size=0;
-
+Directory *root { nullptr }, *current { nullptr };
 
 void* FileBase::operator new(size_t sz) {
 	if (sz > MaxSize) {
@@ -59,7 +59,7 @@ void FileBase::Add(FileBase* ptr) {
  + ToStr((int) mode) + "]";
  }
  */
-int FileBase::operator()(iterator begin, iterator end) {
+int FileBase::operator()(text_iterator begin, text_iterator end) {
 	XPort::WriteLine(
 			"AccessError");
 	return -1;
@@ -83,7 +83,7 @@ FileBase* FileBase::SearchChilren(const string& name) {
 	return nullptr;
 }
 
-FileBase* FileBase::Search(const vector<string>& lst) {
+FileBase* FileBase::Search(const text_vector& lst) {
 	FileBase* it = this;
 	for (const string& cmp : lst) {
 		if (cmp == "..") {
@@ -157,6 +157,20 @@ size_t FileBase::GetTextSizeFree(){
 
 size_t FileBase::GetTextSizeAll(){
 	return text_pool.CountAllByte();
+}
+
+Directory::Directory(const string& _name) :
+		FileBase(_name) {
+	SetType(FileType::Directory);
+}
+
+Directory* Directory::Create(const string& name) {
+	auto *p = new Directory(name);
+	return p;
+}
+
+void Directory::Add(FileBase* p) {
+	FileBase::Add(p);
 }
 
 }

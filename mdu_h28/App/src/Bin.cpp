@@ -1,9 +1,5 @@
 #include <Bin.hpp>
-#include <File.hpp>
-#include <sstream>
-#include <Timer.hpp>
 #include <text.hpp>
-#include <stdio.h>
 #include <Shell.hpp>
 #include <SysTick.hpp>
 #include <cmsis.h>
@@ -30,14 +26,13 @@ Directory* Create() {
 	bin->Add(CreateInfo());
 	bin->Add(CreateStmp());
 	bin->Add(CreateRepeat());
-	bin->Add(Execute<command>::Create("reboot", reboot));
-
-	bin->Add(Execute<command>::Create("test", test));
+	bin->Add(CreateTest());
+	bin->Add(CreateReboot());
 	return bin;
 }
 
 FileBase* CreatePWD() {
-	auto pwd = [](iterator begin, iterator end)->int {
+	auto pwd = [](text_iterator begin, text_iterator end)->int {
 		XPort::WriteLine(current->GetPathName());
 		return 0;
 	};
@@ -45,8 +40,8 @@ FileBase* CreatePWD() {
 }
 
 FileBase* CreateCD() {
-	auto cd = [](iterator begin, iterator end) {
-		iterator path = begin + 1;
+	auto cd = [](text_iterator begin, text_iterator end) {
+		text_iterator path = begin + 1;
 		if (std::distance(begin, end) <= 1) {
 			File::current = File::root;
 			return 0;
@@ -73,7 +68,7 @@ FileBase* CreateCD() {
 }
 
 File::FileBase* CreateEcho() {
-	auto echo = [](iterator begin, iterator end) {
+	auto echo = [](text_iterator begin, text_iterator end) {
 
 		if (distance(begin, end) <= 1) {
 			for (auto it = begin + 1; it != end; it++) {
@@ -88,84 +83,89 @@ File::FileBase* CreateEcho() {
 }
 
 File::FileBase* CreateGet() {
-	return File::CreateExecute("get", [](iterator begin, iterator end)->int {
-		if (distance(begin, end) >= 1) {
-			string text;
-			bool flag = false;
-			begin++;
-			while (distance(begin, end) >= 1) {
-				auto* file = File::current->Search(*begin);
-				if (file != nullptr) {
-					XPort::Write(
-							flag ? "," + file->GetData() : file->GetData());
-					flag = true;
+	return File::CreateExecute("get",
+			[](text_iterator begin, text_iterator end)->int {
+				if (distance(begin, end) >= 1) {
+					string text;
+					bool flag = false;
+					begin++;
+					while (distance(begin, end) >= 1) {
+						auto* file = File::current->Search(*begin);
+						if (file != nullptr) {
+							XPort::Write(
+									flag ? "," + file->GetData() : file->GetData());
+							flag = true;
+						} else {
+							XPort::WriteLine("Found Out");
+							return -1;
+						}
+						begin += 1;
+					}
+					XPort::WriteLine();
+					return 0;
 				} else {
-					XPort::WriteLine("Found Out");
+					XPort::WriteLine("Error:Empty");
 					return -1;
 				}
-				begin += 1;
-			}
-			XPort::WriteLine();
-			return 0;
-		} else {
-			XPort::WriteLine("Error:Empty");
-			return -1;
-		}
-	});
+			});
 
 }
 
 File::FileBase* CreateSet() {
-	return File::CreateExecute("set", [](iterator begin, iterator end) ->int {
-		if (distance(begin, end) >= 1) {
-			begin++;
-			while (distance(begin, end) >= 2) {
-				auto* file = File::current->Search(*(begin));
-				if (file != nullptr) {
-					file->SetData(*(begin+1));
+	return File::CreateExecute("set",
+			[](text_iterator begin, text_iterator end) ->int {
+				if (distance(begin, end) >= 1) {
+					begin++;
+					while (distance(begin, end) >= 2) {
+						auto* file = File::current->Search(*(begin));
+						if (file != nullptr) {
+							file->SetData(*(begin+1));
+						} else {
+							XPort::WriteLine("found out");
+							return -1;
+						}
+						begin+=2;
+					}
+					return 0;
 				} else {
-					XPort::WriteLine("found out");
+					XPort::WriteLine("Error:Empty");
 					return -1;
 				}
-				begin+=2;
-			}
-			return 0;
-		} else {
-			XPort::WriteLine("Error:Empty");
-			return -1;
-		}
-	});
+			});
 }
 File::FileBase* CreateLs() {
-	return File::CreateExecute("ls", [](iterator begin, iterator end) {
-		XPort::WriteLine(current->GetChildrenName());
-		return 0;
-	});
+	return File::CreateExecute("ls",
+			[](text_iterator begin, text_iterator end) {
+				XPort::WriteLine(current->GetChildrenName());
+				return 0;
+			});
 }
 
 File::FileBase* CreateTree() {
-	return File::CreateExecute("tree", [](iterator begin, iterator end) {
-		XPort::WriteLine(current->GetAllName());
-		return 0;
-	});
+	return File::CreateExecute("tree",
+			[](text_iterator begin, text_iterator end) {
+				XPort::WriteLine(current->GetAllName());
+				return 0;
+			});
 
 }
 
 File::FileBase* CreateInfo() {
-	return File::CreateExecute("info", [](iterator begin, iterator end)-> int {
+	return File::CreateExecute("info",
+			[](text_iterator begin, text_iterator end)-> int {
 
-		uint32_t mem = (FileBase::GetMemorySizeUsed() * 100)
-		/ FileBase::GetMemorySizeAll();
-		XPort::WriteLine(string("File Memory[%]:") + ToStr(mem));
+				uint32_t mem = (FileBase::GetMemorySizeUsed() * 100)
+				/ FileBase::GetMemorySizeAll();
+				XPort::WriteLine(string("File Memory[%]:") + ToStr(mem));
 
-		uint32_t text = (FileBase::GetTextSizeUsed() * 100)
-		/ FileBase::GetTextSizeAll();
-		XPort::WriteLine(string("Text Memory[%]:") + ToStr(text));
+				uint32_t text = (FileBase::GetTextSizeUsed() * 100)
+				/ FileBase::GetTextSizeAll();
+				XPort::WriteLine(string("Text Memory[%]:") + ToStr(text));
 
-		XPort::WriteLine("File Size@Item:" + ToStr(FileBase::MaxItemSize()));
-		XPort::WriteLine("TimeStamp:" + ToStr(Device::Tick::TickUs()));
-		return 0;
-	});
+				XPort::WriteLine("File Size@Item:" + ToStr(FileBase::MaxItemSize()));
+				XPort::WriteLine("TimeStamp:" + ToStr(Device::Tick::TickUs()));
+				return 0;
+			});
 }
 
 File::FileBase* CreateStmp() {
@@ -174,20 +174,18 @@ File::FileBase* CreateStmp() {
 	public:
 		stmp() :
 				FileBase("stmp") {
-				SetType(FileType::Execute);
+			SetType(FileType::Execute);
 		}
-		virtual int operator()(iterator begin, iterator end) {
+		virtual int operator()(text_iterator begin, text_iterator end) {
 			uint64_t temp = Device::Tick::TickUs();
 			XPort::WriteLine(ToStr(temp));
 			return 0;
 		}
-		virtual string GetData(){
+		virtual string GetData() {
 			return ToStr(Device::Tick::TickUs());
 		}
 
-
-
-		static stmp* Create(){
+		static stmp* Create() {
 			return new stmp;
 		}
 
@@ -196,35 +194,42 @@ File::FileBase* CreateStmp() {
 }
 
 File::FileBase* CreateRepeat() {
-return File::CreateExecute("repeat", [](iterator begin, iterator end) {
+	return File::CreateExecute("repeat",
+			[](text_iterator begin, text_iterator end) {
 //この関数は本来、stringに返すことをバッファーがオーバーフローすることを防ぐためXPortで出力する。
-		using namespace Device::Tick;
-		uint64_t w;
+				using namespace Device::Tick;
+				uint64_t w;
 //一つ目を飛ばして再作成
-		XPort::WriteLine("!finish before pressing any keys");
-		begin++;
-		while (XPort::IsEmpty()) {
-			Shell::Call(begin, end);
-			XPort::Flush();
-			w = Tick() + 0xFFF;
-			while (Tick() < w)
-			;
-		}
-		XPort::WriteLine("!Fin");
-		return 0;
-	});
+				XPort::WriteLine("!finish before pressing any keys");
+				begin++;
+				while (XPort::IsEmpty()) {
+					Shell::Call(begin, end);
+					XPort::Flush();
+					w = Tick() + 0xFFF;
+					while (Tick() < w)
+					;
+				}
+				XPort::WriteLine("!Fin");
+				return 0;
+			});
 
 }
-int test(iterator begin, iterator end) {
-auto a = fix32::CreateFloat(2.75f);
-XPort::WriteLine(ToStr(a));
-return 0;
+
+File::FileBase* CreateTest() {
+	return File::CreateExecute("test",
+			[](text_iterator begin, text_iterator end)->int {
+				auto a = fix32::CreateFloat(2.75f);
+				XPort::WriteLine(ToStr(a));
+				return 0;
+			});
 }
 
-int reboot(iterator begin, iterator end) {
-NVIC_SystemReset();
-return 0; //dummy cannot reach here
+File::FileBase* CreateReboot() {
+	return File::CreateExecute("reboot",
+			[](text_iterator begin, text_iterator end)->int {
+				NVIC_SystemReset();
+				return 0; //dummy cannot reach here
+			});
 }
-
 }
 } /* namespace Device */

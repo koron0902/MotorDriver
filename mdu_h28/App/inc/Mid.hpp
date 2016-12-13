@@ -1,16 +1,20 @@
 #ifndef APP_MID_H_
 #define APP_MID_H_
 
-#include <File.hpp>
-#include <type.hpp>
-#include <vector>
-#include <string>
+#include <FileBase.hpp>
+
+
+
 namespace App {
 namespace Mid{
 
-using iterator = App::File::iterator;
+
 
 File::Directory* Create();
+
+File::FileBase* CreateDuty();
+File::FileBase* CreateFree();
+File::FileBase* CreateLock();
 
 }
 } /* namespace App */

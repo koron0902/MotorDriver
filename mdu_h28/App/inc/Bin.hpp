@@ -8,14 +8,14 @@
 #ifndef APP_BIN_H_
 #define APP_BIN_H_
 
-#include <File.hpp>
+#include <FileBase.hpp>
 
 namespace App {
 namespace Bin {
-
+using namespace common;
 File::Directory* Create();
-using iterator=File::iterator;
-using command=int(*)(iterator,iterator);
+
+using command=int(*)(text_iterator,text_iterator);
 //基本命令
 File::FileBase* CreatePWD();
 File::FileBase* CreateCD();
@@ -26,14 +26,9 @@ File::FileBase* CreateLs();
 File::FileBase* CreateTree();
 File::FileBase* CreateInfo();
 File::FileBase* CreateStmp();
-int stmp(iterator begin,iterator end);
-
 File::FileBase* CreateRepeat();
-
-
-int reboot(iterator begin,iterator end);
-
-int test(iterator begin,iterator end);//実験用
+File::FileBase* CreateTest();
+File::FileBase* CreateReboot();
 }
 } /* namespace Device */
 

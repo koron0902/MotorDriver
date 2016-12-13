@@ -8,22 +8,12 @@
 #ifndef APP_FILE_H_
 #define APP_FILE_H_
 
-#include <functional>
-#include <fix.hpp>
 #include <FileBase.hpp>
 namespace App {
 namespace File {
 using namespace common;
 
-class Directory: public FileBase {
-private:
-	Directory(const std::string& name);
-public:
-	virtual ~Directory() = default;
-	static Directory* Create(const std::string& name);
-	void Add(FileBase* p);
-	//virtual std::string operator()(std::vector<std::string>&);
-};
+
 
 template<class Func> //インライン展開しやすいように変更
 class Execute: public FileBase {
@@ -38,7 +28,7 @@ public:
 			const Func& func) {
 		return new Execute<Func>(filename, func);
 	}
-	virtual int operator()(iterator begin, iterator end) {
+	virtual int operator()(text_iterator begin, text_iterator end) {
 		return m_func(begin, end);
 	}
 };
@@ -56,7 +46,7 @@ public:
 			const execute_fp& func) {
 		return new Execute<execute_fp>(filename, func);
 	}
-	virtual int operator()(iterator begin, iterator end) {
+	virtual int operator()(text_iterator begin, text_iterator end) {
 		return m_func(begin, end);
 	}
 };
@@ -239,10 +229,6 @@ template<class FSet> WriteOnlyProperty<FSet>*CreateWriteOnlyProperty(
 	return WriteOnlyProperty<FSet>::Create(name, set);
 }
 
-
-
-
-extern Directory *root, *current;
 
 } /* namespace App */
 }

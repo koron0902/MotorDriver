@@ -1,4 +1,3 @@
-#include <iterator>
 #include <Dev.hpp>
 #include <Uart.hpp>
 #include <ADC.hpp>
@@ -39,9 +38,7 @@ Directory* CreateUart() {
 }
 
 File::Directory* CreateADC() {
-	using iterator =App::File::iterator;
 	Directory* dir = Directory::Create("adc");
-
 	dir->Add(File::CreateReadOnlyProperty("batt", [](){
 		return ToStr(ADC::GetVlot());
 	}));

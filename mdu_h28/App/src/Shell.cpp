@@ -1,11 +1,8 @@
 #include <Bin.hpp>
 #include <Dev.hpp>
 #include <Mid.hpp>
-#include <text.hpp>
-#include "TaskManager.hpp"
 #include <Shell.hpp>
-#include <Uart.hpp>
-#include <xport.hpp>
+#include <XPort.hpp>
 using namespace std;
 using namespace common;
 using namespace App::File;
@@ -29,7 +26,7 @@ void Init() {
 	path.push_back(bin);
 }
 
-int Call(iterator begin, iterator end) {
+int Call(text_iterator begin, text_iterator end) {
 	if (distance(begin, end) >= 1) {
 		FileBase* file = current->Search(*begin);
 		if (file != nullptr) {

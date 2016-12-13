@@ -7,7 +7,7 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 
-#include <diskio.hpp>		/* FatFs lower layer API */
+#include <DiskIO.hpp>		/* FatFs lower layer API */
 #include "USB.hpp"
 #include <cstring>
 

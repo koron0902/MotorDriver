@@ -91,7 +91,10 @@ bool IsEnableUSB();
 
 
 std::string ReadLine();
-//std::string Read();
+std::string Read();
+
+
+
 
 }
 

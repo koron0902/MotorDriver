@@ -15,46 +15,6 @@ using namespace Middle;
 namespace App {
 namespace File {
 
-Directory *root { nullptr }, *current { nullptr };
-
-Directory::Directory(const string& _name) :
-		FileBase(_name) {
-	SetType(FileType::Directory);
-}
-
-Directory* Directory::Create(const string& name) {
-	auto *p = new Directory(name);
-	return p;
-}
-
-void Directory::Add(FileBase* p) {
-	FileBase::Add(p);
-}
-/*
- string Directory::operator()(std::vector<std::string>& s) {
- return "Error:(Directory)";
- }
- */
-/*
- Execute::Execute(const string& filename, const command& _func) :
- FileBase(filename) {
- func = _func;
- SetMode(FileMode::Execute);
- SetFlag(FileType::Execute);
- }
-
- Execute* Execute::Create(const string& filename, const command& cmd) {
- return new Execute(filename, cmd);
- }
-
- string Execute::operator()(std::vector<std::string>& v) {
- if (func != nullptr) {
- return func(v);
- } else {
- return "Error:(CMD is Nothing)";
- }
- }
- */
 Integer::Integer(const string& filename, int32_t* d) :
 		FileBase(filename) {
 	SetType(FileType::FileInt32);

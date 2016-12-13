@@ -1,43 +1,49 @@
 #include <Mid.hpp>
 #include <Motor.hpp>
-#include <stdlib.h>
 #include <text.hpp>
-#include <iterator>
-#include <vector>
-#include <string>
+#include <type.hpp>
+#include<File.hpp>
 using namespace Middle;
 using namespace App::File;
 using namespace common;
 
 namespace App {
 namespace Mid{
-
-auto Duty=[](iterator begin,iterator end)->int{
-	if (std::distance(begin,end)>=2){
-		begin++;
-		Motor::SetDuty(common::ToFix(*begin));
-	}else{
-		Motor::Lock();
-	}
-	return 0;
-};
-auto Free=[](iterator being,iterator end)->int{
-	Motor::Free();
-	return 0;
-};
-
-auto Lock=[](iterator being,iterator end)->int{
-	Motor::Lock();
-	return 0;
-};
-
 Directory* Create(){
 	auto *mid=Directory::Create("mid");
-	mid->Add(Execute<decltype(Duty)>::Create("duty",Duty));
-	mid->Add(Execute<decltype(Free)>::Create("free",Free));
-	mid->Add(Execute<decltype(Lock)>::Create("lock",Lock));
+	//mid->Add(Execute<decltype(Duty)>::Create("duty",Duty));
+	//mid->Add(CreateExecute("duty",Duty));
+	mid->Add(CreateDuty());
+	mid->Add(CreateFree());
+	mid->Add(CreateLock());
 	return mid;
 }
+
+File::FileBase* CreateDuty(){
+	return CreateExecute("duty",[](text_iterator begin,text_iterator end)->int{
+		if (std::distance(begin,end)>=2){
+			begin++;
+			Motor::SetDuty(common::ToFix(*begin));
+		}else{
+			Motor::Lock();
+		}
+		return 0;
+	});
+}
+File::FileBase* CreateFree(){
+	return CreateExecute("free",[](text_iterator being,text_iterator end)->int{
+		Motor::Free();
+		return 0;
+	});
+}
+
+File::FileBase* CreateLock(){
+	return CreateExecute("lock",[](text_iterator being,text_iterator end)->int{
+		Motor::Lock();
+		return 0;
+	});
+}
+
 
 }
 
