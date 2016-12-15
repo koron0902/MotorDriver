@@ -1,6 +1,7 @@
 #include <App.hpp>
 #include <DRV.hpp>
 #include <ADC.hpp>
+#include <QEI.hpp>
 //#include <File.hpp>
 #include <Port.hpp>
 #include <string.h>
@@ -22,13 +23,13 @@ namespace App {
 static bool usb_flag = false;
 static string buffer_uart;
 static string buffer_usb;
-Middle::Controller::Trapezium* trap;
+Middle::Controller::PID* pid;
 void Init() {
 	Shell::Init();
 	buffer_uart.reserve(32);
 	buffer_usb.reserve(32);
-	trap = new Middle::Controller::Trapezium();
-	Device::Timer::SetAction(1, trap->GetFreq(), std::move(*trap));
+	pid = new Middle::Controller::PID();
+	Device::Timer::SetAction(1, pid->GetFreq(), std::move(*pid));
 }
 
 void CommandLine() {
@@ -76,11 +77,14 @@ void Run() {
 
 	USB::WriteLine("linked　MDU(prototype)");
 	USB::WriteLine(current->GetAllName());
-	forever() {
+	for(;;) {
 
 		CommandLine();
 		Middle::DRV::Update();
 		Device::ADC::Trigger();
+
+		//for(volatile int i = 0;i < 5000; i++);
+		//Device::QEI::GetVelcoity();
 	}
 	//can't reach here
 }
