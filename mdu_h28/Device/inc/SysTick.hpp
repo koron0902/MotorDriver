@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdint.h>
 #include <unit.hpp>
 namespace Device{
 
@@ -13,7 +12,6 @@ constexpr static uint32_t SampleRate=1_KHz;
 void Init();
 
 uint64_t Tick();
-uint64_t TickSub();
 
 uint64_t TickUs();//マイクロ秒単位
 uint64_t TickMs();//ミリ秒

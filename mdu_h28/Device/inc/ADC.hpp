@@ -21,6 +21,8 @@ fix32 GetAmpU();
 fix32 GetAmpV();
 fix32 GetAmpW();
 
+fix32 GetAccount();//CPU占有率
+
 void Init();
 
 void Trigger();

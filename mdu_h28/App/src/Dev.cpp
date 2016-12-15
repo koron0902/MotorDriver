@@ -39,7 +39,7 @@ Directory* CreateUart() {
 
 File::Directory* CreateADC() {
 	Directory* dir = Directory::Create("adc");
-	dir->Add(File::CreateReadOnlyProperty("batt", [](){
+	dir->Add(File::CreateReadOnlyProperty("batt", []() {
 		return ToStr(ADC::GetVlot());
 	}));
 
@@ -54,6 +54,10 @@ File::Directory* CreateADC() {
 					[] () {
 						return ToStr(ADC::GetAmpU())+" "+ToStr(ADC::GetAmpV())+" "+ToStr(ADC::GetAmpU());
 					}));
+
+	dir->Add(File::CreateReadOnlyProperty("count", []() ->string {
+		return ToStr(ADC::GetAccount()*fix32::CreateInt(100));//百分率
+	}));
 
 	return dir;
 }

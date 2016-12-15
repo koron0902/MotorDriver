@@ -11,9 +11,11 @@
 extern template class std::vector<std::string>;
 extern template class std::vector<uint8_t>;
 
+extern template class std::function<void(void)>;
+
 namespace common {
 //コールバック関数の型
-using callback=std::function<void(void)>;
+using callback_t=std::function<void(void)>;
 using callback_ref=std::function<void(void)>&;
 
 using text_vector=std::vector<std::string>;

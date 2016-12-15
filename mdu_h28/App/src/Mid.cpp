@@ -11,8 +11,6 @@ namespace App {
 namespace Mid{
 Directory* Create(){
 	auto *mid=Directory::Create("mid");
-	//mid->Add(Execute<decltype(Duty)>::Create("duty",Duty));
-	//mid->Add(CreateExecute("duty",Duty));
 	mid->Add(CreateDuty());
 	mid->Add(CreateFree());
 	mid->Add(CreateLock());

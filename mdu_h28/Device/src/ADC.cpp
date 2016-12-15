@@ -2,13 +2,15 @@
 #include <chip.hpp>
 #include <unit.hpp>
 #include <Timer.hpp>
+#include <counter.hpp>
+
 using namespace common;
 
 namespace Device {
 
 namespace ADC {
 //回路による定数
-static constexpr uint32_t ADCSampleClock = 250_KHz;
+static constexpr uint32_t ADCSampleClock = 50_KHz;
 static constexpr uint32_t TriggerRate=50_KHz;
 static constexpr fix32 ADCRef = fix32::CreateDouble(2.495); //[V] 基準電圧の実測値
 static constexpr fix32 Resistance = fix32::CreateDouble(5); //[mΩ]シャント抵抗値
@@ -20,6 +22,8 @@ static fix32 AmpGain = fix32::CreateFloat(1.0f); //DRVで再設定してね。
 //取得したデータはとりあえずここで保持する。これらには[0,1)が入る
 static fix32 AmpRawU, AmpRawV, AmpRawW;
 static fix32 VlotRaw, VlotRawU, VlotRawV, VlotRawW;
+
+static Counter measurement;
 
 void SetAmpGain(const fix32& gain) {
 	AmpGain = gain;
@@ -56,6 +60,11 @@ fix32 GetAmpW() {
 	fix32 vlot = AmpRawW * ADCRef; //実際にマイコンにかかっている電圧[V]
 	fix32 gain = Resistance * AmpGain;
 	return (vlot / gain) / Correct;
+}
+
+fix32 GetAccount(){
+	return measurement.Account();
+
 }
 
 void Init() {
@@ -120,6 +129,8 @@ extern "C" void ADC0A_IRQHandler(void) {
 //ここで結果を得る。
 //Note 電流感知(SA_B(0,10),SA_A(0,9),SA_C(0,11))
 	//AmpA = Chip_ADC_GetDataReg(LPC_ADC0, 9);
+	measurement.Begin();
+
 	AmpRawU = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC0, 9) & 0xFFF0);
 	//AmpB = Chip_ADC_GetDataReg(LPC_ADC0, 10);
 	AmpRawV = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC0, 10) & 0xFFF0);
@@ -127,6 +138,7 @@ extern "C" void ADC0A_IRQHandler(void) {
 	AmpRawW = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC0, 11) & 0xFFF0);
 	Chip_ADC_ClearFlags(LPC_ADC0, Chip_ADC_GetFlags(LPC_ADC0));
 
+	measurement.End();
 }
 
 extern "C" void ADC1A_IRQHandler(void) {

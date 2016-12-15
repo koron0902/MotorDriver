@@ -1,10 +1,3 @@
-/*
- * Port.cpp
- *
- *  Created on: 2016/11/04
- *      Author: TERU
- */
-
 #include <chip.hpp>
 #include "port.hpp"
 
@@ -13,65 +6,65 @@ namespace Port {
 
 //About LED
 //const PortData LED0{1,3};//Note　代替
-const PortData LED1 { 1, 8 };
-const PortData LED2 { 1, 4 };
-const PortData LED3 { 1, 5 };
+const PortData LED1{1, 8 };
+const PortData LED2{1, 4 };
+const PortData LED3{1, 5 };
 //About SW
-const PortData Func { 1, 1 };
-const PortData ISP0 { 1, 9 };
-const PortData ISP1 { 1, 11 };
-const PortData RST { 0, 21 };
-const PortData SC0 { 0, 24 };
-const PortData SC1 { 1, 10 };
+const PortData Func{1, 1 };
+const PortData ISP0{1, 9 };
+const PortData ISP1{1, 11 };
+const PortData RST{0, 21 };
+const PortData SC0{0, 24 };
+const PortData SC1{1, 10 };
 //About DRV(PWM)
-const PortData PWMAH { 0, 14 };
-const PortData PWMAL { 0, 5 };
-const PortData PWMBH { 0, 4 };
-const PortData PWMBL { 0, 3 };
-const PortData PWMCH { 0, 2 };
-const PortData PWMCL { 0, 1 };
-const PortData PWMEN { 0, 6 };
+const PortData PWMAH{0, 14 };
+const PortData PWMAL{0, 5 };
+const PortData PWMBH{0, 4 };
+const PortData PWMBL{0, 3 };
+const PortData PWMCH{0, 2 };
+const PortData PWMCL{0, 1 };
+const PortData PWMEN{0, 6 };
 //About DRV(SPI)
-const PortData SDI { 0, 27 };
-const PortData SDO { 0, 28 };
-const PortData SCK { 0, 26 };
-const PortData CS { 0, 29 };
-const PortData FALUT { 1, 0 };
+const PortData SDI{0, 27 };
+const PortData SDO{0, 28 };
+const PortData SCK{0, 26 };
+const PortData CS{0, 29 };
+const PortData FALUT{1, 0 };
 //About DRV(Analog)
-const AnalogData SA_A { 0, 31, 0, 9 };
-const AnalogData SA_B { 0, 0, 0, 10 };
-const AnalogData SA_C { 0, 30, 0, 11 };
-const AnalogData SV_A { 1, 2, 1, 4 };
-const AnalogData SV_B { 1, 4, 1, 10 }; //代替
-const AnalogData SV_C { 0, 11, 1, 3 };
-const AnalogData SV { 0, 10, 1, 2 };
-const PortData SV_B_Alt { 0, 12 }; //開放する(NC化する)
+const AnalogData SA_A{0, 31, 0, 9 };
+const AnalogData SA_B{0, 0, 0, 10 };
+const AnalogData SA_C{0, 30, 0, 11 };
+const AnalogData SV_A{1, 2, 1, 4 };
+const AnalogData SV_B{1, 4, 1, 10 }; //代替
+const AnalogData SV_C{0, 11, 1, 3 };
+const AnalogData SV{0, 10, 1, 2 };
+const PortData SV_B_Alt{0, 12 }; //開放する(NC化する)
 
 //About DRV(Others)
-const PortData WAKE { 0, 7 };
-const PortData PWRGD { 0, 25 };
+const PortData WAKE{0, 7 };
+const PortData PWRGD{0, 25 };
 
 //Communication
-const PortData Tx { 0, 18 };
-const PortData Rx { 0, 13 };
+const PortData Tx{0, 18 };
+const PortData Rx{0, 13 };
 //他にも二個ピンがあるが使わないので定義しない。
 
 //QEI
 /*
-const PortData QEI_X { 0, 22 };
-const PortData QEI_Y { 0, 23 };
-const PortData QEI_Z { 1, 7 };
-*/
-const PortData QEI_X {0,15};
-const PortData QEI_Y {0,16};
+ const PortData QEI_X { 0, 22 };
+ const PortData QEI_Y { 0, 23 };
+ const PortData QEI_Z { 1, 7 };
+ */
+const PortData QEI_X{0, 15 };
+const PortData QEI_Y{0, 16 };
 
 //Hole Sensor
-const PortData HoleU{0,22};
-const PortData HoleV{0,23};
-const PortData HoleW{0,24};
+const PortData HoleU{0, 22 };
+const PortData HoleV{0, 23 };
+const PortData HoleW{0, 24 };
 
 //USB
-const PortData UID { 1, 6 };
+const PortData UID{1, 6 };
 
 //設定用補助関数群
 static inline void SetDin(PortData data) {
@@ -82,7 +75,7 @@ static inline void SetDin(PortData data) {
 
 static inline void SetDout(PortData data) {
 	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin,
-			IOCON_MODE_INACT | IOCON_DIGMODE_EN);
+	IOCON_MODE_INACT | IOCON_DIGMODE_EN);
 	Chip_GPIO_SetPinDIROutput(LPC_GPIO, data.port, data.pin);
 	Chip_GPIO_SetPinState(LPC_GPIO, data.port, data.pin, true);
 }
@@ -97,12 +90,12 @@ static inline void SetFuncFix(CHIP_SWM_PIN_FIXED_T pin) {
 
 static inline void SetOpen(PortData data) {
 	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin,
-			IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN); //アナログ化することで解放にする。
+	IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN); //アナログ化することで解放にする。
 }
 
 static inline void SetAnalog(AnalogData data) {
 	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin,
-			IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN);
+	IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN);
 }
 
 
@@ -110,7 +103,6 @@ void Init() {
 	//supply clock
 	Chip_SWM_Init();
 	Chip_GPIO_Init(LPC_GPIO);
-	Chip_GPIOGP_Init(LPC_GPIOGROUP);
 	//LED
 	//SetDout(LED0);//Note 代替
 	SetDout(LED1);
@@ -152,7 +144,6 @@ void Init() {
 	SetFuncMove(CS, SWM_SPI0_SSELSN_0_IO);
 	SetDin(FALUT);
 
-
 	//あとで割り込み対応に
 	//DRV(analog)
 	SetAnalog(SA_A);
@@ -193,12 +184,6 @@ void Init() {
 	SetDin(UID);
 	SetFuncMove(UID, SWM_USB_VBUS_I);
 
-	//Hole Sensor
-	SetDin(HoleU);
-	SetDin(HoleV);
-	SetDin(HoleW);
-
-
 }
 
 void Set(PortData data, bool fag) {
@@ -212,8 +197,6 @@ bool Get(PortData data) {
 void Toggle(PortData data) {
 	Chip_GPIO_SetPinToggle(LPC_GPIO, data.port, data.pin);
 }
-
-
 
 }
 } /* namespace Device */

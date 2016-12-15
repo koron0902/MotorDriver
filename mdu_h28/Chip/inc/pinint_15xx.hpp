@@ -28,11 +28,13 @@
  * copyright, permission, and disclaimer notice must appear in all copies of
  * this code.
  */
-
+#pragma once
 #ifndef __PININT_15XX_H_
 #define __PININT_15XX_H_
 
-
+#include <stdint.h>
+#include <cmsis.h>
+#include <core_cm3.h>
 
 /** @defgroup PININT_15XX CHIP: LPC15xx Pin Interrupt driver
  * @ingroup CHIP_15XX_Drivers
@@ -42,31 +44,35 @@
 /**
  * @brief LPC15xx Pin Interrupt and Pattern Match register block structure
  */
-typedef struct {			/*!< PIN_INT Structure */
-	__IO uint32_t ISEL;		/*!< Pin Interrupt Mode register */
-	__IO uint32_t IENR;		/*!< Pin Interrupt Enable (Rising) register */
-	__IO uint32_t SIENR;	/*!< Set Pin Interrupt Enable (Rising) register */
-	__IO uint32_t CIENR;	/*!< Clear Pin Interrupt Enable (Rising) register */
-	__IO uint32_t IENF;		/*!< Pin Interrupt Enable Falling Edge / Active Level register */
-	__IO uint32_t SIENF;	/*!< Set Pin Interrupt Enable Falling Edge / Active Level register */
-	__IO uint32_t CIENF;	/*!< Clear Pin Interrupt Enable Falling Edge / Active Level address */
-	__IO uint32_t RISE;		/*!< Pin Interrupt Rising Edge register */
-	__IO uint32_t FALL;		/*!< Pin Interrupt Falling Edge register */
-	__IO uint32_t IST;		/*!< Pin Interrupt Status register */
-} LPC_PIN_INT_T;
+typedef struct { /*!< PIN_INT Structure */
+	__IO uint32_t ISEL; /*!< Pin Interrupt Mode register */
+	__IO uint32_t IENR; /*!< Pin Interrupt Enable (Rising) register */
+	__IO uint32_t SIENR; /*!< Set Pin Interrupt Enable (Rising) register */
+	__IO uint32_t CIENR; /*!< Clear Pin Interrupt Enable (Rising) register */
+	__IO uint32_t IENF; /*!< Pin Interrupt Enable Falling Edge / Active Level register */
+	__IO uint32_t SIENF; /*!< Set Pin Interrupt Enable Falling Edge / Active Level register */
+	__IO uint32_t CIENF; /*!< Clear Pin Interrupt Enable Falling Edge / Active Level address */
+	__IO uint32_t RISE; /*!< Pin Interrupt Rising Edge register */
+	__IO uint32_t FALL; /*!< Pin Interrupt Falling Edge register */
+	__IO uint32_t IST; /*!< Pin Interrupt Status register */
+}LPC_PIN_INT_T ;
 
 /**
  * LPC15xx Pin Interrupt channel values
  */
-#define PININTCH0         (1 << 0)
-#define PININTCH1         (1 << 1)
-#define PININTCH2         (1 << 2)
-#define PININTCH3         (1 << 3)
-#define PININTCH4         (1 << 4)
-#define PININTCH5         (1 << 5)
-#define PININTCH6         (1 << 6)
-#define PININTCH7         (1 << 7)
-#define PININTCH(ch)      (1 << (ch))
+enum {
+	PININTCH0 = (1 << 0),
+	PININTCH1 = (1 << 1),
+	PININTCH2 = (1 << 2),
+	PININTCH3 = (1 << 3),
+	PININTCH4 = (1 << 4),
+	PININTCH5 = (1 << 5),
+	PININTCH6 = (1 << 6),
+	PININTCH7 = (1 << 7)
+};
+static inline uint32_t PININTCH(uint32_t ch){
+	return (1 << (ch));
+}
 
 /**
  * @brief	Initialize Pin interrupt block
@@ -74,31 +80,23 @@ typedef struct {			/*!< PIN_INT Structure */
  * @return	Nothing
  * @note	This function should be used after the Chip_GPIO_Init() function.
  */
-STATIC INLINE void Chip_PININT_Init(LPC_PIN_INT_T *pPININT)
-{
-	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_PININT);
-	Chip_SYSCTL_PeriphReset(RESET_PININT);
-}
 
+void Chip_PININT_Init(LPC_PIN_INT_T *pPININT);
 /**
  * @brief	De-Initialize Pin interrupt block
  * @param	pPININT	: The base address of Pin interrupt block
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_DeInit(LPC_PIN_INT_T *pPININT)
-{
-	Chip_Clock_DisablePeriphClock(SYSCTL_CLOCK_PININT);
-}
-
+void Chip_PININT_DeInit(LPC_PIN_INT_T *pPININT);
 /**
  * @brief	Configure the pins as edge sensitive in Pin interrupt block
  * @param	pPININT	: The base address of Pin interrupt block
  * @param	pins	: Pins (ORed value of PININTCH*)
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_SetPinModeEdge(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->ISEL &= ~pins;
+static inline void Chip_PININT_SetPinModeEdge(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->ISEL &= ~pins;
 }
 
 /**
@@ -107,9 +105,9 @@ STATIC INLINE void Chip_PININT_SetPinModeEdge(LPC_PIN_INT_T *pPININT, uint32_t p
  * @param	pins	: Pins (ORed value of PININTCH*)
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_SetPinModeLevel(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->ISEL |= pins;
+static inline void Chip_PININT_SetPinModeLevel(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->ISEL |= pins;
 }
 
 /**
@@ -120,9 +118,8 @@ STATIC INLINE void Chip_PININT_SetPinModeLevel(LPC_PIN_INT_T *pPININT, uint32_t 
  * For each bit, a 0 means the high edge/level interrupt is disabled, while a 1
  * means it's enabled.
  */
-STATIC INLINE uint32_t Chip_PININT_GetHighEnabled(LPC_PIN_INT_T *pPININT)
-{
-	return pPININT->IENR;
+static inline uint32_t Chip_PININT_GetHighEnabled(LPC_PIN_INT_T *pPININT) {
+return pPININT->IENR;
 }
 
 /**
@@ -131,9 +128,9 @@ STATIC INLINE uint32_t Chip_PININT_GetHighEnabled(LPC_PIN_INT_T *pPININT)
  * @param	pins	: Pins to enable (ORed value of PININTCH*)
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_EnableIntHigh(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->SIENR = pins;
+static inline void Chip_PININT_EnableIntHigh(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->SIENR = pins;
 }
 
 /**
@@ -142,9 +139,9 @@ STATIC INLINE void Chip_PININT_EnableIntHigh(LPC_PIN_INT_T *pPININT, uint32_t pi
  * @param	pins	: Pins to disable (ORed value of PININTCH*)
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_DisableIntHigh(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->CIENR = pins;
+static inline void Chip_PININT_DisableIntHigh(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->CIENR = pins;
 }
 
 /**
@@ -155,9 +152,8 @@ STATIC INLINE void Chip_PININT_DisableIntHigh(LPC_PIN_INT_T *pPININT, uint32_t p
  * For each bit, a 0 means the low edge/level interrupt is disabled, while a 1
  * means it's enabled.
  */
-STATIC INLINE uint32_t Chip_PININT_GetLowEnabled(LPC_PIN_INT_T *pPININT)
-{
-	return pPININT->IENF;
+static inline uint32_t Chip_PININT_GetLowEnabled(LPC_PIN_INT_T *pPININT) {
+return pPININT->IENF;
 }
 
 /**
@@ -166,9 +162,9 @@ STATIC INLINE uint32_t Chip_PININT_GetLowEnabled(LPC_PIN_INT_T *pPININT)
  * @param	pins	: Pins to enable (ORed value of PININTCH*)
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_EnableIntLow(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->SIENF = pins;
+static inline void Chip_PININT_EnableIntLow(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->SIENF = pins;
 }
 
 /**
@@ -177,9 +173,9 @@ STATIC INLINE void Chip_PININT_EnableIntLow(LPC_PIN_INT_T *pPININT, uint32_t pin
  * @param	pins	: Pins to disable (ORed value of PININTCH*)
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_DisableIntLow(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->CIENF = pins;
+static inline void Chip_PININT_DisableIntLow(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->CIENF = pins;
 }
 
 /**
@@ -187,9 +183,8 @@ STATIC INLINE void Chip_PININT_DisableIntLow(LPC_PIN_INT_T *pPININT, uint32_t pi
  * @param	pPININT	: The base address of Pin interrupt block
  * @return	PININT states (bit n = high) with a latched rise state detected
  */
-STATIC INLINE uint32_t Chip_PININT_GetRiseStates(LPC_PIN_INT_T *pPININT)
-{
-	return pPININT->RISE;
+static inline uint32_t Chip_PININT_GetRiseStates(LPC_PIN_INT_T *pPININT) {
+return pPININT->RISE;
 }
 
 /**
@@ -198,9 +193,9 @@ STATIC INLINE uint32_t Chip_PININT_GetRiseStates(LPC_PIN_INT_T *pPININT)
  * @param	pins	: Pins with latched states to clear
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_ClearRiseStates(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->RISE = pins;
+static inline void Chip_PININT_ClearRiseStates(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->RISE = pins;
 }
 
 /**
@@ -208,9 +203,8 @@ STATIC INLINE void Chip_PININT_ClearRiseStates(LPC_PIN_INT_T *pPININT, uint32_t 
  * @param	pPININT	: The base address of Pin interrupt block
  * @return	PININT states (bit n = high) with a latched rise state detected
  */
-STATIC INLINE uint32_t Chip_PININT_GetFallStates(LPC_PIN_INT_T *pPININT)
-{
-	return pPININT->FALL;
+static inline uint32_t Chip_PININT_GetFallStates(LPC_PIN_INT_T *pPININT) {
+return pPININT->FALL;
 }
 
 /**
@@ -219,9 +213,9 @@ STATIC INLINE uint32_t Chip_PININT_GetFallStates(LPC_PIN_INT_T *pPININT)
  * @param	pins	: Pins with latched states to clear
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_ClearFallStates(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->FALL = pins;
+static inline void Chip_PININT_ClearFallStates(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->FALL = pins;
 }
 
 /**
@@ -229,9 +223,8 @@ STATIC INLINE void Chip_PININT_ClearFallStates(LPC_PIN_INT_T *pPININT, uint32_t 
  * @param	pPININT	: The base address of Pin interrupt block
  * @return	Interrupt status (bit n for PININTn = high means interrupt ie pending)
  */
-STATIC INLINE uint32_t Chip_PININT_GetIntStatus(LPC_PIN_INT_T *pPININT)
-{
-	return pPININT->IST;
+static inline uint32_t Chip_PININT_GetIntStatus(LPC_PIN_INT_T *pPININT) {
+return pPININT->IST;
 }
 
 /**
@@ -240,15 +233,13 @@ STATIC INLINE uint32_t Chip_PININT_GetIntStatus(LPC_PIN_INT_T *pPININT)
  * @param	pins	: Pin interrupts to clear (ORed value of PININTCH*)
  * @return	Nothing
  */
-STATIC INLINE void Chip_PININT_ClearIntStatus(LPC_PIN_INT_T *pPININT, uint32_t pins)
-{
-	pPININT->IST = pins;
+static inline void Chip_PININT_ClearIntStatus(LPC_PIN_INT_T *pPININT,
+	uint32_t pins) {
+pPININT->IST = pins;
 }
 
 /**
  * @}
  */
-
-
 
 #endif /* __PININT_15XX_H_ */

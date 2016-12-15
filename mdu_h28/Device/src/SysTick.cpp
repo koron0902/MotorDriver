@@ -7,22 +7,20 @@ namespace Device {
 namespace Tick {
 
 static uint64_t tick;
-static constexpr uint64_t bit24=(1u<<24);
+static constexpr uint64_t bit24=(1u<<10);
 static constexpr uint64_t mask=bit24-1;
 
 //システムモニタ用タイマーの初期化
 void Init() {
-	SysTick_Config(mask);
+	auto *p=SysTick;
+	p->LOAD=mask;
+	p->VAL=mask;
 	tick = 0;
 }
 
 uint64_t Tick() {
-	return tick+TickSub();
-}
-
-uint64_t TickSub(){
 	auto *p=SysTick;
-	return bit24-(p->LOAD);
+	return tick+(bit24-(p->LOAD));
 }
 
 uint64_t TickUs(){
@@ -43,9 +41,9 @@ void DelayMs(uint64_t ms){
 	while (TickMs()<time);
 }
 
-
 extern "C" void SysTick_Handler() {
-	SysTick_Config(mask);
+	auto *p=SysTick;
+	p->LOAD=mask;
 	tick+=bit24;
 }
 

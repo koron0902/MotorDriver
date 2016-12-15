@@ -10,9 +10,7 @@
 
 namespace common {
 
-struct error {
-
-enum:int{
+enum Code{
 	OK=0,
 	Unknown=-1,
 	PtrErr=-100,
@@ -22,8 +20,8 @@ enum:int{
 
 	MissMatch=-10000
 };
+
 const char* GetMessage(int);
-};
 
 } /* namespace common */
 
