@@ -62,12 +62,7 @@ Float* Float::Create(const string& filename, float* f) {
 
 string Float::GetData() {
 	if (data != nullptr) {
-		stringstream ss;
-		int d1 = (*data);
-		float f = (*data) * 10000;
-		int d2 = abs((int) (f) % 10000);
-		ss << d1 << "." << d2;
-		return ss.str();
+		return ToStrF(*data);
 	} else {
 		return "null";
 	}
@@ -76,14 +71,14 @@ string Float::GetData() {
 int Float::SetData(const std::string& str) {
 	if (data != nullptr) {
 		if (str.empty()) {
-			XPort::WriteLine("Null");
+			XPort::WriteLine("Empty");
 			return -1; //NPE prevention
 		} else {
-			*data = (float) std::atof(str.data());
+			*data =ToFloat(str);
 			return 0;
 		}
 	} else {
-		XPort::WriteLine("found out");
+		XPort::WriteLine("Null");
 		return -1;
 	}
 }

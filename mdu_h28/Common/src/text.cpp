@@ -59,7 +59,7 @@ string ToStr(int64_t value) {
 	if (sp.empty()) {
 		return "0";
 	} else {
-		string ans=sign(value)?"-":"";
+		string ans = sign(value) ? "-" : "";
 		do {
 			ans += sp.back();
 			sp.pop_back();
@@ -70,22 +70,26 @@ string ToStr(int64_t value) {
 }
 
 std::string ToStr(fix32 value) {
-	constexpr static int32_t d[] { (1 << 16) / 10, (1 << 16) / 100, (1 << 16)
+	constexpr static int32_t d[]{(1 << 16) / 10, (1 << 16) / 100, (1 << 16)
 			/ 1000, (1 << 16) / 10000 };
 
 	int32_t num, point;
-	fix32 a= abs(value);
+	fix32 a = abs(value);
 	num = a.GetInt();
 	point = a.GetPoint();
 
 	string ans = ToStr(num) + ".";
 	uint idx;
-	for (idx=0;idx<4-1;idx++) {
-		ans+=ToChar(point/d[idx]);
-		point%=d[idx];
+	for (idx = 0; idx < 4 - 1; idx++) {
+		ans += ToChar(point / d[idx]);
+		point %= d[idx];
 	}
-	ans+=ToChar(value/d[idx]);
+	ans += ToChar(value / d[idx]);
 	return ans;
+}
+
+std::string ToStrF(float raw){
+	return ToStr(fix32::CreateFloat(raw));
 }
 
 fix32 ToFix(const std::string& text) {
@@ -148,4 +152,40 @@ int32_t ToInt(const std::string& text) {
 
 	return num;
 }
+
+float ToFloat(const std::string& text) {
+	uint32_t idx = 0;
+	bool sign = false; //マイナスならtrue
+	char c;
+	auto next = [&text,&idx]()->char {
+		return text[idx++];
+	};
+	float raw = 0.0f;
+	c = next();
+	if (IsSign(c)) {
+		sign = (c == '-');
+		c = next();
+	}
+	while (IsNumber(c)) {
+		raw *= 10.0f;
+		raw += FromNumber(c);
+		c = next();
+	}
+	if (IsPoint(c)) {
+		float s = 1.0f;
+		c = next();
+		while (IsNumber(c)) {
+			s /= 10.0f;
+			raw += s * FromNumber(c);
+			c = next();
+		}
+	}
+
+	if (sign) {
+		return -raw;
+	} else {
+		return raw;
+	}
+}
+
 } /* namespace common */

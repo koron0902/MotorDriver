@@ -16,12 +16,15 @@ namespace common {
 
 	std::string ToStr(int64_t);
 	std::string ToStr(fix32);
+	std::string ToStrF(float);
+
+
 	template <class T,uint X,uint Y>std::string ToStr(const Matrix<T,X,Y>&);
 
 	common::fix32 ToFix(const std::string&);
 	int32_t ToInt(const std::string&);
 
-
+	float ToFloat(const std::string&);
 
 
 	//トークン処理用
