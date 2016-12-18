@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ZERO_SET_HEADER
 #define ZERO_SET_HEADER
 

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef COMMON_INC_TEXT_HPP_
 #define COMMON_INC_TEXT_HPP_
 #include <type.hpp>

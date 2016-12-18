@@ -1,3 +1,4 @@
+#pragma once
 #ifndef COMMON_INC_TYPE_HPP_
 #define COMMON_INC_TYPE_HPP_
 

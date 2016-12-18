@@ -184,6 +184,10 @@ void Init() {
 	SetDin(UID);
 	SetFuncMove(UID, SWM_USB_VBUS_I);
 
+	//HoleSensor(INT)
+	SetDin(HoleU);
+	SetDin(HoleV);
+	SetDin(HoleW);
 }
 
 void Set(PortData data, bool fag) {

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __SQUEUE_HEADER
 #define __SQUEUE_HEADER
 #include <stdint.h>

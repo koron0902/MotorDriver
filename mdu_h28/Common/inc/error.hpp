@@ -1,23 +1,22 @@
 #pragma once
-namespace common{
-namespace errors{
-//ここにエラーコードを書いていく
-constexpr int
- OK=0,
- UnKnown=-1,
- Null=-2,
- FoundOut=-3,
- InputBad=-4,
- PromiseBad=-5
-;
+#ifndef COMMON_ERROR_H_
+#define COMMON_ERROR_H_
+
+namespace common {
+
+enum Code{
+	OK=0,
+	Unknown=-1,
+	PtrErr=-100,
+	FoundOut,
+	Empty,
+	AccessErr,
+
+	MissMatch=-10000
+};
 
 const char* GetMessage(int);
-static inline bool IsError(int code){
-	return code<0;
-}
 
+} /* namespace common */
 
-}
-
-
-};
+#endif /* COMMON_ERROR_H_ */

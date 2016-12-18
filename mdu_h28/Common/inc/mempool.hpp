@@ -1,10 +1,4 @@
-/*
- * Mempool.h
- *
- *  Created on: 2016/11/06
- *      Author: TERU
- */
-
+#pragma once
 #ifndef COMMON_MEMPOOL_H_
 #define COMMON_MEMPOOL_H_
 

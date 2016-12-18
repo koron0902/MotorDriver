@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MIDDLE_COUNTER_H_
 #define MIDDLE_COUNTER_H_
 

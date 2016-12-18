@@ -1,3 +1,4 @@
+#pragma once
 #ifndef COMMON_INC_BITS_HPP_
 #define COMMON_INC_BITS_HPP_
 

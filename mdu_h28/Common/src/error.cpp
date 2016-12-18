@@ -1,4 +1,4 @@
-#include "error.hpp"
+#include "Error.hpp"
 namespace common{
 
 const char* GetMessage(int err){
