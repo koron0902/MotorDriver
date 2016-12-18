@@ -67,127 +67,36 @@ const PortData HoleW{0, 24 };
 const PortData UID{1, 6 };
 
 //設定用補助関数群
-static inline void SetDin(PortData data) {
+/* 互換用に残しているが後々消す。*/
+void SetDin(PortData data) {
 	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin,
 	IOCON_DIGMODE_EN | IOCON_MODE_PULLUP);
 	Chip_GPIO_SetPinDIRInput(LPC_GPIO, data.port, data.pin);
 }
 
-static inline void SetDout(PortData data) {
+void SetDout(PortData data) {
 	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin,
 	IOCON_MODE_INACT | IOCON_DIGMODE_EN);
 	Chip_GPIO_SetPinDIROutput(LPC_GPIO, data.port, data.pin);
 	Chip_GPIO_SetPinState(LPC_GPIO, data.port, data.pin, true);
 }
 
-static inline void SetFuncMove(PortData data, CHIP_SWM_PIN_MOVABLE func) {
+void SetFuncMove(PortData data, CHIP_SWM_PIN_MOVABLE func) {
 	Chip_SWM_MovablePortPinAssign(func, data.port, data.pin);
 }
 
-static inline void SetFuncFix(CHIP_SWM_PIN_FIXED_T pin) {
+void SetFuncFix(CHIP_SWM_PIN_FIXED_T pin) {
 	Chip_SWM_FixedPinEnable(pin, true);
 }
 
-static inline void SetOpen(PortData data) {
+void SetOpen(PortData data) {
 	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin,
 	IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN); //アナログ化することで解放にする。
 }
 
-static inline void SetAnalog(AnalogData data) {
+void SetAnalog(AnalogData data) {
 	Chip_IOCON_PinMuxSet(LPC_IOCON, data.port, data.pin,
 	IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN);
-}
-
-
-void Init() {
-	//supply clock
-	Chip_SWM_Init();
-	Chip_GPIO_Init(LPC_GPIO);
-	//LED
-	//SetDout(LED0);//Note 代替
-	SetDout(LED1);
-	Set(LED1, true);
-	SetDout(LED2);
-	SetDout(LED3);
-
-	//SW
-	SetDin(Func);
-	SetDin(ISP0);
-	SetDin(ISP1);
-	SetDin(RST);
-	SetDin(SC0);
-	SetDin(SC1);
-
-	//DRV(PWM)
-	SetDout(PWMAH);
-	SetFuncFix(SWM_FIXED_SCT1_OUT5);
-	SetDout(PWMAL);
-	//SetFuncMove(PWMAL,SWM_SCT1_OUT2_O);
-	SetDout(PWMBH);
-	//SetFuncMove(PWMBH,SWM_SCT1_OUT1_O);
-	SetDout(PWMBL);
-	//SetFuncFix(SWM_FIXED_SCT1_OUT4);
-	SetDout(PWMCH);
-	//SetFuncFix(SWM_FIXED_SCT1_OUT3);
-	SetDout(PWMCL);
-	//SetFuncMove(SWM_SCT1_OUT0_O);
-	SetDout(PWMEN);
-
-	//DRV(SPI)
-	SetDout(SDO);
-	SetFuncMove(SDO, SWM_SPI0_MOSI_IO);
-	SetDin(SDI);
-	SetFuncMove(SDI, SWM_SPI0_MISO_IO);
-	SetDout(SCK);
-	SetFuncMove(SCK, SWM_SPI0_SCK_IO);
-	SetDout(CS);
-	SetFuncMove(CS, SWM_SPI0_SSELSN_0_IO);
-	SetDin(FALUT);
-
-	//あとで割り込み対応に
-	//DRV(analog)
-	SetAnalog(SA_A);
-	SetFuncFix(SWM_FIXED_ADC0_9);
-	SetAnalog(SA_B);
-	SetFuncFix(SWM_FIXED_ADC0_10);
-	SetAnalog(SA_C);
-	SetFuncFix(SWM_FIXED_ADC0_11);
-	SetAnalog(SV_A);
-	SetFuncFix(SWM_FIXED_ADC1_4);
-	SetAnalog(SV_B);
-	SetFuncFix(SWM_FIXED_ADC1_5);	//NOTE 代替ピン
-	SetAnalog(SV_C);
-	SetFuncFix(SWM_FIXED_ADC1_3);
-	SetAnalog(SV);
-	SetFuncFix(SWM_FIXED_ADC1_2);
-	SetOpen(SV_B_Alt);	//Note 代替のため
-
-	//DRV(Other)
-	SetDout(WAKE);
-	SetDout(PWRGD);
-
-	//Communication
-	SetDout(Tx);
-	SetFuncMove(Tx, SWM_UART0_TXD_O);
-	SetDin(Rx);
-	SetFuncMove(Rx, SWM_UART0_RXD_I);
-
-	//QEI
-	SetDin(QEI_X);
-	SetFuncMove(QEI_X, SWM_QEI0_PHA_I);
-	SetDin(QEI_Y);
-	SetFuncMove(QEI_Y, SWM_QEI0_PHB_I);
-	//SetDin(QEI_Z);
-	//SetFuncMove(QEI_Z, SWM_QEI0_IDX_I);
-
-	//USB
-	SetDin(UID);
-	SetFuncMove(UID, SWM_USB_VBUS_I);
-
-	//HoleSensor(INT)
-	SetDin(HoleU);
-	SetDin(HoleV);
-	SetDin(HoleW);
 }
 
 void Set(PortData data, bool fag) {
@@ -200,6 +109,126 @@ bool Get(PortData data) {
 
 void Toggle(PortData data) {
 	Chip_GPIO_SetPinToggle(LPC_GPIO, data.port, data.pin);
+}
+
+void PortData::Set(bool flag)const {
+	Chip_GPIO_SetPinState(LPC_GPIO, port, pin, flag);
+}
+
+bool PortData::Get() const{
+	return Chip_GPIO_GetPinState(LPC_GPIO, port, pin);
+}
+
+void PortData::Toggle() const{
+	Chip_GPIO_SetPortToggle(LPC_GPIO, port, pin);
+}
+
+const PortData& PortData::Din()const {
+	Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin,
+	IOCON_DIGMODE_EN | IOCON_MODE_PULLUP);
+	Chip_GPIO_SetPinDIRInput(LPC_GPIO, port, pin);
+	return *this;
+}
+
+const PortData& PortData::Dout()const {
+	Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin,
+	IOCON_MODE_INACT | IOCON_DIGMODE_EN);
+	Chip_GPIO_SetPinDIROutput(LPC_GPIO, port, pin);
+	Chip_GPIO_SetPinState(LPC_GPIO, port, pin, true);
+	return *this;
+}
+
+const PortData& PortData::Open()const {
+	Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin,
+	IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN); //アナログ化することで解放にする。
+	return *this;
+}
+
+const PortData& PortData::Move(CHIP_SWM_PIN_MOVABLE_T func)const{
+	Chip_SWM_MovablePortPinAssign(func, port, pin);
+	return *this;
+}
+
+const PortData& PortData::Fix(CHIP_SWM_PIN_FIXED_T fix)const{
+	Chip_SWM_FixedPinEnable(fix, true);
+	return *this;
+}
+
+const AnalogData& AnalogData::Init(CHIP_SWM_PIN_FIXED_T pin)const{
+	Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin,
+	IOCON_ADMODE_EN | IOCON_MODE_PULLDOWN);
+	Chip_SWM_FixedPinEnable(pin, true);
+	return *this;
+}
+
+
+void Init() {
+	//supply clock
+	Chip_SWM_Init();
+	Chip_GPIO_Init(LPC_GPIO);
+	//LED
+	//SetDout(LED0);//Note 代替
+	LED1.Dout().Set(true);
+	LED2.Dout();
+	LED3.Dout();
+
+	//SW
+	Func.Din();
+	ISP0.Din();
+	ISP1.Din();
+	RST.Din();
+	SC0.Din();
+	SC1.Din();
+
+	//DRV(PWM)
+	PWMAH.Dout().Fix(SWM_FIXED_SCT1_OUT5);
+	PWMAL.Dout();
+	//SetFuncMove(PWMAL,SWM_SCT1_OUT2_O);
+	PWMBH.Dout();
+	//SetFuncMove(PWMBH,SWM_SCT1_OUT1_O);
+	PWMBL.Dout();
+	//SetFuncFix(SWM_FIXED_SCT1_OUT4);
+	PWMCH.Dout();
+	//SetFuncFix(SWM_FIXED_SCT1_OUT3);
+	PWMCL.Dout();
+	//SetFuncMove(SWM_SCT1_OUT0_O);
+	PWMEN.Dout();
+
+	//DRV(SPI)
+	SDO.Dout().Move(SWM_SPI0_MOSI_IO);
+	SDI.Din().Move( SWM_SPI0_MISO_IO);
+	SCK.Dout().Move( SWM_SPI0_SCK_IO);
+	CS.Dout().Move( SWM_SPI0_SSELSN_0_IO);
+	FALUT.Din();
+
+	//あとで割り込み対応に
+	//DRV(analog)
+	SA_A.Init(SWM_FIXED_ADC0_9);
+	SA_B.Init(SWM_FIXED_ADC0_10);
+	SA_C.Init(SWM_FIXED_ADC0_11);
+	SV_A.Init(SWM_FIXED_ADC1_4);
+	SV_B.Init(SWM_FIXED_ADC1_5);	//NOTE 代替ピン
+	SV_C.Init(SWM_FIXED_ADC1_3);
+	SV.Init(SWM_FIXED_ADC1_2);
+	SV_B_Alt.Open();	//Note 代替のため
+
+	//DRV(Other)
+	WAKE.Dout();
+	PWRGD.Dout();
+
+	//Communication
+	Tx.Dout().Move( SWM_UART0_TXD_O);
+	Rx.Din().Move( SWM_UART0_RXD_I);
+
+	//QEI
+	QEI_X.Din().Move( SWM_QEI0_PHA_I);
+	QEI_Y.Din().Move(SWM_QEI0_PHB_I);
+	//SetDin(QEI_Z);
+	//SetFuncMove(QEI_Z, SWM_QEI0_IDX_I);
+
+	//USB
+	UID.Din().Move( SWM_USB_VBUS_I);
+
 }
 
 }

@@ -16,6 +16,17 @@ namespace Port{
 struct PortData{
 	port_t port;
 	pin_t pin;
+
+	void Set(bool)const;
+	bool Get()const;
+	void Toggle()const;
+	//設定用関数
+	const PortData& Din()const;
+	const PortData& Dout()const;
+	//const PortData& Analog()const;
+	const PortData& Open()const;
+	const PortData& Move(CHIP_SWM_PIN_MOVABLE_T func)const;
+	const PortData& Fix(CHIP_SWM_PIN_FIXED_T fix)const;
 };
 
 struct AnalogData{
@@ -23,6 +34,11 @@ struct AnalogData{
 	pin_t pin;
 	module_t module;
 	id_t id;
+	const AnalogData& Init(CHIP_SWM_PIN_FIXED_T)const;
+	PortData GetPortData()const{
+		return PortData{port,pin};
+	}
+
 };
 
 //About LED
@@ -87,7 +103,7 @@ void Set(PortData,bool);
 bool Get(PortData);
 void Toggle(PortData);
 /*
- * 設定用関数
+ * 設定用関数[非推奨]
  */
 void SetDin(PortData data);
 void SetDout(PortData data);
