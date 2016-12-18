@@ -7,7 +7,7 @@ namespace INT {
 using namespace Port;
 
 const uint32_t IntMax = 8;
-callback_t handlers[IntMax];
+static IntHandler handlers[IntMax];
 
 static inline void EnableInt(INT_ID id, uint8_t priority = 254);
 static inline void DiseableInt(INT_ID id);
@@ -19,26 +19,13 @@ void Init() {
 	for (uint32_t i = 0; i < IntMax; i++) {
 		handlers[i] = nullptr;
 	}
-	//あとでmidに入れる関数
-
-	//GPIO Initialize
-	SetDin(HoleU);
-	SetDin(HoleV);
-	SetDin(HoleW);
-	//登録する
-	SetInt(HoleU, INT_ID::INT0);
-	SetInt(HoleV, INT_ID::INT1);
-	SetInt(HoleW, INT_ID::INT2);
-	//割り込み先を登録
-	auto func=[](){
-		return;
-	};
-	SetHandler(INT_ID::INT0,func);
-	SetHandler(INT_ID::INT1,func);
-	SetHandler(INT_ID::INT2,func);
+	//割り込み全て無効化
+	for (uint32_t id=(uint32_t)INT_ID::INT0;id<=(uint32_t)INT_ID::INT7;id++){
+		DiseableInt((INT_ID)id);
+	}
 }
 
-void SetHandler(INT_ID id, const callback_t& func , uint8_t priority) {
+void SetHandler(INT_ID id, const IntHandler& func , uint8_t priority) {
 	handlers[(uint32_t) id] = func;
 	if (func != nullptr) {
 		EnableInt(id, priority);
@@ -106,56 +93,56 @@ static inline void DiseableInt(INT_ID id) {
 extern "C" void PIN_INT0_IRQHandler(void) {
 	auto id = INT_ID::INT0;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 
 extern "C" void PIN_INT1_IRQHandler(void) {
 	auto id = INT_ID::INT1;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 
 extern "C" void PIN_INT2_IRQHandler(void) {
 	auto id = INT_ID::INT2;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 
 extern "C" void PIN_INT3_IRQHandler(void) {
 	auto id = INT_ID::INT3;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 
 extern "C" void PIN_INT4_IRQHandler(void) {
 	auto id = INT_ID::INT4;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 
 extern "C" void PIN_INT5_IRQHandler(void) {
 	auto id = INT_ID::INT5;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 
 extern "C" void PIN_INT6_IRQHandler(void) {
 	auto id = INT_ID::INT6;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 
 extern "C" void PIN_INT7_IRQHandler(void) {
 	auto id = INT_ID::INT7;
 	auto& handler = handlers[(uint32_t) id];
-	if (handler != nullptr) handler();
+	if (handler != nullptr) handler(id);
 	ClrIntSta(id);
 }
 

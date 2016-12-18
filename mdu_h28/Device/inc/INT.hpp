@@ -17,7 +17,8 @@ extern const uint32_t IntMax;//内部のピン数
 
 void Init();
 //割り込みを登録する
-void SetHandler(INT_ID id,const callback_t& func=nullptr,uint8_t priority=254);
+using IntHandler= std::function<void(INT_ID)>;
+void SetHandler(INT_ID id,const IntHandler& func=nullptr,uint8_t priority=254);
 
 /*
  * 内部の操作用(ただのラッパー)
