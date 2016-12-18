@@ -88,7 +88,7 @@ std::string ToStr(fix32 value) {
 	return ans;
 }
 
-std::string ToStrF(float raw){
+std::string ToStrF(float raw) {
 	return ToStr(fix32::CreateFloat(raw));
 }
 
@@ -186,6 +186,50 @@ float ToFloat(const std::string& text) {
 	} else {
 		return raw;
 	}
+}
+
+bool IsNumberPattern(const std::string& text) {
+	auto it = text.begin();
+	if (IsEnd(*it)) return false; //nullは論外
+	//符号はなくてもいい
+	if (IsSign(*it)) {
+		it++;
+		if (IsEnd(*it)) return false;
+	}
+
+	while (!IsEnd(*it)) {
+		if (IsNumber(*it)) {
+			it++;
+		} else if (IsPoint(*it)) {
+			it++;
+			while (IsEnd(*it)) {
+				if (IsNumber(*it)) {
+					it++;
+				} else {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	};
+	return true;
+}
+
+bool IsOptionPattern(const std::string& text) {
+	auto it = text.begin();
+	if (IsEnd(*it)) return false; //nullは論外
+	if (*it!='-')return false;
+	it++;
+	while (!IsEnd(*it)){
+		if (IsNumber(*it)||IsAlphabet(*it)){
+			it++;
+		}else{
+			return false;
+		}
+	}
+	return true;
 }
 
 } /* namespace common */

@@ -85,8 +85,8 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	DRESULT res;
-	int result;
+	//DRESULT res;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :
@@ -119,8 +119,8 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-	DRESULT res;
-	int result;
+	//DRESULT res;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :
@@ -151,8 +151,8 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	DRESULT res;
-	int result;
+	//DRESULT res;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :

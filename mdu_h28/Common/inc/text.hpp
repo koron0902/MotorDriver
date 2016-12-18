@@ -33,8 +33,16 @@ namespace common {
 		return '0'<=c&&c<='9';
 	}
 
+	static inline bool IsHex(char c){
+		return  ('0'<=c&&c<='9')||('a'<=c&&c<='f')||('A'<=c&&c<='F');
+	}
+
 	static inline int32_t FromNumber(char c){
 		return c-'0';
+	}
+
+	static inline bool IsEnd(char c){
+		return c=='\0';
 	}
 
 	static inline bool IsPoint(char c){
@@ -45,13 +53,40 @@ namespace common {
 		return c=='+'||c=='-';
 	}
 
+	static inline bool IsSmall(char c){
+		return 'a'<=c&&c<='z';
+	}
+
+	static inline bool IsLarge(char c){
+		return 'A'<=c&&c<='Z';
+	}
+
+	static inline bool IsAlphabet(char c){
+		return IsSmall(c)||IsLarge(c);
+	}
+
 	static inline char ToChar(int32_t value){
 		return '0'+value;
 	}
 
-	//
+	static inline char IsMark(char c){
+		return ('!'<=c&&c<='/')||(':'<=c&&c<='?')||
+				('['<=c&&c<='`')||('{'<=c&&c<='~');
+	}
 
+	static inline char IsEndLine(char c){
+		return c==newline;
+	}
 
+	bool IsNumberPattern(const std::string&);
+	/* S:={'+','-'},N:=[0,9],P:={'.'}
+	 * (S|0)N#(PN*|0)
+	 */
+
+	bool IsOptionPattern(const std::string&);
+	 /* A=['a','Z'],N[0,9],C={A|N}
+	  * '-'C#
+	 */
 
 } /* namespace common */
 
