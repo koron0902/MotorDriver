@@ -28,6 +28,7 @@ Directory* Create() {
 	bin->Add(CreateRepeat());
 	bin->Add(CreateTest());
 	bin->Add(CreateReboot());
+	bin->Add(CreateDelay());
 	return bin;
 }
 
@@ -69,16 +70,20 @@ FileBase* CreateCD() {
 
 File::FileBase* CreateEcho() {
 	auto echo = [](text_iterator begin, text_iterator end) {
-
-		if (distance(begin, end) <= 1) {
-			for (auto it = begin + 1; it != end; it++) {
-				XPort::Write(*it);
+		begin++; //一つ目には必ず呼び出し元が入っているので省略
+			if (begin!=end) {
+				XPort::Write(*(begin++));
+			} else {
+				return 0;
 			}
+			while (begin!=end) {
+				XPort::Write(comma);
+				XPort::Write(*(begin++));
+			}
+			XPort::WriteLine();
+			XPort::Flush();
 			return 0;
-		} else {
-			return -1;
-		}
-	};
+		};
 	return Execute<decltype(echo)>::Create("echo", echo);
 }
 
@@ -175,10 +180,28 @@ File::FileBase* CreateStmp() {
 		stmp() :
 				FileBase("stmp") {
 			SetType(FileType::Execute);
+
 		}
 		virtual int operator()(text_iterator begin, text_iterator end) {
-			uint64_t temp = Device::Tick::TickUs();
-			XPort::WriteLine(ToStr(temp));
+			if (++begin != end) {
+				if (IsOptionPattern(*begin)) {
+					if (*begin == "-s") {
+						XPort::WriteLine(ToStr(Device::Tick::TickS()));
+					} else if (*begin == "-ms") {
+						XPort::WriteLine(ToStr(Device::Tick::TickMs()));
+					} else if (*begin == "-us") {
+						XPort::WriteLine(ToStr(Device::Tick::TickUs()));
+					} else if (*begin == "-t") {
+						XPort::WriteLine(ToStr(Device::Tick::Tick()));
+					} else {
+						XPort::WriteLine("NonSurport");
+					}
+				} else {
+					XPort::WriteLine(ToStr(Device::Tick::TickUs()));
+				}
+			}else{
+				XPort::WriteLine(ToStr(Device::Tick::TickUs()));
+			}
 			return 0;
 		}
 		virtual string GetData() {
@@ -196,21 +219,40 @@ File::FileBase* CreateStmp() {
 File::FileBase* CreateRepeat() {
 	return File::CreateExecute("repeat",
 			[](text_iterator begin, text_iterator end) {
-//この関数は本来、stringに返すことをバッファーがオーバーフローすることを防ぐためXPortで出力する。
-				using namespace Device::Tick;
-				uint64_t w;
-//一つ目を飛ばして再作成
-				XPort::WriteLine("!finish before pressing any keys");
-				begin++;
-				while (XPort::IsEmpty()) {
-					Shell::Call(begin, end);
+				//この関数は本来、stringに返すことをバッファーがオーバーフローすることを防ぐためXPortで出力する。
+				//一つ目を飛ばして再作成
+				bool flush=false;
+				if (++begin!=end) {
+					if (IsOptionPattern(*begin)) {
+						if (*begin=="-f") {
+							flush=true;
+						} else if (*begin=="-help") {
+							XPort::WriteLine("[option] command");
+							XPort::WriteLine("option..-f(flush),-help");
+							return 0;
+						} else {
+							XPort::WriteLine("NonSurport");
+							return -2;
+						}
+
+						if (++begin==end) {
+							return -1;
+						}
+					}
+
+					while (XPort::IsEmpty()) {
+						Shell::Call(begin, end);
+						if (flush) {
+							XPort::Flush();
+						}
+					}
+
 					XPort::Flush();
-					w = Tick() + 0xFFF;
-					while (Tick() < w)
-					;
+					return 0;
+				} else {
+					XPort::WriteLine("Empty");
+					return -1;
 				}
-				XPort::WriteLine("!Fin");
-				return 0;
 			});
 
 }
@@ -229,6 +271,52 @@ File::FileBase* CreateReboot() {
 			[](text_iterator begin, text_iterator end)->int {
 				NVIC_SystemReset();
 				return 0; //dummy cannot reach here
+			});
+}
+
+File::FileBase* CreateDelay() {
+	return File::CreateExecute("delay",
+			[](text_iterator begin, text_iterator end)->int {
+				uint64_t time=10; //[us] default
+				if (++begin!=end) {
+					if (IsUnsignedNumberPatten(*begin)) {
+						time= ToUInt64(*begin);
+						if (++begin==end) {
+							XPort::WriteLine("Empty");
+							return -1;
+						}
+					}
+
+					if (IsOptionPattern(*begin)) {
+						if (*begin=="-us") {
+						} else if (*begin=="-ms") {
+							time*=1000;
+						} else if (*begin=="-s") {
+							time*=1000000;
+						} else if (*begin=="-help") {
+							XPort::WriteLine("[time] [option] command");
+							XPort::WriteLine("time..0~");
+							XPort::WriteLine("option{-us,-ms,-s,-help}");
+							return 0;
+						} else {
+							XPort::WriteLine("NonSurport");
+						}
+
+						if (++begin==end) {
+							XPort::WriteLine("Empty");
+							return -1;
+						}
+					}
+					Device::Tick::DelayUs(time);
+
+					Shell::Call(begin,end);
+
+					return 0;
+				} else {
+					XPort::WriteLine("Empty");
+					return -1;
+				}
+
 			});
 }
 }

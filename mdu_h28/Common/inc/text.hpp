@@ -9,8 +9,8 @@
 #include <fix.hpp>
 namespace common {
 
-	constexpr char newline ='\r';
-
+	extern char newline;
+	extern char comma;//区切り文字[CSV用]
 	std::vector<std::string> Split(const std::string& target,const std::string& sep="\r");
 
 	std::string Space(const std::string& str,unsigned int s=0);//cがs個繰り返された文字列
@@ -23,70 +23,39 @@ namespace common {
 	template <class T,uint X,uint Y>std::string ToStr(const Matrix<T,X,Y>&);
 
 	common::fix32 ToFix(const std::string&);
-	int32_t ToInt(const std::string&);
-
+	int32_t ToInt32(const std::string&);
+	int64_t ToInt64(const std::string&);
+	uint32_t ToUInt32(const std::string&);
+	uint64_t ToUInt64(const std::string&);
 	float ToFloat(const std::string&);
-
-
-	//トークン処理用
-	static inline bool IsNumber(char c){
-		return '0'<=c&&c<='9';
-	}
-
-	static inline bool IsHex(char c){
-		return  ('0'<=c&&c<='9')||('a'<=c&&c<='f')||('A'<=c&&c<='F');
-	}
 
 	static inline int32_t FromNumber(char c){
 		return c-'0';
 	}
 
-	static inline bool IsEnd(char c){
-		return c=='\0';
-	}
 
-	static inline bool IsPoint(char c){
-		return c=='.';
-	}
-
-	static inline bool IsSign(char c){
-		return c=='+'||c=='-';
-	}
-
-	static inline bool IsSmall(char c){
-		return 'a'<=c&&c<='z';
-	}
-
-	static inline bool IsLarge(char c){
-		return 'A'<=c&&c<='Z';
-	}
-
-	static inline bool IsAlphabet(char c){
-		return IsSmall(c)||IsLarge(c);
-	}
 
 	static inline char ToChar(int32_t value){
 		return '0'+value;
 	}
 
-	static inline char IsMark(char c){
-		return ('!'<=c&&c<='/')||(':'<=c&&c<='?')||
-				('['<=c&&c<='`')||('{'<=c&&c<='~');
-	}
 
-	static inline char IsEndLine(char c){
-		return c==newline;
-	}
 
 	bool IsNumberPattern(const std::string&);
 	/* S:={'+','-'},N:=[0,9],P:={'.'}
 	 * (S|0)N#(PN*|0)
 	 */
 
+	bool IsUnsignedNumberPatten(const std::string&);
+	/* N=[0,9]
+	 * ('+',0)N#
+	 */
+
 	bool IsOptionPattern(const std::string&);
-	 /* A=['a','Z'],N[0,9],C={A|N}
+	 /* A=['a','Z'],N=[0,9],C={A|N}
 	  * '-'C#
 	 */
+
 
 } /* namespace common */
 

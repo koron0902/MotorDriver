@@ -137,7 +137,7 @@ size_t FileBase::GetMemorySizeFree() {
 
 std::string FileBase::GetChildrenNameSub() const {
 	if (next != nullptr) {
-		return next->GetChildrenNameSub() + newline + name;
+		return next->GetChildrenNameSub() + comma + name;
 	} else {
 		return name;
 	}

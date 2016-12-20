@@ -38,7 +38,7 @@ int Integer::SetData(const std::string& str) {
 		XPort::WriteLine("Null");
 		return -1; //NPE prevention
 	} else if (data != nullptr) {
-		*data = ToInt(str);
+		*data = ToInt32(str);
 		return 0;
 	} else {
 		XPort::WriteLine("found out");

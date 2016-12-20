@@ -29,7 +29,7 @@ DSTATUS disk_status (
 )
 {
 	DSTATUS stat;
-	int result;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :
@@ -56,7 +56,7 @@ DSTATUS disk_initialize (
 )
 {
 	DSTATUS stat;
-	int result;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :

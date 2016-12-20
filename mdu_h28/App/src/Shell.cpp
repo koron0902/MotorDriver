@@ -45,34 +45,6 @@ int Call(text_iterator begin, text_iterator end) {
 }
 
 int Call(std::vector<std::string>& arg) {
-	/*
-	 if (arg.empty())
-	 return -1;
-	 history = arg;
-	 auto& method = arg[0];
-	 FileBase* file;
-
-	 if ((file = current->Search(method)) != nullptr) {
-	 if (file->GetMode().IsExecutable()) {
-	 return (*file)(arg.begin, arg.end());
-	 } else {
-	 XPort::WriteLine("NonExecute");
-	 return -1;
-	 }
-	 }
-
-	 for (auto dir : path) {
-	 if ((file = dir->Search(method)) != nullptr) {
-	 if (file->GetMode().IsExecutable()) {
-	 return (*file)(arg.begin, arg.end());
-	 } else {
-	 XPort::WriteLine("NonExecute");
-	 return -1;
-	 }
-	 }
-	 }
-	 return "Not Exist";
-	 */
 	return Call(arg.begin(), arg.end());
 }
 

@@ -26,9 +26,9 @@ void CommandLine() {
 	auto call = [&buf]() {
 
 		while (XPort::IsLine()) {
-			int code;
+			//int code;
 			buf = XPort::ReadLine();
-			code=Shell::Call(buf);
+			/*code=*/Shell::Call(buf);
 
 		}
 		XPort::Flush();

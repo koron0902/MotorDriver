@@ -3,10 +3,14 @@
 #include <stack>
 #include <cstdio>
 #include <qmath.hpp>
-
+#include <token.hpp>
 using namespace std;
 
 namespace common {
+
+char newline ='\r';
+char comma=',';
+
 
 vector<string> Split(const string& text, const string& seq) {
 	vector<string> arg;
@@ -127,14 +131,14 @@ fix32 ToFix(const std::string& text) {
 	return fix;
 }
 
-int32_t ToInt(const std::string& text) {
+template<class T> T ToInt(const std::string& text) {
 	uint32_t idx = 0;
 	bool sign = false;
 	char c;
 	auto next = [&text,&idx]()->char {
 		return text[idx++];
 	};
-	int32_t num = 0;
+	T num = 0;
 	c = next();
 	if (IsSign(c)) {
 		sign = (c == '-');
@@ -151,6 +155,38 @@ int32_t ToInt(const std::string& text) {
 	}
 
 	return num;
+}
+
+template<class T> T ToUInt(const std::string& text) {
+	uint32_t idx = 0;
+	char c;
+	auto next = [&text,&idx]()->char {
+		return text[idx++];
+	};
+	T num = 0;
+	c = next();
+	while (IsNumber(c)) {
+		num *= 10;
+		num += FromNumber(c);
+		c = next();
+	}
+	return num;
+}
+
+int32_t ToInt32(const std::string& text) {
+	return ToInt<int32_t>(text);
+}
+
+int64_t ToInt64(const std::string& text) {
+	return ToInt<int64_t>(text);
+}
+
+uint32_t ToUInt32(const std::string& text) {
+	return ToUInt<uint32_t>(text);
+}
+
+uint64_t ToUInt64(const std::string& text) {
+	return ToUInt<uint64_t>(text);
 }
 
 float ToFloat(const std::string& text) {
@@ -217,15 +253,40 @@ bool IsNumberPattern(const std::string& text) {
 	return true;
 }
 
+bool IsUnsignedNumberPatten(const std::string& text) {
+	auto it = text.begin();
+	if (IsEnd(*it)) return false; //nullは論外
+	if (*it=='+'){
+		it++;
+		if (IsEnd(*it))return false;
+	}
+	//必ず一文字は数字
+	if (IsNumber(*it)){
+		it++;
+		if (IsEnd(*it))return false;
+	}else{
+		return false;
+	}
+
+	while (IsEnd(*it)){
+		if (IsNumber(*it)){
+			it++;
+		}else{
+			return false;
+		}
+	}
+	return true;
+}
+
 bool IsOptionPattern(const std::string& text) {
 	auto it = text.begin();
 	if (IsEnd(*it)) return false; //nullは論外
-	if (*it!='-')return false;
+	if (*it != '-') return false;
 	it++;
-	while (!IsEnd(*it)){
-		if (IsNumber(*it)||IsAlphabet(*it)){
+	while (!IsEnd(*it)) {
+		if (IsNumber(*it) || IsAlphabet(*it)) {
 			it++;
-		}else{
+		} else {
 			return false;
 		}
 	}
