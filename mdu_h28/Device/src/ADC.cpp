@@ -27,7 +27,7 @@ uint16_t GetAmpC() {
 	return AmpC;
 }
 
-fix32 GetVlot() {
+fix32 GetVolt() {
 	return VlotRaw*ADCRef*VlotGain;
 }
 fix32 GetVlotA() {

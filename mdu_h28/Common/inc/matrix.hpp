@@ -54,6 +54,12 @@ template<class T, unsigned int X, unsigned int Y> struct Matrix {
 		}
 	}
 
+	Matrix(const T value[]){
+		for(uint i = 0;i < size; i++){
+			dat[i] = value[i];
+		}
+	}
+
 	Matrix(const Matrix&)=default;
 
 

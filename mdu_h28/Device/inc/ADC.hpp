@@ -9,7 +9,7 @@ uint16_t GetAmpA();
 uint16_t GetAmpB();
 uint16_t GetAmpC();
 
-fix32 GetVlot();
+fix32 GetVolt();
 fix32 GetVlotA();
 fix32 GetVlotB();
 fix32 GetVlotC();

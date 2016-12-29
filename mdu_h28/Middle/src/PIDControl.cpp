@@ -7,8 +7,6 @@
 
 #include <PIDControl.hpp>
 #include <matrix.hpp>
-#include <qmath.hpp>
-#include <Timer.hpp>
 #include <Port.hpp>
 #include <QEI.hpp>
 #include <ADC.hpp>
@@ -18,6 +16,7 @@
 
 namespace Middle{
 	namespace Controller{
+	fix32 PID::LastDuty;
 		PID::PID()://mFreq(FREQUENCY_DEFAULT),
 				mGearRate(GEAR_RATE_DEFAULT),
 				mRadius(RADIUS_DEFAULT),
@@ -41,19 +40,24 @@ namespace Middle{
 		}
 
 		void PID::Proc(MotorState_t& last, MotorState_t& next){
-			mNextState.mRealSpeed = fix32::CreateFloat(Device::QEI::GetVelcoity()) * mFreq / mEncoderResolution;
-			const fix32 gains[] = {mKp, mKi, mKd, mKe};
-			const Matrix<fix32, 1, 4> GainMatrix(gains[0]);
-			Matrix<fix32, 4, 1> in_vector;
+			static const float gains[] = {mKp, mKi, mKd, mKe};
+			static const Matrix<float, 1, 4> GainMatrix(gains);
+			//for(int i = 0;i < 4;i++)
+				//GainMatrix(0, i) = gains[i];
+			static Matrix<float, 4, 1> in_vector;
 
-			fix32 error, integ, duty;
-			static const fix32 BatteryVoltage = Device::ADC::GetVlot() * 100;//Device::ADC::GetVlot();
-			static const fix32 Volt2Duty = fix32::One * 6.25 / BatteryVoltage >> 4;
 
-			error = next.mTargetSpeed - next.mRealSpeed;
-			integ = last.mIntegration + error;
-			static constexpr fix32 min = -150 << fix32::shift;
-			static constexpr fix32 max = 150 << fix32::shift;
+			static const auto BatteryVoltage = (float)Device::ADC::GetVolt() * 100;
+			static const auto Volt2Duty = 4096 * 6.25f / (BatteryVoltage / 16);
+			static const auto Pulse2RPS = (float)mFreq / mEncoderResolution;
+
+			next.mRealSpeed = Device::QEI::GetVelcoity() * Pulse2RPS;
+
+			next.mTargetSpeed = next.mRealSpeed;
+			static const auto error = next.mTargetSpeed - next.mRealSpeed;
+			static auto integ = last.mIntegration + error;
+			static constexpr auto min = -10.0f ;//<< fix32::shift;
+			static constexpr auto max = 10.0f;// << fix32::shift;
 			integ = (integ < min ? min : (integ > max ? max : integ));
 
 			in_vector(0, 0) = error;
@@ -64,14 +68,17 @@ namespace Middle{
 			auto output = GainMatrix * in_vector;
 
 			output(0, 0) *= Volt2Duty;
-			duty = output(0, 0);
-			duty = regions::one.Fit(duty);
+			auto duty = output(0, 0);
+			duty /= 4096;
+			duty = (duty < -1 ? -1 : (duty > 1 ? 1 : duty));
 
 			next.mIntegration = integ;
 			next.mError = error;
 			next.mDuty = duty;
 
-			Middle::Motor::SetDuty(duty);
+			Middle::Motor::SetDuty(regions::one.Fit(fix32::CreateFloat(duty)));
+			last = next;
+			LastDuty = last.mDuty;
 		}
 
 		void PID::SetFreq(fix32 freq){

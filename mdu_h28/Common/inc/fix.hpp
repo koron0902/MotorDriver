@@ -109,7 +109,7 @@ struct fix32 {
 	}
 
 	constexpr fix32 operator *=(const fix32 x) {
-		return fix32(word = ((int64_t) word * x.word) >> shift);
+		return fix32(word = (((int64_t) word * x.word) >> shift));
 	}
 
 	constexpr fix32 operator *=(int32_t x) {

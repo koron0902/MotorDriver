@@ -51,7 +51,7 @@ File::Directory* CreateADC(){
 
 		string out;
 		out.reserve(64);
-		out=ToStr(ADC::GetVlot())+",";
+		out=ToStr(ADC::GetVolt())+",";
 		out+=ToStr(ADC::GetVlotA())+",";
 		out+=ToStr(ADC::GetVlotB())+",";
 		out+=ToStr(ADC::GetVlotC());

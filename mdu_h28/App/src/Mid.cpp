@@ -4,6 +4,7 @@
 #include <text.hpp>
 #include <DRV.hpp>
 #include <Trapezium.hpp>
+#include <PIDControl.hpp>
 using namespace Middle;
 using namespace App::File;
 using namespace common;
@@ -18,6 +19,7 @@ Directory* Create(){
 	mid->Add(Execute::Create("lock",Lock));
 	mid->Add(CreateDRV());
 	mid->Add(CreateTrap());
+	mid->Add(CreatePID());
 	return mid;
 }
 
@@ -34,6 +36,13 @@ Directory* CreateTrap(){
 	trap->Add(FileProperty::Create("step", *Controller::Trapezium::GetStep, Controller::Trapezium::SetStep));
 
 	return trap;
+}
+
+Directory* CreatePID(){
+	auto* pid = Directory::Create("pid");
+	pid->Add(FileFix::Create("duty", &(Controller::PID::LastDuty)));
+
+	return pid;
 }
 
 std::string Duty(const common::ShellParameter& arg){
