@@ -110,6 +110,9 @@ namespace Device {
 		static constexpr uint32_t MeasureFrequency=100_Hz;//速度を計測する周波数
 		volatile uint32_t* QEIVel;
 
+		void WaitForZero(volatile uint32_t* reg){
+			while(*reg != 0);
+		}
 
 		void Init() {
 			//clock supply
@@ -117,14 +120,24 @@ namespace Device {
 			Chip_SYSCTL_PeriphReset(RESET_QEI0);
 			QEI->MAXPOS = 40;
 			QEI->SIGMODE = 0;
-			QEI->LOAD = (0xFFFFFFFF) * (1.0 * 30_KHz / SystemCoreClock);
-			QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = 500;
+			//QEI->LOAD = 0xFFFFFFFF - ((0xFFFFFFFF) * (1.0 * 30_KHz / SystemCoreClock));
+			SetTimer(10000);
+			//QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = 500;
+			SetFilter(0);
 			QEI->CAPMODE = true;
 			QEI->CON = 0b1111;
-			while(QEI->CAP != 0);
+			//while(QEI->CAP != 0);
+			WaitForZero(&(QEI->CAP));
 			QEIVel = &(QEI->CAP);
 		}
 
+		void SetTimer(uint32_t clock){
+			QEI->LOAD = ((float)SystemCoreClock / clock) + 0.5;
+		}
+
+		void SetFilter(uint32_t clock){
+			QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = clock;
+		}
 
 		uint32_t GetVelcoity(){
 			return QEI->CAP;

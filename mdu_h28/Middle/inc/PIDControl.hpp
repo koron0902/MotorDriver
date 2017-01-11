@@ -27,7 +27,7 @@ namespace Middle{
 			float mKd;	// 微分ゲイン
 			float mKe;	// 逆起電力ゲイン
 
-			static constexpr float FREQUENCY_DEFAULT = 8_KHz;
+			static constexpr float FREQUENCY_DEFAULT = 10_KHz;
 			static constexpr float GEAR_RATE_DEFAULT = 1;
 			static constexpr float RADIUS_DEFAULT = 1;
 			static constexpr float ENCODER_RESOLUTION_DEFAULT = 400;
