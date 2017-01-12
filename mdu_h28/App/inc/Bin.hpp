@@ -30,7 +30,7 @@ std::string repeat(const std::vector<std::string>&);
 
 std::string reboot(const std::vector<std::string>&);
 
-std::string test(const std::vector<std::string>&);//実験用
+std::string mkfs(const std::vector<std::string>&);
 }
 } /* namespace Device */
 
