@@ -29,8 +29,8 @@
  * this code.
  */
 
-#include "chip.h"
-#include "eeprom.h"
+#include <chip.hpp>
+#include <eeprom.hpp>
 
 /*****************************************************************************
  * Private types/enumerations/variables

@@ -56,7 +56,7 @@
 
 #ifndef __IASMARM__
 /* For SystemCoreClock */
-#include <chip.h>
+#include <chip.hpp>
 #endif
 
 /*-----------------------------------------------------------

@@ -5,7 +5,7 @@
  *      Author: Keita
  */
 
-#include <chip.h>
+#include <chip.hpp>
 #include <Port.hpp>
 #include <SPI.hpp>
 #include <unit.hpp>

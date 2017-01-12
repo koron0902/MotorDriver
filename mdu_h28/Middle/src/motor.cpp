@@ -1,9 +1,10 @@
-#include <motor.hpp>
+#include <Motor.hpp>
 #include <PWM.hpp>
 #include "DRV.hpp"
 #include <functional>
 #include <utilize.hpp>
 #include <qmath.hpp>
+#include <region.hpp>
 using namespace common;
 using namespace Device;
 
@@ -24,10 +25,10 @@ void Init() {
 	//ModeAs(Type::None);
 
 	ModeAs(Type::DCMotor);
-	for(int i = 0;i < 4;i++){
+	/*for(int i = 0;i < 4;i++){
 		SetDuty(fix32::CreateFloat(0.1 * i));
 		Wait();
-	}
+	}*/
 }
 
 void ModeAs(Type t) {
@@ -83,12 +84,15 @@ void DCMotor::Lock() {
 void DCMotor::SetDuty(fix32 duty) {
 	using namespace PWM;
 	using namespace common;
+	constexpr uint32_t eps = 100;
 	fix32 c = regions::one.Fit(duty);
 	fix32 a = abs(c);
+	if(a == fix32::One)
+		a -= fix32::CreateRaw(eps);
 	q32_t q = a.GetRaw() << 16; //小数部のみにする。
 	bool s = sign(c);
 
-	if (s) {
+	if (!s) {
 		//正転
 		SetSignal(Signal::AB);
 	} else {

@@ -1,32 +1,41 @@
-/*
- * ADC.h
- *
- *  Created on: 2016/11/06
- *      Author: TERU
- */
 
-#ifndef DEVICE_ADC_H_
-#define DEVICE_ADC_H_
-
-#include <stdint.h>
-
+#pragma once
+#include <fix.hpp>
 namespace Device {
 
 namespace ADC{
+using namespace common;
 
+void SetAmpGain(const fix32& gain);
+/*
 uint16_t GetAmpA();
 uint16_t GetAmpB();
 uint16_t GetAmpC();
+<<<<<<< HEAD
 
-uint16_t GetVlot();
-uint16_t GetVlotA();
-uint16_t GetVlotB();
-uint16_t GetVlotC();
+fix32 GetVolt();
+fix32 GetVoltA();
+fix32 GetVoltB();
+fix32 GetVoltC();
+=======
+*/
+fix32 GetVolt();
+fix32 GetVoltU();
+fix32 GetVoltV();
+fix32 GetVoltW();
+
+fix32 GetAmpU();
+fix32 GetAmpV();
+fix32 GetAmpW();
+
+fix32 GetAccount();//CPU占有率
 
 void Init();
+
+void Trigger();
+
+
 
 }
 
 } /* namespace Device */
-
-#endif /* DEVICE_ADC_H_ */

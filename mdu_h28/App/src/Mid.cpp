@@ -1,21 +1,79 @@
-/*
- * Mid.cpp
- *
- *  Created on: 2016/11/16
- *      Author: hamus
- */
+#include <Mid.hpp>
+#include <Motor.hpp>
+#include <text.hpp>
+#include <DRV.hpp>
+#include <Trapezium.hpp>
+#include <PIDControl.hpp>
+#include <type.hpp>
+#include<File.hpp>
 
-#include "Mid.h"
+using namespace Middle;
+using namespace App::File;
+using namespace common;
 
 namespace App {
-
-Mid::Mid() {
-	// TODO Auto-generated constructor stub
-	
+namespace Mid{
+Directory* Create(){
+	auto *mid=Directory::Create("mid");
+	mid->Add(CreateDuty());
+	mid->Add(CreateFree());
+	mid->Add(CreateLock());
+	mid->Add(CreateDRV());
+	mid->Add(CreateTrap());
+	mid->Add(CreatePID());
+	return mid;
 }
 
-Mid::~Mid() {
-	// TODO Auto-generated destructor stub
+Directory* CreateDRV(){
+	auto* drv = Directory::Create("drv");
+	//drv->Add(File::CreateProperty("gain",*(Middle::DRV::GetGain),*(Middle::DRV::SetGain)));
+	return drv;
+}
+
+Directory* CreateTrap(){
+	auto* trap = Directory::Create("trap");
+	trap->Add(File::Fix::Create("tDuty", &(Controller::Trapezium::mMotorState.mTargetDuty)));
+	trap->Add(File::Fix::Create("nDuty", &(Controller::Trapezium::mMotorState.mLastDuty)));
+	trap->Add(File::Fix::Create("step", &(Controller::Trapezium::mMotorState.mStep)));
+
+	return trap;
+}
+
+Directory* CreatePID(){
+	auto* pid = Directory::Create("pid");
+	//pid->Add(File::Fix::Create("duty", &(Controller::PID::LastDuty)));
+
+	return pid;
+}
+
+
+File::FileBase* CreateDuty(){
+	return CreateExecute("duty",[](text_iterator begin,text_iterator end)->int{
+		if (std::distance(begin,end)>=2){
+			begin++;
+			Motor::SetDuty(common::ToFix(*begin));
+		}else{
+			Motor::Lock();
+		}
+		return 0;
+	});
+
+}
+File::FileBase* CreateFree(){
+	return CreateExecute("free",[](text_iterator being,text_iterator end)->int{
+		Motor::Free();
+		return 0;
+	});
+}
+
+File::FileBase* CreateLock(){
+	return CreateExecute("lock",[](text_iterator being,text_iterator end)->int{
+		Motor::Lock();
+		return 0;
+	});
+}
+
+
 }
 
 } /* namespace App */

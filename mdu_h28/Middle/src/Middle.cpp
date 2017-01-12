@@ -5,15 +5,13 @@
  *      Author: hamus
  */
 
-#include "Middle.hpp"
-#include "motor.hpp"
+#include <motor.hpp>
+#include <Middle.hpp>
+#include <cstring>
 namespace Middle {
-
 
 void Init(){
 	Motor::Init();
-
-	
 }
 
 

@@ -5,10 +5,9 @@
  *      Author: TERU
  */
 
-#include <chip.h>
+#include <chip.hpp>
+#include <ring_buffer.hpp>
 #include <cstring>
-#include <ring_buffer.h>
-
 #include <TaskManager.hpp>
 #include <Uart.hpp>
 
@@ -59,22 +58,16 @@ bool IsFull() {
 }
 
 void Write(char c) {
-	while (IsFull())
-		;
-
+	while (IsFull());
 	Chip_UART_SendRB(LPC_USART0, &TxBuf, &c, sizeof(char));
-
 }
 
-void Write(const char* data, size_t sz) {
-
+void Write(const uint8_t* data, size_t sz) {
 	Chip_UART_SendRB(LPC_USART0, &TxBuf, data, sz);
-
-
 }
 
 void Write(const char* str) {
-	Write(str, std::strlen(str));
+	Write((uint8_t*)str, std::strlen(str));
 }
 
 void Write(const vector<uint8_t>& data) {
@@ -82,7 +75,7 @@ void Write(const vector<uint8_t>& data) {
 }
 
 void Write(const string& text) {
-	Write(text.data(), text.length());
+	Write((uint8_t*)text.data(), text.length());
 }
 
 bool IsEmpty() {
@@ -112,15 +105,31 @@ string ReadLine() {
 	while ((c=ReadByte())!='\r'){
 		s+=c;
 	}
-	return move(s);
+	return s;
 }
 
+
+
+void Claer(){
+	RingBuffer_Flush(&RxBuf);
+}
+
+bool IsBusy(){
+	return !RingBuffer_IsEmpty(&TxBuf);
+}
+
+bool IsExist(char c){
+	char* data=(char*)RxRaw;
+	for (unsigned int i=RxBuf.tail;i!=RxBuf.head;i=(i+1)%RxBuf.count){
+		if (data[i]==c)return true;
+	}
+	return false;
 }
 
 extern "C" void UART0_IRQHandler(void) {
 	Chip_UART_IRQRBHandler(LPC_USART0, &RxBuf, &TxBuf);
 }
 
-
+}
 
 } /* namespace Device */

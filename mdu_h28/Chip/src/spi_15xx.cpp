@@ -29,7 +29,7 @@
  * this code.
  */
 
-#include "chip.h"
+#include <chip.hpp>
 
 /*****************************************************************************
  * Private types/enumerations/variables
@@ -179,6 +179,7 @@ void Chip_SPI_Int_Cmd(LPC_SPI_T *pSPI, uint32_t IntMask, FunctionalState NewStat
 /*Send and Receive SPI Data  */
 uint32_t Chip_SPI_RWFrames_Blocking(LPC_SPI_T *pSPI, SPI_DATA_SETUP_T *pXfSetup)
 {
+	uint8_t cnt(0);
 	uint32_t Status;
 	/* Clear status */
 	Chip_SPI_ClearStatus(
@@ -194,12 +195,16 @@ uint32_t Chip_SPI_RWFrames_Blocking(LPC_SPI_T *pSPI, SPI_DATA_SETUP_T *pXfSetup)
 		/* In case of TxReady */
 		if ((Status & SPI_STAT_TXRDY) && (pXfSetup->TxCnt < pXfSetup->Length)) {
 			SPI_Send_Data(pSPI, pXfSetup);
+			cnt = 0;
 		}
 
 		/*In case of Rx ready */
 		if ((Status & SPI_STAT_RXRDY) && (pXfSetup->RxCnt < pXfSetup->Length)) {
 			SPI_Receive_Data(pSPI, pXfSetup);
+			cnt = 0;
 		}
+		if(++cnt == UINT8_MAX)
+			return 0;
 	}
 	/* Check error */
 	if (Chip_SPI_GetStatus(pSPI) & (SPI_STAT_RXOV | SPI_STAT_TXUR)) {

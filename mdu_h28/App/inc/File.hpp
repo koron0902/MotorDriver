@@ -8,139 +8,226 @@
 #ifndef APP_FILE_H_
 #define APP_FILE_H_
 
-#include <vector>
-#include <deque>
-#include <string>
-#include <stdint.h>
-#include <functional>
-
+#include <FileBase.hpp>
 namespace App {
-namespace File{
-//ファイルの登録
-enum class FileType:uint16_t{
-	None=0,//エラー用の空集合
-	Directory,
-	Execute,//通常の実行可能な関数
-	FileInt32,
-	FileFloat,
-	FileString,
-};
+namespace File {
+using namespace common;
 
-union FileMode{
-	uint8_t flag;
-	struct {
-		unsigned executable:1;
-		unsigned writable:1;
-		unsigned readable:1;
-		unsigned protection:1;
-	};
-};
 
-class FileBase {
-public:
-	static constexpr int MaxNumber = 32; //ファイルの最大数
-	static constexpr int MaxSize = 64; //派生先を含むクラスの最大サイズ
+
+template<class Func> //インライン展開しやすいように変更
+class Execute: public FileBase {
 private:
-	std::string name;
-	//本当はスマートポインタを使うはずだった..
-	FileBase* parent{nullptr };
-	FileBase* child{nullptr };
-	FileBase* next{nullptr };
-	FileType flag{FileType::None};
-	FileMode mode;
-protected:
-	static void* operator new(size_t);
-	static void operator delete(void*);
-
-	void SetFlag(FileType _flag) {
-		flag = _flag;
+	Func m_func;
+	Execute(const std::string& name, const Func& func) :
+			FileBase(name), m_func(func) {
+		SetType(FileType::Execute);
 	}
-	void Add(FileBase*); //子要素として追加
 public:
-	FileBase(const std::string& name); //本来はprotected
-	virtual ~FileBase();
-
-	virtual std::string operator()(std::vector<std::string>&);
-	FileType GetFlag() const {
-		return flag;
+	static Execute<Func>* Create(const std::string& filename,
+			const Func& func) {
+		return new Execute<Func>(filename, func);
 	}
-	const std::string& GetName() const {
-		return name;
+	virtual int operator()(text_iterator begin, text_iterator end) {
+		return m_func(begin, end);
 	}
-	FileBase* SearchChilren(const std::string& name) ;
-	FileBase* Search(const std::vector<std::string>&);
-	FileBase* Search(const std::string&);
-	virtual std::string GetData();
-	virtual std::string SetData(const std::string&);
-	std::string GetPathName()const;
-	std::string GetChildrenName()const;
-	std::string GetAllName(unsigned int sp = 0) const;
-	//メモリーの配置状態の取得
-	static size_t GetMemorySizeAll();
-	static size_t GetMemorySizeUsed();
-	static size_t GetMemorySizeFree();
-private:
-	std::string GetChildrenNameSub()const;
 };
 
-class Directory: public FileBase {
-private:
-	Directory(const std::string& name);
-public:
+//互換性を保つために作成した関数ポインター版(非推奨)
+template<> class Execute<execute_fp> : public FileBase {
+	execute_fp m_func;
+	Execute(const std::string& name, execute_fp func) :
+			FileBase(name), m_func(func) {
+		SetType(FileType::Execute);
 
-	virtual ~Directory()=default;
-	static Directory* Create(const std::string& name);
-	void Add(FileBase* p);
-	virtual std::string operator()(std::vector<std::string>&);
+	}
+public:
+	static Execute<execute_fp>* Create(const std::string& filename,
+			const execute_fp& func) {
+		return new Execute<execute_fp>(filename, func);
+	}
+	virtual int operator()(text_iterator begin, text_iterator end) {
+		return m_func(begin, end);
+	}
 };
+//毎回書くのが面倒なので省略形
+template<class T> FileBase* CreateExecute(const std::string& filename,
+		const T& obj) {
+	return Execute<T>::Create(filename, obj);
+}
 
-class Execute:public FileBase{
-public:
-	using command= std::function<std::string(std::vector<std::string>&)>;
-private:
-	command func;
-	Execute(const std::string& name,const command& func=nullptr);
-public:
-	static Execute* Create(const std::string& filename, const command& cmd=nullptr);
-	virtual std::string operator()(std::vector<std::string>& v);
-
-
-};
-
-class FileInt32:public FileBase{
+class Integer: public FileBase {
 private:
 	int32_t* data;
-	FileInt32(const std::string& filename,int32_t* d);
+	Integer(const std::string& filename, int32_t* d);
 public:
-	static FileInt32* Create(const std::string& filename,int32_t* d);
-	std::string GetData();
-	std::string SetData(const std::string&);
-	virtual std::string operator()(std::vector<std::string>&);
+	static Integer* Create(const std::string& filename, int32_t* d = nullptr);
+	virtual std::string GetData();
+	virtual int SetData(const std::string&);
 };
 
-class FileFloat:public FileBase{
+class Float: public FileBase {
 private:
 	float* data;
-	FileFloat(const std::string& filename,float* f);
+	Float(const std::string& filename, float* f);
 public:
-	static FileFloat* Create(const std::string& filename,float* f);
-	std::string GetData();
-	std::string SetData(const std::string&);
-	virtual std::string operator()(std::vector<std::string>&);
+	static Float* Create(const std::string& filename, float* f = nullptr);
+	virtual std::string GetData();
+	virtual int SetData(const std::string&);
 };
 
-class FileString:public FileBase{
+class String: public FileBase {
 private:
 	std::string* data;
-	FileString(const std::string& filename,std::string* str);
+	String(const std::string& filename, std::string* str = nullptr);
 public:
-	static FileString* Create(const std::string& filename,std::string* str);
-	std::string GetData();
-	std::string SetData(const std::string&);
-	virtual std::string operator()(std::vector<std::string>&);
+	static String* Create(const std::string& filename, std::string* str);
+	virtual std::string GetData();
+	virtual int SetData(const std::string&);
 };
 
-extern Directory *root,*current;
+class Fix: public FileBase {
+private:
+	fix32* data;
+	Fix(const std::string& filename, fix32* f = nullptr);
+public:
+	static Fix* Create(const std::string& filename, fix32* f);
+	virtual std::string GetData();
+	virtual int SetData(const std::string&);
+};
+
+template<class FSet, class FGet> class Property: public FileBase {
+private:
+	FSet m_set;
+	FGet m_get;
+	Property(const std::string& filename, const FSet& set, const FGet& get) :
+			FileBase(filename), m_set(set), m_get(get) {
+			SetType(FileType::Properties);
+
+	}
+public:
+	static Property<FSet, FGet>* Create(const std::string& filename,
+			const FSet& set, const FGet& get) {
+		return new Property<FSet, FGet>(filename, set, get);
+	}
+	virtual std::string GetData() {
+		return m_get();
+	}
+	virtual int SetData(const std::string& value) {
+		return m_set(value);
+	}
+};
+
+//関数ポインタ版[互換性のため]
+template <>class Property<set_fp,get_fp>: public FileBase {
+private:
+	set_fp m_set;
+	get_fp m_get;
+	Property(const std::string& filename, const set_fp& set, const get_fp& get) :
+			FileBase(filename), m_set(set), m_get(get) {
+			SetType(FileType::Properties);
+
+	}
+public:
+	static Property<set_fp, get_fp>* Create(const std::string& filename,
+			const set_fp& set, const get_fp& get) {
+		return new Property<set_fp, get_fp>(filename, set, get);
+	}
+	virtual std::string GetData() {
+		return m_get();
+	}
+	virtual int SetData(const std::string& value) {
+		return m_set(value);
+	}
+};
+
+
+template<class FGet> class ReadOnlyProperty: public FileBase {
+private:
+	FGet m_get;
+	ReadOnlyProperty(const std::string filename, const FGet& get) :
+			FileBase(filename), m_get(get) {
+		SetType(FileType::Properties);
+
+	}
+public:
+	static ReadOnlyProperty<FGet>* Create(const std::string & filename,
+			const FGet& get) {
+		return new ReadOnlyProperty<FGet>(filename, get);
+	}
+	virtual std::string GetData() {
+		return m_get();
+	}
+};
+
+template <>class ReadOnlyProperty<get_fp>: public FileBase {
+private:
+	get_fp m_get;
+	ReadOnlyProperty(const std::string filename, const get_fp& get) :
+			FileBase(filename), m_get(get) {
+		SetType(FileType::Properties);
+
+	}
+public:
+	static ReadOnlyProperty<get_fp>* Create(const std::string & filename,
+			const get_fp& get) {
+		return new ReadOnlyProperty<get_fp>(filename, get);
+	}
+	virtual std::string GetData() {
+		return m_get();
+	}
+};
+
+template<class FSet> class WriteOnlyProperty: public FileBase {
+private:
+	FSet m_set;
+	WriteOnlyProperty(const std::string& name, const FSet& set) :
+			FileBase(name), m_set(set) {
+		SetType(FileType::Properties);
+
+	}
+public:
+	static WriteOnlyProperty<FSet>* Create(const std::string & filename,
+			const FSet& set) {
+		return new WriteOnlyProperty<FSet*>(filename, set);
+	}
+	virtual std::string SetData(const std::string& value){
+		return m_set(value);
+	}
+};
+
+template<> class WriteOnlyProperty<set_fp>: public FileBase {
+private:
+	set_fp m_set;
+	WriteOnlyProperty(const std::string& name, const set_fp& set) :
+			FileBase(name), m_set(set) {
+		SetType(FileType::Properties);
+
+	}
+public:
+	static WriteOnlyProperty<set_fp>* Create(const std::string & filename,
+			const set_fp& set) {
+		return new WriteOnlyProperty<set_fp>(filename, set);
+	}
+	virtual int SetData(const std::string& value){
+		return m_set(value);
+	}
+};
+
+template<class FSet, class FGet> Property<FSet, FGet>* CreateProperty(
+		const std::string & name, const FSet& set, const FGet& get) {
+	return new Property<FSet, FGet>(name, set, get);
+}
+
+template<class FGet> ReadOnlyProperty<FGet>*CreateReadOnlyProperty(
+		const std::string& name, const FGet& get) {
+	return ReadOnlyProperty<FGet>::Create(name, get);
+}
+
+template<class FSet> WriteOnlyProperty<FSet>*CreateWriteOnlyProperty(
+		const std::string& name, const FSet& set) {
+	return WriteOnlyProperty<FSet>::Create(name, set);
+}
 
 
 } /* namespace App */

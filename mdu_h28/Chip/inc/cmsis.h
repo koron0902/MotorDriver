@@ -32,8 +32,8 @@
 #ifndef __CMSIS_15XX_H_
 #define __CMSIS_15XX_H_
 
-#include "lpc_types.h"
-#include "sys_config.h"
+#include <lpc_types.hpp>
+#include <sys_config.hpp>
 
 #ifdef __cplusplus
 extern "C" {

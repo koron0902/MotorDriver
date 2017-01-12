@@ -6,7 +6,7 @@
  */
 
 #include <bits.hpp>
-#include <chip.h>
+#include <chip.hpp>
 #include <Port.hpp>
 #include <PWM.hpp>
 #include <unit.hpp>
@@ -16,7 +16,7 @@ namespace Device {
 
 namespace PWM {
 
-static const uint32_t Rate = 5000; //[Hz]動作周波数
+static const uint32_t Rate = 30000; //[Hz]動作周波数
 //SCT内部のピン配置
 const uint8_t AH_PIN = 5;
 const uint8_t AL_PIN = 2;

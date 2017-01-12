@@ -12,13 +12,13 @@
 
 namespace App {
 namespace Shell{
+using namespace common;
 	//Initialize
 	void Init();
 	//shellの呼び出し
-	std::string Call(std::vector<std::string>&);
-	std::string Call(const std::string&);
-
-
+	int Call(text_iterator begin,text_iterator end);
+	int Call(const text_vector&);
+	int Call(const std::string&);
 }
 }
 

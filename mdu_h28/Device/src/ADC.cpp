@@ -1,30 +1,73 @@
 #include <ADC.hpp>
-#include <chip.h>
+#include <chip.hpp>
 #include <unit.hpp>
+#include <Timer.hpp>
+#include <counter.hpp>
+
 using namespace common;
 
 namespace Device {
 
 namespace ADC {
-
+//回路による定数
 static constexpr uint32_t ADCSampleClock = 50_KHz;
+static constexpr uint32_t TriggerRate=50_KHz;
+static constexpr fix32 ADCRef = fix32::CreateDouble(2.495); //[V] 基準電圧の実測値
+static constexpr fix32 Resistance = fix32::CreateDouble(5); //[mΩ]シャント抵抗値
+static constexpr fix32 VoltGain = fix32::CreateDouble(10.0f); //分圧回路による分圧率
+//
+static constexpr int32_t Correct = 1000; //補正値[k]
+static constexpr uint32_t ADCMax = (1 << 12) - 1;
+static fix32 AmpGain = fix32::CreateFloat(1.0f); //DRVで再設定してね。
+//取得したデータはとりあえずここで保持する。これらには[0,1)が入る
+static fix32 AmpRawU, AmpRawV, AmpRawW;
+static fix32 VoltRaw, VoltRawU, VoltRawV, VoltRawW;
 
-//取得したデータはとりあえずここで保持する。後々、LPFでも掛けてくれ。
-static uint16_t AmpA,AmpB,AmpC;
-static uint16_t Vlot,VlotA,VlotB,VlotC;
+static Counter measurement;
 
-uint16_t GetAmpA(){return AmpA;}
-uint16_t GetAmpB(){return AmpB;}
-uint16_t GetAmpC(){return AmpC;}
+void SetAmpGain(const fix32& gain) {
+	AmpGain = gain;
+}
 
-uint16_t GetVlot(){return Vlot;}
-uint16_t GetVlotA(){return VlotA;}
-uint16_t GetVlotB(){return VlotB;}
-uint16_t GetVlotC(){return VlotC;}
+fix32 GetVolt() {
+	return VoltRaw * ADCRef * VoltGain;
+}
+
+fix32 GetVoltU() {
+	return VoltRawU * ADCRef * VoltGain;
+}
+
+fix32 GetVoltV() {
+	return VoltRawV * ADCRef * VoltGain;
+}
+
+fix32 GetVoltW() {
+	return VoltRawW * ADCRef * VoltGain;
+}
+
+fix32 GetAmpU() {
+	fix32 Volt = AmpRawU * ADCRef; //実際にマイコンにかかっている電圧[V]
+	fix32 gain = Resistance * AmpGain;
+	return (Volt / gain) / Correct;
+}
+fix32 GetAmpV() {
+	fix32 Volt = AmpRawV * ADCRef; //実際にマイコンにかかっている電圧[V]
+	fix32 gain = Resistance * AmpGain;
+	return (Volt / gain) / Correct;
+}
+
+fix32 GetAmpW() {
+	fix32 Volt = AmpRawW * ADCRef; //実際にマイコンにかかっている電圧[V]
+	fix32 gain = Resistance * AmpGain;
+	return (Volt / gain) / Correct;
+}
+
+fix32 GetAccount(){
+	return measurement.Account();
+
+}
 
 void Init() {
-#if 0
-
 	//supply clock
 	Chip_ADC_Init(LPC_ADC0, 0);
 	Chip_ADC_Init(LPC_ADC1, 0);
@@ -38,82 +81,77 @@ void Init() {
 	Chip_ADC_SetupSequencer(LPC_ADC0, ADC_SEQA_IDX, //
 			ADC_SEQ_CTRL_CHANSEL(
 					10) | ADC_SEQ_CTRL_CHANSEL(9) | ADC_SEQ_CTRL_CHANSEL(11) |	//
-					ADC_SEQ_CTRL_BURST);
+					ADC_SEQ_CTRL_MODE_EOS);
 	//Note 電圧検知(SV(1,2),SV_C(1,3),SV_B(1,5),SV_A(1,4)) 補足 SV_Bは本来LED0の場所である。
 	Chip_ADC_SetupSequencer(LPC_ADC1,
 			ADC_SEQA_IDX, //
 			ADC_SEQ_CTRL_CHANSEL(
 					2)|ADC_SEQ_CTRL_CHANSEL(3)|ADC_SEQ_CTRL_CHANSEL(5)|ADC_SEQ_CTRL_CHANSEL(4)| //
-					ADC_SEQ_CTRL_BURST
+					ADC_SEQ_CTRL_MODE_EOS
 					);
-
-
 
 	//補正を掛ける
 	Chip_ADC_StartCalibration(LPC_ADC0);
+	while (!Chip_ADC_IsCalibrationDone(LPC_ADC0))
+		;
 	Chip_ADC_StartCalibration(LPC_ADC1);
-	while (!Chip_ADC_IsCalibrationDone(LPC_ADC0));
-	while (!Chip_ADC_IsCalibrationDone(LPC_ADC1));
+	while (!Chip_ADC_IsCalibrationDone(LPC_ADC1))
+		;
 
 	//Cross Point、割り込みを作成する場合ここに挿入。
 
 	//割り込み
-	Chip_ADC_ClearFlags(LPC_ADC0,Chip_ADC_GetFlags(LPC_ADC0));
-	Chip_ADC_ClearFlags(LPC_ADC1,Chip_ADC_GetFlags(LPC_ADC1));
+	Chip_ADC_ClearFlags(LPC_ADC0, Chip_ADC_GetFlags(LPC_ADC0));
+	Chip_ADC_ClearFlags(LPC_ADC1, Chip_ADC_GetFlags(LPC_ADC1));
 
-
-	Chip_ADC_EnableInt(LPC_ADC0,ADC_INTEN_SEQA_ENABLE);
-	Chip_ADC_EnableInt(LPC_ADC1,ADC_INTEN_SEQA_ENABLE);
+	Chip_ADC_EnableInt(LPC_ADC0, ADC_INTEN_SEQA_ENABLE);
+	Chip_ADC_EnableInt(LPC_ADC1, ADC_INTEN_SEQA_ENABLE);
 
 	NVIC_EnableIRQ(ADC0_SEQA_IRQn);
 	NVIC_EnableIRQ(ADC1_SEQA_IRQn);
 
-
 	//実際に処理を開始する。
-	Chip_ADC_EnableSequencer(LPC_ADC0,ADC_SEQA_IDX);
-	Chip_ADC_EnableSequencer(LPC_ADC1,ADC_SEQA_IDX);
-#endif
+	Chip_ADC_EnableSequencer(LPC_ADC0, ADC_SEQA_IDX);
+	Chip_ADC_EnableSequencer(LPC_ADC1, ADC_SEQA_IDX);
+
+	//周期的に呼び出されるようにTimerに登録する。
+	Timer::SetAction(1,TriggerRate,Trigger);
+
 }
 
-extern "C"
-void ADC0A_IRQHandler(void)
-{
-	uint32_t pending;
-
-	/* Get pending interrupts */
-	pending = Chip_ADC_GetFlags(LPC_ADC0);
-
-	//ここで結果を得る。
-	//Note 電流感知(SA_B(0,10),SA_A(0,9),SA_C(0,11))
-	AmpA=Chip_ADC_GetDataReg(LPC_ADC0,9);
-	AmpB=Chip_ADC_GetDataReg(LPC_ADC0,10);
-	AmpC=Chip_ADC_GetDataReg(LPC_ADC0,11);
-
-	/* Clear any pending interrupts */
-	Chip_ADC_ClearFlags(LPC_ADC0, pending);
+void Trigger() {
+	//割り込み
+	Chip_ADC_StartSequencer(LPC_ADC0, ADC_SEQA_IDX);
+	Chip_ADC_StartSequencer(LPC_ADC1, ADC_SEQA_IDX);
 }
 
-extern "C"
-void ADC1A_IRQHandler(void)
-{
-	uint32_t pending;
+extern "C" void ADC0A_IRQHandler(void) {
+//ここで結果を得る。
+//Note 電流感知(SA_B(0,10),SA_A(0,9),SA_C(0,11))
+	//AmpA = Chip_ADC_GetDataReg(LPC_ADC0, 9);
+	measurement.Begin();
 
-	/* Get pending interrupts */
-	pending = Chip_ADC_GetFlags(LPC_ADC1);
+	AmpRawU = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC0, 9) & 0xFFF0);
+	//AmpB = Chip_ADC_GetDataReg(LPC_ADC0, 10);
+	AmpRawV = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC0, 10) & 0xFFF0);
+	//AmpC = Chip_ADC_GetDataReg(LPC_ADC0, 11);
+	AmpRawW = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC0, 11) & 0xFFF0);
+	Chip_ADC_ClearFlags(LPC_ADC0, Chip_ADC_GetFlags(LPC_ADC0));
 
-	//ここで結果を得る
-	//Note 電圧検知(SV(1,2),SV_C(1,3),SV_B(1,5),SV_A(1,4)) 補足 SV_Bは本来LED0の場所である。
-	Vlot=Chip_ADC_GetDataReg(LPC_ADC1,2);
-	VlotA=Chip_ADC_GetDataReg(LPC_ADC1,3);
-	VlotB=Chip_ADC_GetDataReg(LPC_ADC1,5);
-	VlotC=Chip_ADC_GetDataReg(LPC_ADC1,4);
+	measurement.End();
+}
 
-	/* Clear Sequence A completion interrupt */
-	Chip_ADC_ClearFlags(LPC_ADC1, pending);
+extern "C" void ADC1A_IRQHandler(void) {
+//Note 電圧検知(SV(1,2),SV_C(1,3),SV_B(1,5),SV_A(1,4)) 補足 SV_Bは本来LED0の場所である。
+	VoltRaw = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC1, 2) & 0xFFF0);
+	VoltRawU = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC1, 3) & 0xFFF0);
+	VoltRawV = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC1, 5) & 0xFFF0);
+	VoltRawW = fix32::CreateRaw(Chip_ADC_GetDataReg(LPC_ADC1, 4) & 0xFFF0);
+
+	Chip_ADC_ClearFlags(LPC_ADC1, Chip_ADC_GetFlags(LPC_ADC1));
 }
 
 }
 
 } /* namespace Device */
-
 
