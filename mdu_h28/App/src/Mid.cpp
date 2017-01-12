@@ -1,22 +1,23 @@
 #include <Mid.hpp>
 #include <Motor.hpp>
-#include <stdlib.h>
 #include <text.hpp>
 #include <DRV.hpp>
 #include <Trapezium.hpp>
 #include <PIDControl.hpp>
+#include <type.hpp>
+#include<File.hpp>
+
 using namespace Middle;
 using namespace App::File;
 using namespace common;
 
 namespace App {
 namespace Mid{
-
 Directory* Create(){
 	auto *mid=Directory::Create("mid");
-	mid->Add(Execute::Create("duty",Duty));
-	mid->Add(Execute::Create("free",Free));
-	mid->Add(Execute::Create("lock",Lock));
+	mid->Add(CreateDuty());
+	mid->Add(CreateFree());
+	mid->Add(CreateLock());
 	mid->Add(CreateDRV());
 	mid->Add(CreateTrap());
 	mid->Add(CreatePID());
@@ -25,46 +26,52 @@ Directory* Create(){
 
 Directory* CreateDRV(){
 	auto* drv = Directory::Create("drv");
-	drv->Add(FileProperty::Create("gain", *Middle::DRV::GetGain, *Middle::DRV::SetGain));
-
+	//drv->Add(File::CreateProperty("gain",*(Middle::DRV::GetGain),*(Middle::DRV::SetGain)));
 	return drv;
 }
 
 Directory* CreateTrap(){
 	auto* trap = Directory::Create("trap");
-	trap->Add(FileProperty::Create("duty", *Controller::Trapezium::GetNowDuty, *Controller::Trapezium::SetTargetDuty));
-	trap->Add(FileProperty::Create("step", *Controller::Trapezium::GetStep, Controller::Trapezium::SetStep));
+	trap->Add(File::Fix::Create("tDuty", &(Controller::Trapezium::mMotorState.mTargetDuty)));
+	trap->Add(File::Fix::Create("nDuty", &(Controller::Trapezium::mMotorState.mLastDuty)));
+	trap->Add(File::Fix::Create("step", &(Controller::Trapezium::mMotorState.mStep)));
 
 	return trap;
 }
 
 Directory* CreatePID(){
 	auto* pid = Directory::Create("pid");
-	pid->Add(FileFix::Create("duty", &(Controller::PID::LastDuty)));
+	//pid->Add(File::Fix::Create("duty", &(Controller::PID::LastDuty)));
 
 	return pid;
 }
 
-std::string Duty(const common::ShellParameter& arg){
-	if (arg.size()>1){
-		Motor::SetDuty(common::ToFix(arg[1]));
-	}else{
+
+File::FileBase* CreateDuty(){
+	return CreateExecute("duty",[](text_iterator begin,text_iterator end)->int{
+		if (std::distance(begin,end)>=2){
+			begin++;
+			Motor::SetDuty(common::ToFix(*begin));
+		}else{
+			Motor::Lock();
+		}
+		return 0;
+	});
+
+}
+File::FileBase* CreateFree(){
+	return CreateExecute("free",[](text_iterator being,text_iterator end)->int{
+		Motor::Free();
+		return 0;
+	});
+}
+
+File::FileBase* CreateLock(){
+	return CreateExecute("lock",[](text_iterator being,text_iterator end)->int{
 		Motor::Lock();
-	}
-	return "";
+		return 0;
+	});
 }
-std::string Free(const common::ShellParameter&){
-	Motor::Free();
-	return "";
-}
-
-std::string Lock(const common::ShellParameter&){
-	Motor::Lock();
-	return "";
-}
-
-
-
 
 
 }

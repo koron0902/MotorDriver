@@ -1,21 +1,13 @@
-/*
- * fix32.h
- *
- *  Created on: 2016/11/12
- *      Author: hamus
- */
-
+#pragma once
 #ifndef COMMON_INC_FIX_HPP_
 #define COMMON_INC_FIX_HPP_
 
-#pragma once
 #include <stdint.h>
-//#include <iostream>
 
 namespace common {
-
+using namespace common;
 struct fix32 {
-	//定数部1
+	//定数部1b
 	constexpr static unsigned int shift = 16;
 	constexpr static int32_t gain = (1 << shift) - 1;
 	const static fix32 Max, Min, Eps, One,PI;
@@ -41,9 +33,13 @@ struct fix32 {
 		return fix32(x * gain);
 	}
 
-	/*static fix32 CreateQ31(q31_t q) {
-	 return fix32(q >> 15);
-	 }*/
+	constexpr static fix32 CreateDouble(double x){
+		return fix32(x*gain);
+	}
+
+	constexpr static fix32 CreateQ32(uint32_t x){
+		return fix32(x>>16);
+	}
 
 	constexpr bool IsZero() const {
 		return !word;

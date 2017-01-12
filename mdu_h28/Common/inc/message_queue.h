@@ -1,10 +1,4 @@
-/*
- * MessageQueue.h
- *
- *  Created on: 2016/11/23
- *      Author: hamus
- */
-
+#pragma once
 #ifndef COMMON_MESSAGEQUEUE_H_
 #define COMMON_MESSAGEQUEUE_H_
 

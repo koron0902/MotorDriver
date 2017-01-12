@@ -4,7 +4,7 @@
  * @ingroup ROMAPI_15XX
  * @{
  */
-#include <error.h>
+#include <error.hpp>
 /* error status bits */
 #define CAN_ERROR_NONE 0x00000000UL
 #define CAN_ERROR_PASS 0x00000001UL

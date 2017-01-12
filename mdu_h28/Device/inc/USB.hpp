@@ -1,19 +1,11 @@
-/*
- * USB.h
- *
- *  Created on: 2016/11/14
- *      Author: takumi152
- */
+#pragma once
 
-#ifndef DEVICE_INC_USB_HPP_
-#define DEVICE_INC_USB_HPP_
-
+#include <error.hpp>
 #include <stdint.h>
 #include <string>
 #include <vector>
 #include "usb/app_usbd_cfg.h"
 #include <text.hpp>
-#include<error.h>
 #include <stddef.h>
 namespace Device {
 
@@ -22,18 +14,18 @@ namespace USB {
 #define VCOM_RX_BUF_SZ      512
 #define VCOM_TX_CONNECTED   _BIT(8)		/* connection state is for both RX/Tx */
 #define VCOM_TX_BUSY        _BIT(0)
-#define VCOM_RX_DONE        _BIT(0)
-#define VCOM_RX_BUF_FULL    _BIT(1)
-#define VCOM_RX_BUF_QUEUED  _BIT(2)
-#define VCOM_RX_DB_QUEUED   _BIT(3)
+#define VCOM_RX_DONE        _BIT(1)
+#define VCOM_RX_BUF_FULL    _BIT(2)
+#define VCOM_RX_BUF_QUEUED  _BIT(3)
+#define VCOM_RX_DB_QUEUED   _BIT(4)
 
 /**
  * Structure containing Virtual Comm port control data
  */
 
 constexpr size_t RxBufferSize=128;//二次バッファの大きさ(受信)
-constexpr size_t TxBufferSize=256;//二次バッファの大きさ(送信)
-constexpr size_t TxBufferLimit=128;//Flushする時のサイズ 50%以上90％以下を推奨
+constexpr int TxBufferSize=256;
+constexpr int TxBufferLimit=196;
 constexpr size_t RxTempSize=32;//二次バッファへ移動する際のバッファの大きさ(スタックに乗る)
 
 // TODO USB header stub
@@ -76,7 +68,7 @@ static INLINE uint32_t Connected(void) {
  * @param	buf_len	: Length of the buffer passed
  * @return	Number of bytes written
  */
-uint32_t WriteDirect (uint8_t *pBuf, uint32_t buf_len);
+uint32_t vcom_write (const uint8_t *pBuf, uint32_t buf_len);
 
 /**
  * @}
@@ -94,15 +86,18 @@ bool IsConnected();
 uint32_t GetDepth();//受信文字数
 bool IsEmpty();
 
+
+
 char ReadByte();
 std::string Read();
-void Claer();
+std::string ReadLine();
 
+void Claer();
 bool IsBusy();//送信中？
-void Flush();
-void Write(const char* byte,size_t size);
+
+void Write(const uint8_t* byte,size_t size);
 static inline void Write(const std::string& text){
-	Write(text.data(),text.length());
+	Write((uint8_t*)text.data(),text.length());
 }
 
 static inline void WriteLine(const std::string& text){
@@ -110,12 +105,15 @@ static inline void WriteLine(const std::string& text){
 }
 
 static inline void Write(char c){//非推奨
-	 Write(&c,sizeof(c));
+	 Write((uint8_t*)&c,sizeof(c));
 }
 
-
+bool IsExist(char);
+static inline bool IsLine(){
+	return IsExist(common::newline);
 }
 
 }
 
-#endif /* DEVICE_INC_USB_HPP_ */
+}
+

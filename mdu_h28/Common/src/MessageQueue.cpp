@@ -5,7 +5,7 @@
  *      Author: hamus
  */
 
-#include "MessageQueue.h"
+#include <message_queue.h>
 
 using namespace std;
 

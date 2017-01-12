@@ -1,3 +1,4 @@
+#pragma once
 #ifndef COMMON_INC_QMATH_HPP_
 #define COMMON_INC_QMATH_HPP_
 

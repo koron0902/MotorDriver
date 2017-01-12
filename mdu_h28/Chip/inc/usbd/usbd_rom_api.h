@@ -30,7 +30,7 @@
  *
  */
 
-#include "error.h"
+#include <error.hpp>
 #include "usbd.h"
 #include "usbd_hw.h"
 #include "usbd_core.h"

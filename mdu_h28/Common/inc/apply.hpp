@@ -1,10 +1,4 @@
-/*
- * apply.hpp
- *
- *  Created on: 2016/10/08
- *      Author: TERU
- */
-
+#pragma once
 #ifndef COMMON_INC_APPLY_HPP_
 #define COMMON_INC_APPLY_HPP_
 
