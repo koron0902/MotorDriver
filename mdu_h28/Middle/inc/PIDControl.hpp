@@ -11,7 +11,7 @@
 #include <fix.hpp>
 #include <unit.hpp>
 #include <text.hpp>
-#include <ControllerBase.h>
+#include <ControllerBase.hpp>
 
 namespace Middle{
 	namespace Controller{
