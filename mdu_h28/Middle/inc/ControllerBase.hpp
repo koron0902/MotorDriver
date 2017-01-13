@@ -5,8 +5,8 @@
  *      Author: Keita
  */
 
-#ifndef MIDDLE_INC_CONTROLLERBASE_H_
-#define MIDDLE_INC_CONTROLLERBASE_H_
+#ifndef MIDDLE_INC_CONTROLLERBASE_HPP_
+#define MIDDLE_INC_CONTROLLERBASE_HPP_
 
 #include <fix.hpp>
 #include <unit.hpp>
@@ -41,7 +41,15 @@ namespace Middle {
 
 		};
 
+		enum class ControlMode_e:uint32_t{
+			ModeTrapezium = 1,
+			ModePID = 2
+		};
+		extern ControlMode_e mMode;
+
+		void SwitchControlMode(ControlMode_e _mode);
+
 	} /* namespace Controller */
 } /* namespace Middle */
 
-#endif /* MIDDLE_INC_CONTROLLERBASE_H_ */
+#endif /* MIDDLE_INC_CONTROLLERBASE_HPP_ */
