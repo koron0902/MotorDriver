@@ -17,8 +17,8 @@ namespace Middle {
 			CallProc = [this](){
 				this->Proc(mMotorState);
 			};
-			Device::Port::Set(Device::Port::PWMEN, true);
-			Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+			//Device::Port::Set(Device::Port::PWMEN, true);
+			//Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
 		}
 
 

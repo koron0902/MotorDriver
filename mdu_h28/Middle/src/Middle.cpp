@@ -9,9 +9,12 @@
 #include <Middle.hpp>
 #include "ff.hpp"
 #include "Middle.hpp"
+#include "ControllerBase.hpp"
+
 namespace Middle {
 
 void Init(){
+	Controller::SwitchControlMode(Controller::ControlMode_e::ModePID);
 	Motor::Init();
 	uint8_t *work;
 	work = new uint8_t[512];

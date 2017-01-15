@@ -23,13 +23,11 @@ namespace App {
 static bool usb_flag = false;
 static string buffer_uart;
 static string buffer_usb;
-Middle::Controller::PID* pid;
+
 void Init() {
 	Shell::Init();
 	buffer_uart.reserve(32);
 	buffer_usb.reserve(32);
-	pid = new Middle::Controller::PID();
-	Device::Timer::SetAction(1, pid->GetFreq(), std::move(*pid));
 }
 
 void CommandLine() {

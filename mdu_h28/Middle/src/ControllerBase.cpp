@@ -32,13 +32,13 @@ namespace Middle {
 			switch(mMode){
 				case ControlMode_e::ModeTrapezium:{
 					Trapezium* trap = new Trapezium();
-					Device::Timer::SetAction(1, trap->GetFreq(), std::move(*trap));
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, trap->GetFreq(), std::move(*trap));
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
 					break;
 				}case ControlMode_e::ModePID:{
 					PID* pid = new PID();
-					Device::Timer::SetAction(1, pid->GetFreq(), std::move(*pid));
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, pid->GetFreq(), std::move(*pid));
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
 					break;

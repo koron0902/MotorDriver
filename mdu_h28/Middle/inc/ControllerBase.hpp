@@ -26,6 +26,7 @@ namespace Middle {
 			std::function<void(void)> CallProc = nullptr;
 
 		public:
+			static constexpr uint32_t mControllerTaskPriority = 1;
 			ControllerBase();
 			ControllerBase(const ControllerBase&) = default;
 			virtual ~ControllerBase();
@@ -46,7 +47,6 @@ namespace Middle {
 			ModePID = 2
 		};
 		extern ControlMode_e mMode;
-
 		void SwitchControlMode(ControlMode_e _mode);
 
 	} /* namespace Controller */

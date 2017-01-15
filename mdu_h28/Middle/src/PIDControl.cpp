@@ -29,8 +29,8 @@ namespace Middle{
 				this->Proc(mLastState, mNextState);
 			};
 
-			Device::Port::Set(Device::Port::PWMEN, true);
-			Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+			//Device::Port::Set(Device::Port::PWMEN, true);
+			//Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
 		}
 
 		PID::~PID(){
