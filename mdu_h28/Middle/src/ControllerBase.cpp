@@ -30,6 +30,13 @@ namespace Middle {
 
 			std::string retStr = "";
 			switch(_mode){
+				case ControlMode_e::ModeTest:{
+					Device::Port::Set(Device::Port::PWMEN, true);
+					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, 1, nullptr);
+					retStr = "Succeeded in switching test mode";
+					break;
+				}
 				case ControlMode_e::ModeTrapezium:{
 					Trapezium* trap = new Trapezium();
 					Device::Port::Set(Device::Port::PWMEN, true);

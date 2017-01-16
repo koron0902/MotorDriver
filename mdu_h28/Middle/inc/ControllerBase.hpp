@@ -43,6 +43,7 @@ namespace Middle {
 		};
 
 		enum class ControlMode_e:uint32_t{
+			ModeTest = 0,
 			ModeTrapezium = 1,
 			ModePID = 2
 		};
