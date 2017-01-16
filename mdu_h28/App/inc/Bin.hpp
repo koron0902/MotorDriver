@@ -8,29 +8,29 @@
 #ifndef APP_BIN_H_
 #define APP_BIN_H_
 
-#include <File.hpp>
+#include <FileBase.hpp>
 
 namespace App {
 namespace Bin {
-
+using namespace common;
 File::Directory* Create();
 
+using command=int(*)(text_iterator,text_iterator);
 //基本命令
-std::string pwd(const std::vector<std::string>&);
-std::string cd(const std::vector<std::string>&);
-std::string echo(const std::vector<std::string>&);
-std::string get(const std::vector<std::string>&);
-std::string set(const std::vector<std::string>&);
-std::string ls(const std::vector<std::string>&);
-std::string tree(const std::vector<std::string>&);
-
-std::string info(const std::vector<std::string>&);//システムの状態を表示する
-std::string stmp(const std::vector<std::string>&);
-std::string repeat(const std::vector<std::string>&);
-
-std::string reboot(const std::vector<std::string>&);
-
-std::string test(const std::vector<std::string>&);//実験用
+std::string mkfs(const std::vector<std::string>&);
+File::FileBase* CreatePWD();
+File::FileBase* CreateCD();
+File::FileBase* CreateEcho();
+File::FileBase* CreateGet();
+File::FileBase* CreateSet();
+File::FileBase* CreateLs();
+File::FileBase* CreateTree();
+File::FileBase* CreateInfo();
+File::FileBase* CreateStmp();
+File::FileBase* CreateRepeat();
+File::FileBase* CreateTest();
+File::FileBase* CreateReboot();
+File::FileBase* CreateDelay();
 }
 } /* namespace Device */
 

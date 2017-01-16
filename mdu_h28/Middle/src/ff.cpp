@@ -18,7 +18,7 @@
 /----------------------------------------------------------------------------*/
 
 
-#include <diskio.hpp>		/* Declarations of device I/O functions */
+#include <DiskIO.hpp>		/* Declarations of device I/O functions */
 #include <ff.hpp>			/* Declarations of FatFs API */
 
 using namespace Device::DiskIO;

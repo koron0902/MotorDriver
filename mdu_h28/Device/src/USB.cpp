@@ -6,10 +6,11 @@
  */
 
 #include <chip.hpp>
-#include <ring_buffer.hpp>
 #include <string.h>
 #include <USB.hpp>
 #include "usb/app_usbd_cfg.h"
+#include <ring_buffer.hpp>
+#include <eeprom.hpp>
 #include <algorithm>
 
 using namespace std;
@@ -27,6 +28,8 @@ struct VCOM_DATA {
 	uint8_t *rx_buff;
 	uint16_t rx_rd_count;
 	uint16_t rx_count;
+	uint16_t tx_buff_count;		//
+	uint8_t *tx_buff;
 	volatile uint16_t tx_flags;
 	volatile uint16_t rx_flags;
 };
@@ -48,9 +51,8 @@ static ErrorCode_t vcom_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
 //キューとして実装
 static uint8_t RxRaw[RxBufferSize];
 static RINGBUFF_T RxBuf;
-//単純配列として実装。
-static char TxBuf[TxBufferSize];
-static size_t TxPos;
+static uint8_t TxRaw[TxBufferSize];
+static RINGBUFF_T TxBuf;
 
 /* Find the address of interface descriptor for given class type. */
 USB_INTERFACE_DESCRIPTOR *find_IntfDesc(const uint8_t *pDesc,
@@ -84,7 +86,7 @@ void Init() {
 	USBD_API_INIT_PARAM_T usb_param;
 	USB_CORE_DESCS_T desc;
 	ErrorCode_t ret = LPC_OK;
-	uint32_t prompt = 0, rdCnt = 0;  // For testing only
+	//uint32_t prompt = 0, rdCnt = 0;  // For testing only
 
 	//Clock Supply
 	Chip_USB_Init();
@@ -126,13 +128,13 @@ void Init() {
 	}
 
 	//Second Buffer
-	RingBuffer_Init(&RxBuf,RxRaw,sizeof(RxRaw[0]),RxBufferSize);
-
+	RingBuffer_Init(&RxBuf, RxRaw, sizeof(RxRaw[0]), RxBufferSize);
+	RingBuffer_Init(&TxBuf, TxRaw, sizeof(TxRaw[0]), TxBufferSize);
 }
 
 /* VCOM bulk EP_IN endpoint handler */
-static ErrorCode_t VCOM_bulk_in_hdlr(USBD_HANDLE_T hUsb, void *data, uint32_t event)
-{
+static ErrorCode_t VCOM_bulk_in_hdlr(USBD_HANDLE_T hUsb, void *data,
+		uint32_t event) {
 	VCOM_DATA *pVcom = (VCOM_DATA *) data;
 
 	if (event == USB_EVT_IN) {
@@ -142,13 +144,14 @@ static ErrorCode_t VCOM_bulk_in_hdlr(USBD_HANDLE_T hUsb, void *data, uint32_t ev
 }
 
 /* VCOM bulk EP_OUT endpoint handler */
-static ErrorCode_t VCOM_bulk_out_hdlr(USBD_HANDLE_T hUsb, void *data, uint32_t event)
-{
+static ErrorCode_t VCOM_bulk_out_hdlr(USBD_HANDLE_T hUsb, void *data,
+		uint32_t event) {
 	VCOM_DATA *pVcom = (VCOM_DATA *) data;
 
 	switch (event) {
 	case USB_EVT_OUT:
-		pVcom->rx_count = USBD_API->hw->ReadEP(hUsb, USB_CDC_OUT_EP, pVcom->rx_buff);
+		pVcom->rx_count = USBD_API->hw->ReadEP(hUsb, USB_CDC_OUT_EP,
+				pVcom->rx_buff);
 		if (pVcom->rx_flags & VCOM_RX_BUF_QUEUED) {
 			pVcom->rx_flags &= ~VCOM_RX_BUF_QUEUED;
 			if (pVcom->rx_count != 0) {
@@ -288,12 +291,23 @@ uint32_t vcom_read_cnt(void) {
 
 /* Virtual com port write routine*/
 //uint32_t vcom_write(uint8_t *pBuf, uint32_t len) {
-uint32_t WriteDirect(uint8_t *pBuf, uint32_t len) {
+uint32_t vcom_write(const uint8_t *pBuf, uint32_t len) {
 	VCOM_DATA *pVcom = &g_vCOM;
 	uint32_t ret = 0;
 
 	if ((pVcom->tx_flags & VCOM_TX_CONNECTED)
 			&& ((pVcom->tx_flags & VCOM_TX_BUSY) == 0)) {
+		while (pVcom->tx_flags & VCOM_TX_BUSY)
+			;
+		/*if (!(pVcom->tx_flags & VCOM_TX_BUSY)) {*/
+		pVcom->tx_flags |= VCOM_TX_BUSY;
+		/* enter critical section */
+		NVIC_DisableIRQ(USB0_IRQn);
+		ret = USBD_API->hw->WriteEP(pVcom->hUsb, USB_CDC_IN_EP, (uint8_t*)pBuf, len);
+		/* exit critical section */
+		NVIC_EnableIRQ(USB0_IRQn);
+		/*}*/
+#if 0
 		pVcom->tx_flags |= VCOM_TX_BUSY;
 
 		/* enter critical section */
@@ -301,20 +315,23 @@ uint32_t WriteDirect(uint8_t *pBuf, uint32_t len) {
 		ret = USBD_API->hw->WriteEP(pVcom->hUsb, USB_CDC_IN_EP, pBuf, len);
 		/* exit critical section */
 		NVIC_EnableIRQ(USB0_IRQn);
+#endif
 	}
 
 	return ret;
 }
 
 /* Mass storage device init routine */
-ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc, USBD_API_INIT_PARAM_T *pUsbParam){
+ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
+		USBD_API_INIT_PARAM_T *pUsbParam) {
 	USBD_MSC_INIT_PARAM msc_param;
 	ErrorCode_t ret = LPC_OK;
 
 	/* init MSC params */
 	msc_param.mem_base = pUsbParam->mem_base;
 	msc_param.mem_size = pUsbParam->mem_size;
-	msc_param.intf_desc = (uint8_t*) find_IntfDesc(pDesc->high_speed_desc, USB_DEVICE_CLASS_STORAGE);
+	msc_param.intf_desc = (uint8_t*) find_IntfDesc(pDesc->high_speed_desc,
+	USB_DEVICE_CLASS_STORAGE);
 	msc_param.InquiryStr = MSC_SCSI_InquiryString;
 	msc_param.BlockCount = 8;
 	msc_param.BlockSize = 512;
@@ -329,35 +346,40 @@ ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc, USBD_API_INIT_
 	return ret;
 }
 
-void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_offset){
+void msc_write(uint32_t offset, uint8_t** src, uint32_t length,
+		uint32_t high_offset) {
 	//TODO: msc write stub
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
+	Chip_EEPROM_Write(offset, *src, length * sizeof(uint8_t));
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
 
 }
 
-void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_offset){
+void msc_read(uint32_t offset, uint8_t** dst, uint32_t length,
+		uint32_t high_offset) {
 	//TODO: msc read stub
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Read(offset, *dst, length*sizeof(uint8_t));
+	Chip_EEPROM_Read(offset, *dst, length * sizeof(uint8_t));
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
 }
 
-ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length, uint32_t high_offset){
+ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length,
+		uint32_t high_offset) {
 	//TODO msc verify stub
 	uint8_t tmp[length];
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Read(offset, tmp, length*sizeof(uint8_t));
+	Chip_EEPROM_Read(offset, tmp, length * sizeof(uint8_t));
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
-	if(memcmp(buf, tmp, length*sizeof(uint8_t))==0) return LPC_OK;
-	else return ERR_FAILED;
+	if (memcmp(buf, tmp, length * sizeof(uint8_t)) == 0)
+		return LPC_OK;
+	else
+		return ERR_FAILED;
 }
 
 bool IsConnected() {
@@ -369,14 +391,14 @@ static void ReadUpData() {
 	uint32_t len;
 	//uint32_t idx;
 	while ((len = vcom_bread(buf, RxTempSize)) > 0) {
-		RingBuffer_InsertMult(&RxBuf,buf,len);
+		RingBuffer_InsertMult(&RxBuf, buf, len);
 	}
 }
 
-uint32_t GetDepth(){
+uint32_t GetDepth() {
 	return RingBuffer_GetCount(&RxBuf);
 }
-bool IsEmpty(){
+bool IsEmpty() {
 	ReadUpData();
 	return RingBuffer_IsEmpty(&RxBuf);
 }
@@ -384,53 +406,59 @@ bool IsEmpty(){
 char ReadByte() {
 	ReadUpData();
 	char c;
-	RingBuffer_Pop(&RxBuf,&c);
+	RingBuffer_Pop(&RxBuf, &c);
 	return c;
 }
+
+std::string ReadLine(){
+	if (IsLine()){
+		string text;
+		char c;
+		c=ReadByte();
+		while (c!=common::newline){
+			text+=c;
+			c=ReadByte();
+		}
+		return text;
+	}
+return "";
+}
+
 
 string Read() {
 	string s = "";
 	char c;
 	ReadUpData();
 	while (!IsEmpty()) {
-		RingBuffer_Pop(&RxBuf,&c);
-		s+=c;
+		RingBuffer_Pop(&RxBuf, &c);
+		s += c;
 	}
 	return s;
 }
 
-void Claer(){
+void Claer() {
 	RingBuffer_Flush(&RxBuf);
 }
 
-bool IsBusy(){
+bool IsBusy() {
 	VCOM_DATA *pVcom = &g_vCOM;
 	return pVcom->tx_flags & VCOM_TX_BUSY;
 }
 
-void Flush(){
-	//前提としてまだオーバーフローしていないこと
-	WriteDirect((uint8_t*)TxBuf,TxPos);//TxBufは先でコピーされる
-	TxPos=0;
+void Write(const uint8_t* byte, size_t size) {
+	vcom_write(byte,size);
 }
 
-void Write(const char* byte,size_t size){
-	size_t cs=0;
-	size_t ncs;
-	if (TxPos+size-1>TxBufferSize){
-		cs= TxBufferSize-TxPos-1;//seek分
-		memcpy(&TxBuf[TxPos],byte,cs);
-		Flush();
+bool IsExist(char c){
+	ReadUpData();
+	char* data=(char*)RxRaw;
+	for (unsigned int i=RxBuf.tail;i!=RxBuf.head;i=(i+1)%RxBuf.count){
+		if (data[i]==c)return true;
 	}
-
-	ncs=min(size-cs,TxBufferSize);//コピーする分
-	memcpy(&TxBuf[TxPos],&byte[cs],ncs);
-	TxPos+=ncs;
-	if (TxPos>TxBufferLimit){
-		Flush();
-	}
-
+	return false;
 }
+
+
 
 //割り込み
 extern "C" void USB_IRQHandler(void) {

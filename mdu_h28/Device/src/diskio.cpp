@@ -7,7 +7,7 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 
-#include <diskio.hpp>		/* FatFs lower layer API */
+#include <DiskIO.hpp>		/* FatFs lower layer API */
 #include "USB.hpp"
 #include <cstring>
 
@@ -29,7 +29,7 @@ DSTATUS disk_status (
 )
 {
 	DSTATUS stat;
-	int result;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :
@@ -56,7 +56,7 @@ DSTATUS disk_initialize (
 )
 {
 	DSTATUS stat;
-	int result;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :
@@ -85,8 +85,8 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	DRESULT res;
-	int result;
+	//DRESULT res;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :
@@ -119,8 +119,8 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-	DRESULT res;
-	int result;
+	//DRESULT res;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :
@@ -130,7 +130,7 @@ DRESULT disk_write (
 
 		// translate the reslut code here
 		if(sector+count>8)return RES_PARERR;
-		USB::msc_write((uint32_t)512*sector, (uint8_t**)&buff, (uint32_t)512*count, 0);
+		Device::USB::msc_write((uint32_t)512*sector, (uint8_t**)&buff, (uint32_t)512*count, 0);
 
 		return RES_OK;
 
@@ -151,8 +151,8 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	DRESULT res;
-	int result;
+	//DRESULT res;
+	//int result;
 
 	switch (pdrv) {
 	case DEV_RAM :

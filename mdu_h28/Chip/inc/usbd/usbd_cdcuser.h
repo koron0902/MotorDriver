@@ -24,9 +24,9 @@
 #ifndef __CDCUSER_H__
 #define __CDCUSER_H__
 
-#include "error.h"
+#include <error.hpp>
+#include <usbd/usbd_cdc.hpp>
 #include "usbd.h"
-#include "usbd_cdc.h"
 
 /** \file
  *  \brief Communication Device Class (CDC) API structures and function prototypes.

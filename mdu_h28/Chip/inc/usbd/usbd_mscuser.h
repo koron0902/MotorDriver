@@ -24,7 +24,7 @@
 #ifndef __MSCUSER_H__
 #define __MSCUSER_H__
 
-#include "error.h"
+#include <error.hpp>
 #include "usbd.h"
 #include "usbd_msc.h"
 #include "usbd_core.h"
