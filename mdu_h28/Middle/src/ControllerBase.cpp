@@ -39,9 +39,10 @@ namespace Middle {
 					break;
 				}case ControlMode_e::ModePID:{
 					PID* pid = new PID();
-					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, pid->GetFreq(), std::move(*pid));
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					Controller::PID::Reset();
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, pid->GetFreq(), std::move(*pid));
 					retStr = "Succeeded in switching pid control";
 					break;
 				}default :{

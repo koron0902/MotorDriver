@@ -17,6 +17,7 @@
 namespace Middle{
 	namespace Controller{
 	fix32 PID::LastDuty;
+	PID::MotorState_t PID::mNextState, PID::mLastState;
 		PID::PID()://mFreq(FREQUENCY_DEFAULT),
 				mGearRate(GEAR_RATE_DEFAULT),
 				mRadius(RADIUS_DEFAULT),
