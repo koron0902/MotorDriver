@@ -39,6 +39,11 @@ namespace Middle {
 				Proc(mMotorState);
 			};*/
 
+			static const void Reset(){
+				MotorInfo_t reset;
+				mMotorState = reset;
+			}
+
 			static const std::string SetTargetDuty(const std::string& duty){
 				mMotorState.mTargetDuty = common::ToFix(duty);
 				return "";
