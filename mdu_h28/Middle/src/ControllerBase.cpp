@@ -32,9 +32,10 @@ namespace Middle {
 			switch(_mode){
 				case ControlMode_e::ModeTrapezium:{
 					Trapezium* trap = new Trapezium();
-					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, trap->GetFreq(), std::move(*trap));
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					Controller::Trapezium::Reset();
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, trap->GetFreq(), std::move(*trap));
 					retStr = "Succeeded in switching trap. control";
 					break;
 				}case ControlMode_e::ModePID:{
