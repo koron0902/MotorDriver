@@ -12,6 +12,7 @@ File::Directory* Create();
 File::Directory* CreateDRV();
 File::Directory* CreateTrap();
 File::Directory* CreatePID();
+File::Directory* CreateBasic();
 
 File::FileBase* CreateSwitch();
 File::FileBase* CreateDuty();

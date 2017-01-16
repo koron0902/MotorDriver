@@ -17,9 +17,7 @@ namespace App {
 namespace Mid{
 Directory* Create(){
 	auto *mid=Directory::Create("mid");
-	mid->Add(CreateDuty());
-	mid->Add(CreateFree());
-	mid->Add(CreateLock());
+	mid->Add(CreateBasic());
 	mid->Add(CreateDRV());
 	mid->Add(CreateTrap());
 	mid->Add(CreatePID());
@@ -49,6 +47,15 @@ Directory* CreatePID(){
 	return pid;
 }
 
+Directory* CreateBasic(){
+	auto* basic = Directory::Create("basic");
+
+	basic->Add(CreateDuty());
+	basic->Add(CreateFree());
+	basic->Add(CreateLock());
+
+	return basic;
+}
 
 File::FileBase* CreateDuty(){
 	return CreateExecute("duty",[](text_iterator begin,text_iterator end)->int{
