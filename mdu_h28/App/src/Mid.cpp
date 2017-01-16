@@ -5,6 +5,7 @@
 #include <DRV.hpp>
 #include <Trapezium.hpp>
 #include <PIDControl.hpp>
+#include <ControllerBase.hpp>
 using namespace Middle;
 using namespace App::File;
 using namespace common;
@@ -20,6 +21,7 @@ Directory* Create(){
 	mid->Add(CreateDRV());
 	mid->Add(CreateTrap());
 	mid->Add(CreatePID());
+	mid->Add(Execute::Create("switch", CreateSwitch));
 	return mid;
 }
 
@@ -32,8 +34,8 @@ Directory* CreateDRV(){
 
 Directory* CreateTrap(){
 	auto* trap = Directory::Create("trap");
-	//trap->Add(FileProperty::Create("duty", *Controller::Trapezium::GetNowDuty, *Controller::Trapezium::SetTargetDuty));
-	//trap->Add(FileProperty::Create("step", *Controller::Trapezium::GetStep, Controller::Trapezium::SetStep));
+	trap->Add(FileProperty::Create("duty", *Controller::Trapezium::GetNowDuty, *Controller::Trapezium::SetTargetDuty));
+	//trap->Add(FileProperty::Create("step", *Controller::Trapezium::GetStep, *Controller::Trapezium::SetStep));
 
 	return trap;
 }
@@ -63,7 +65,12 @@ std::string Lock(const common::ShellParameter&){
 	return "";
 }
 
+std::string CreateSwitch(const common::ShellParameter& arg){
+	if(arg.size() == 1)
+		return "type this\nswitch 1:trapezium 2:pid";
 
+	return Controller::SwitchControlMode((Controller::ControlMode_e)common::ToInt(arg[1]));
+}
 
 
 

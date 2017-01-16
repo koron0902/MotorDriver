@@ -13,7 +13,7 @@ File::Directory* CreatePID();
 std::string Duty(const common::ShellParameter&);
 std::string Free(const common::ShellParameter&);
 std::string Lock(const common::ShellParameter&);
-
+std::string CreateSwitch(const common::ShellParameter& arg);
 
 }
 } /* namespace App */

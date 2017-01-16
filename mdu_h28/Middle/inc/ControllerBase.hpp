@@ -47,7 +47,7 @@ namespace Middle {
 			ModePID = 2
 		};
 		extern ControlMode_e mMode;
-		void SwitchControlMode(ControlMode_e _mode);
+		std::string SwitchControlMode(ControlMode_e _mode);
 
 	} /* namespace Controller */
 } /* namespace Middle */

@@ -24,28 +24,32 @@ namespace Middle {
 
 		}
 
-		void SwitchControlMode(ControlMode_e _mode){
+		std::string SwitchControlMode(ControlMode_e _mode){
 			if(mMode == _mode)
-				return;
+				return "Already running as requested mode";
 
-			mMode = _mode;
-			switch(mMode){
+			std::string retStr = "";
+			switch(_mode){
 				case ControlMode_e::ModeTrapezium:{
 					Trapezium* trap = new Trapezium();
 					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, trap->GetFreq(), std::move(*trap));
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					retStr = "Succeeded in switching trap. control";
 					break;
 				}case ControlMode_e::ModePID:{
 					PID* pid = new PID();
 					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, pid->GetFreq(), std::move(*pid));
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					retStr = "Succeeded in switching pid control";
 					break;
 				}default :{
-					break;
+					return "No such as control mode";
 				}
 			}
+			mMode = _mode;
+			return retStr;
 		}
 	
 	} /* namespace Controller */
