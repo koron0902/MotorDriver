@@ -23,11 +23,8 @@ using namespace Middle;
 
 namespace App {
 
-Middle::Controller::Trapezium* trap;
 void Init() {
 	Shell::Init();
-	trap = new Middle::Controller::Trapezium();
-	Device::Timer::SetAction(1, trap->GetFreq(), std::move(*trap));
 }
 
 void CommandLine() {

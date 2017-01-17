@@ -46,7 +46,7 @@ public:
 				MotorState_t(): mError(0), mIntegration(0), mTargetSpeed(0), mRealSpeed(0), mDuty(0){}
 			};
 private:
-			MotorState_t mNextState, mLastState;
+			static MotorState_t mNextState, mLastState;
 
 			void Proc(MotorState_t&, MotorState_t&);
 			void SetFreq(fix32 freq);
@@ -56,6 +56,12 @@ private:
 			PID();
 			PID(const PID&) = default;
 			virtual ~PID();
+
+			static const void Reset(){
+				MotorState_t reset;
+				mNextState = mLastState = reset;
+			}
+
 			void SetGainP(fix32 p);
 			void SetGainP(float p);
 			void SetGainI(fix32 i);

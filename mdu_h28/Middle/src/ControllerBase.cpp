@@ -24,28 +24,41 @@ namespace Middle {
 
 		}
 
-		void SwitchControlMode(ControlMode_e _mode){
+		std::string SwitchControlMode(ControlMode_e _mode){
 			if(mMode == _mode)
-				return;
+				return "Already running as requested mode";
 
-			mMode = _mode;
-			switch(mMode){
-				case ControlMode_e::ModeTrapezium:{
-					Trapezium* trap = new Trapezium();
-					Device::Timer::SetAction(1, trap->GetFreq(), std::move(*trap));
+			std::string retStr = "";
+			switch(_mode){
+				case ControlMode_e::ModeTest:{
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, 1, nullptr);
+					retStr = "Succeeded in switching test mode";
+					break;
+				}
+				case ControlMode_e::ModeTrapezium:{
+					Trapezium* trap = new Trapezium();
+					Device::Port::Set(Device::Port::PWMEN, true);
+					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					Controller::Trapezium::Reset();
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, trap->GetFreq(), std::move(*trap));
+					retStr = "Succeeded in switching trap. control";
 					break;
 				}case ControlMode_e::ModePID:{
 					PID* pid = new PID();
-					Device::Timer::SetAction(1, pid->GetFreq(), std::move(*pid));
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
+					Controller::PID::Reset();
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, pid->GetFreq(), std::move(*pid));
+					retStr = "Succeeded in switching pid control";
 					break;
 				}default :{
-					break;
+					return "No such as control mode";
 				}
 			}
+			mMode = _mode;
+			return retStr;
 		}
 	
 	} /* namespace Controller */

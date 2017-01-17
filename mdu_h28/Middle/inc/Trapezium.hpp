@@ -34,7 +34,10 @@ namespace Middle {
 			Trapezium();
 			Trapezium(const Trapezium&) = default;
 			virtual ~Trapezium();
-
+			static const void Reset(){
+				MotorInfo_t reset;
+				mMotorState = reset;
+			}
 		};
 	}
 }

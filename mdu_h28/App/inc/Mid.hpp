@@ -7,13 +7,14 @@
 
 namespace App {
 namespace Mid{
+File::Directory* Create();
+
 File::Directory* CreateDRV();
 File::Directory* CreateTrap();
 File::Directory* CreatePID();
+File::Directory* CreateBasic();
 
-
-File::Directory* Create();
-
+File::FileBase* CreateSwitch();
 File::FileBase* CreateDuty();
 File::FileBase* CreateFree();
 File::FileBase* CreateLock();
