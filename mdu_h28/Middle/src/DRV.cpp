@@ -50,7 +50,7 @@ namespace Middle {
 			gateDriveCtrl.TVDS = DEGLITCH_TIME_7us;
 			gateDriveCtrl.DEAD_TIME = DEAD_TIME_88ns;
 			gateDriveCtrl.PWM_MODE = PWM_USES_1;
-			SetConfiguration(DRVRegName::GATE_DRIVE_CTRL, gateDriveCtrl);
+			SetConfiguration(DRVRegName::GATE_DRIVE_CTRL, 0b01100100111);
 
 			IC_OPERATION_T icOperation;
 			icOperation.SET_VCPH_UV = CHP_UV_THRESHOLD_4v6;
