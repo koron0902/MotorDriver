@@ -27,6 +27,10 @@ const uint8_t CL_PIN = 0;
 
 //SCT内部のレジスタの登録
 
+static MotorPosition m_position=MotorPosition::None;
+static uint32_t m_duty=0;
+
+
 void Init() {
 	auto assign=[](uint8_t id){
 		Chip_SCTPWM_SetOutPin(LPC_SCT1, id, id);
@@ -36,18 +40,25 @@ void Init() {
 	Chip_SCTPWM_SetRate(LPC_SCT1, Rate); //divide
 	//Assignment
 	assign(AH_PIN);
-	//assign(BH_PIN);
-	//assign(CH_PIN);
+	assign(BH_PIN);
+	assign(CH_PIN);
 
 	//Chip_SCTPWM_PercentageToTicks(LPC_SCT1,50);
 	Clear();
 	Chip_SCTPWM_Start(LPC_SCT1);
 
+}
 
+static void Update(){
+	uint32_t bits= (uint32_t)m_position;
+	Chip_SCTPWM_SetDutyCycle(LPC_SCT1,AH_PIN,bits&Bit(0)?m_duty:0);
+	Chip_SCTPWM_SetDutyCycle(LPC_SCT1,BH_PIN,bits&Bit(0)?m_duty:0);
+	Chip_SCTPWM_SetDutyCycle(LPC_SCT1,CH_PIN,bits&Bit(0)?m_duty:0);
 }
 
 void SetDutyRaw(uint32_t raw){
-	Chip_SCTPWM_SetDutyCycle(LPC_SCT1,AH_PIN,raw);
+	m_duty=raw;
+	Update();
 }
 
 void SetDuty(q32_t duty){
@@ -62,18 +73,12 @@ uint32_t GetCycle(){
 
 void Clear(){
 	SetDutyRaw(0);
-	SetSignal(Signal::Halt);
+	SetPWMMode(MotorPosition::None);
 }
 
-void SetSignal(Signal mode){
-	using namespace Port;
-	using namespace common;
-	uint32_t port=(uint32_t)mode;
-	//テーブル式で出力する。
-	Set(PWMAL,port&Bit(3));
-	Set(PWMBH,port&Bit(2));
-	Set(PWMBL,port&Bit(1));
-	Set(PWMCH,port&Bit(0));
+void SetPWMMode(MotorPosition inst){
+	m_position=inst;
+	Update();
 }
 }
 

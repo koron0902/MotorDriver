@@ -180,11 +180,11 @@ void Init() {
 	PWMAH.Dout().Fix(SWM_FIXED_SCT1_OUT5);
 	PWMAL.Dout();
 	//SetFuncMove(PWMAL,SWM_SCT1_OUT2_O);
-	PWMBH.Dout();
+	PWMBH.Dout().Move(SWM_SCT1_OUT1_O);
 	//SetFuncMove(PWMBH,SWM_SCT1_OUT1_O);
 	PWMBL.Dout();
 	//SetFuncFix(SWM_FIXED_SCT1_OUT4);
-	PWMCH.Dout();
+	PWMCH.Dout().Fix(SWM_FIXED_SCT1_OUT3);
 	//SetFuncFix(SWM_FIXED_SCT1_OUT3);
 	PWMCL.Dout();
 	//SetFuncMove(SWM_SCT1_OUT0_O);

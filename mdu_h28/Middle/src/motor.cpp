@@ -61,6 +61,8 @@ void Free() {
 	}
 }
 
+
+
 DCMotor::DCMotor() {
 	Free();
 }
@@ -72,12 +74,12 @@ DCMotor::~DCMotor() {
 void DCMotor::Free() {
 	using namespace PWM;
 	SetDutyRaw(0);
-	SetSignal(Signal::Halt);
+	SetPWMMode(MotorPosition::None);
 }
 
 void DCMotor::Lock() {
 	using namespace PWM;
-	SetSignal(Signal::CB_CA);
+	SetPWMMode(MotorPosition::None);
 	SetDutyRaw(0);
 }
 
@@ -94,13 +96,15 @@ void DCMotor::SetDuty(fix32 duty) {
 
 	if (!s) {
 		//正転
-		SetSignal(Signal::AB);
+		SetPWMMode(MotorPosition::U);
 	} else {
 		//逆転
-		SetSignal(Signal::BA);
+		SetPWMMode(MotorPosition::V);
 	}
 	PWM::SetDuty(q);
 }
 
 }
 }
+
+

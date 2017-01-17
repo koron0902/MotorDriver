@@ -40,7 +40,6 @@ void Free();
 
 
 
-
 class IMotor{
 public:
 	IMotor()=default;

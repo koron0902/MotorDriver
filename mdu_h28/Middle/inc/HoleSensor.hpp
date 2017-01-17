@@ -4,24 +4,18 @@
 
 #include <functional>
 #include <stdint.h>
+#include <status.hpp>
 
 namespace Middle {
 namespace HoleSensor{
 void Init();
 
-enum class HoleStatus:uint32_t{
-	None=0b000,
-	U=0b001,
-	UV=0b011,
-	V=0b010,
-	VW=0b110,
-	W=0b100,
-	WU=0b101
-};
 
-using HoleSensorHandler=std::function<void(HoleSensor::HoleStatus)>;
+using HoleSensorHandler=std::function<void(common::MotorPosition)>;
 
 void SetHandler(const HoleSensorHandler&func=nullptr);
+
+
 
 
 
