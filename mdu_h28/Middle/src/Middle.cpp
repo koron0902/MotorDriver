@@ -6,11 +6,14 @@
  */
 
 #include <motor.hpp>
-#include <Middle.hpp>
+#include "ff.hpp"
+#include "Middle.hpp"
+#include "ControllerBase.hpp"
 #include <cstring>
 namespace Middle {
 
 void Init(){
+	Controller::SwitchControlMode(Controller::ControlMode_e::ModePID);
 	Motor::Init();
 }
 

@@ -8,11 +8,11 @@
 #ifndef MIDDLE_INC_TRAPEZIUM_HPP_
 #define MIDDLE_INC_TRAPEZIUM_HPP_
 
+#include <ControllerBase.hpp>
 #include <stdint.h>
 #include <fix.hpp>
 #include <unit.hpp>
 #include <text.hpp>
-#include <ControllerBase.h>
 
 namespace Middle {
 	namespace Controller {
@@ -34,7 +34,10 @@ namespace Middle {
 			Trapezium();
 			Trapezium(const Trapezium&) = default;
 			virtual ~Trapezium();
-
+			static const void Reset(){
+				MotorInfo_t reset;
+				mMotorState = reset;
+			}
 		};
 	}
 }

@@ -4,8 +4,10 @@
 #include <DRV.hpp>
 #include <Trapezium.hpp>
 #include <PIDControl.hpp>
+#include <ControllerBase.hpp>
 #include <type.hpp>
 #include<File.hpp>
+#include <xport.hpp>
 
 using namespace Middle;
 using namespace App::File;
@@ -15,12 +17,11 @@ namespace App {
 namespace Mid{
 Directory* Create(){
 	auto *mid=Directory::Create("mid");
-	mid->Add(CreateDuty());
-	mid->Add(CreateFree());
-	mid->Add(CreateLock());
+	mid->Add(CreateBasic());
 	mid->Add(CreateDRV());
 	mid->Add(CreateTrap());
 	mid->Add(CreatePID());
+	mid->Add(CreateSwitch());
 	return mid;
 }
 
@@ -46,6 +47,15 @@ Directory* CreatePID(){
 	return pid;
 }
 
+Directory* CreateBasic(){
+	auto* basic = Directory::Create("basic");
+
+	basic->Add(CreateDuty());
+	basic->Add(CreateFree());
+	basic->Add(CreateLock());
+
+	return basic;
+}
 
 File::FileBase* CreateDuty(){
 	return CreateExecute("duty",[](text_iterator begin,text_iterator end)->int{
@@ -73,6 +83,18 @@ File::FileBase* CreateLock(){
 	});
 }
 
+File::FileBase* CreateSwitch(){
+	return CreateExecute("switch", [](text_iterator begin, text_iterator end)->int{
+		if(std::distance(begin, end) == 1){
+			XPort::WriteLine("type this\nswitch 0:test 1:trapezium 2:pid");
+			return 0;
+		}
+
+		begin++;
+		XPort::WriteLine(Controller::SwitchControlMode((Controller::ControlMode_e)common::ToInt32((*begin))));
+		return 0;
+	});
+}
 
 }
 
