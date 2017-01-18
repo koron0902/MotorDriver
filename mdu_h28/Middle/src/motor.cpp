@@ -12,7 +12,7 @@ namespace Middle {
 namespace Motor {
 
 static IMotor* action = nullptr;
-
+static Motor::Type mType;
 volatile void Wait(){
 	for (volatile int i = 0;i < 180000; i++);
 }
@@ -24,7 +24,8 @@ void Init() {
 	//制御法を設定する。
 	//ModeAs(Type::None);
 
-	ModeAs(Type::DCMotor);
+	//ModeAs(Type::DCMotor);
+	SwitchMotorType(Type::DCMotor);
 	/*for(int i = 0;i < 4;i++){
 		SetDuty(fix32::CreateFloat(0.1 * i));
 		Wait();
@@ -41,6 +42,28 @@ void ModeAs(Type t) {
 		action = nullptr;
 		break;
 	}
+}
+
+std::string SwitchMotorType(Motor::Type _type){
+	if(mType == _type)
+		return "Already set as requested type";
+
+	Release(action);
+	std::string retStr = "";
+	switch(_type){
+	case Type::DCMotor:
+		action = new DCMotor();
+		retStr = "Succeeded in switching DC Motor";
+		break;
+	case Type::BLDCWithSensor:
+		retStr = "Succeeded in switching BLDC Motor(No Encoder)";
+		break;
+	default:
+		action = nullptr;
+		break;
+	}
+	mType = _type;
+	return retStr;
 }
 
 void SetDuty(fix32 fix){
