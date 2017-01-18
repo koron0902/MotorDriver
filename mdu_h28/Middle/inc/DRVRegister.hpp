@@ -238,7 +238,14 @@ namespace Middle{
 				COMM_OPTION	= FREE_WHEEL_DEFAULT;
 			}
 
-			operator uint16_t() const{return d;}
+			operator uint16_t() const{
+				return (COMM_OPTION << 9 |
+						PWM_MODE << 7 |
+						DEAD_TIME << 4 |
+						TBLANK << 2 |
+						TVDS
+						);
+			}
 			GATE_DRIVE_CTRL_T operator = (uint16_t value) {d = value; return *this;}
 		};
 
