@@ -35,19 +35,19 @@ void SetHandler(INT_ID id, const IntHandler& func , uint8_t priority) {
 }
 
 void SetInt(PortData data, INT_ID idx) {
-	Chip_INMUX_PinIntSel(data.pin, data.port, (uint32_t) idx);
+	Chip_INMUX_PinIntSel((uint32_t) idx,data.port, data.pin);
 }
 
 void ModeEdge(INT_ID id) {
-	Chip_PININT_SetPinModeEdge(LPC_GPIO_PIN_INT, (uint32_t) id);
+	Chip_PININT_SetPinModeEdge(LPC_GPIO_PIN_INT, (1 << (uint32_t)id) | Chip_PININT_GetHighEnabled(LPC_GPIO_PIN_INT));
 }
 
 void ModeHigh(INT_ID id) {
-	Chip_PININT_EnableIntHigh(LPC_GPIO_PIN_INT, (uint32_t) id);
+	Chip_PININT_EnableIntHigh(LPC_GPIO_PIN_INT, (1 << (uint32_t)id) | Chip_PININT_GetHighEnabled(LPC_GPIO_PIN_INT));
 }
 
 void ModeLow(INT_ID id) {
-	Chip_PININT_EnableIntLow(LPC_GPIO_PIN_INT, (uint32_t) id);
+	Chip_PININT_EnableIntLow(LPC_GPIO_PIN_INT, (1 << (uint32_t)id) | Chip_PININT_GetHighEnabled(LPC_GPIO_PIN_INT));
 }
 
 void ModeChanged(INT_ID id) {
@@ -68,13 +68,14 @@ static inline IRQn GetIRQ(INT_ID id) {
 
 //割り込み状態を削除する
 static inline void ClrIntSta(INT_ID id) {
-	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, (uint32_t) id);
+	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, (1 << (uint32_t) id));
 }
 
 //割り込み許可
 static inline void  EnableInt(INT_ID id, uint8_t priority) {
 	auto irq = GetIRQ(id);
 	if (irq != WDT_IRQn) {
+		ModeChanged(id);
 		NVIC_ClearPendingIRQ(irq);
 		NVIC_EnableIRQ(irq);
 		NVIC_SetPriority(irq, priority);
