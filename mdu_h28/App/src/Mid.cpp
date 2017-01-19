@@ -87,7 +87,15 @@ File::FileBase* CreateLock(){
 File::FileBase* CreateSwitch(){
 	return CreateExecute("switch", [](text_iterator begin, text_iterator end)->int{
 		if(std::distance(begin, end) <= 2){
-			XPort::WriteLine("option...\n -c | controller mode\n   0: test 1: trapeziom 2: pid\n -m | motor type\n   0: none 1: DC 2: BLDC(Hall-Sensor)");
+			std::string comment = "";
+			comment += "switch [-c controller_type] | [-m motor_type]\n";
+			comment += " -c | controller mode\n";
+			comment += "   0: test, 1: trapeziom, 2: pid\n";
+			comment += " -m | motor type\n";
+			comment += "   0: none, 1: DC, 2: BLDC(Hall-Sensor)\n";
+			comment += "ex. switch -c 0 | change to test mode";
+			//XPort::WriteLine("switch [-c controller_type] | [-m motor_type]\n -c | controller mode\n   0: test, 1: trapeziom, 2: pid\n -m | motor type\n   0: none, 1: DC, 2: BLDC(Hall-Sensor)\nex. switch -c 0 | change to test mode");
+			XPort::WriteLine(comment);
 			return 0;
 		}
 
