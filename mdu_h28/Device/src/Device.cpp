@@ -10,6 +10,8 @@
 #include <USB.hpp>
 #include <SPI.hpp>
 #include <SysTick.hpp>
+#include <HoleSensor.hpp>
+#include <INT.hpp>
 
 namespace Device {
 
@@ -29,6 +31,8 @@ void Init(){
 	ADC::Init();
 	USB::Init();
 	SPI::Init();
+	INT::Init();
+
 }
 
 
