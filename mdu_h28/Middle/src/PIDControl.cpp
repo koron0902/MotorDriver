@@ -10,8 +10,8 @@
 #include <Port.hpp>
 #include <QEI.hpp>
 #include <ADC.hpp>
+#include <Motor.hpp>
 #include <PWM.hpp>
-#include <motor.hpp>
 #include <region.hpp>
 
 namespace Middle{

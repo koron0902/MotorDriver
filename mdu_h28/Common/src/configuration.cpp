@@ -4,7 +4,7 @@
  *  Created on: 2017/01/20
  *      Author: hamus
  */
-
+#include <unit.hpp>
 #include <configuration.hpp>
 
 namespace common{
@@ -25,5 +25,11 @@ const uint8_t PriorityCycle=0x20;
 //通信系
 const uint8_t PriorityUSB=0xA0;
 const uint8_t PriorityUart=0xAF;
+
+
+//周期
+const uint32_t CyclePWM	= 30_KHz;
+const uint32_t CycleControl = 15_KHz;
+const uint32_t Divider=CyclePWM/CycleControl;
 
 }

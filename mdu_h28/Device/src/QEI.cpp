@@ -1,6 +1,6 @@
 #include <chip.hpp>
 #include <QEI.hpp>
-
+#include <configuration.hpp>
 #define __USED __attribute__((used))
 
 using namespace std;
@@ -120,7 +120,7 @@ namespace Device {
 			QEI->MAXPOS = 40;
 			QEI->SIGMODE = 0;
 			//QEI->LOAD = 0xFFFFFFFF - ((0xFFFFFFFF) * (1.0 * 30_KHz / SystemCoreClock));
-			SetTimer(10000);
+			SetTimer(CycleControl);
 			//QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = 500;
 			SetFilter(0);
 			QEI->CAPMODE = true;
@@ -131,7 +131,7 @@ namespace Device {
 		}
 
 		void SetTimer(uint32_t clock){
-			QEI->LOAD = ((float)SystemCoreClock / clock) + 0.5;
+			QEI->LOAD = (/*(double)*/SystemCoreClock / clock) + 1;
 		}
 
 		void SetFilter(uint32_t clock){

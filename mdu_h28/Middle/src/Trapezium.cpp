@@ -5,8 +5,8 @@
  *      Author: Keita
  */
 
-#include <Trapezium.hpp>
 #include <Motor.hpp>
+#include <Trapezium.hpp>
 #include <Port.hpp>
 
 namespace Middle {

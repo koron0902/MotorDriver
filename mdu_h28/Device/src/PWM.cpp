@@ -17,7 +17,7 @@ namespace Device {
 
 namespace PWM {
 
-static uint32_t Rate = 30000; //[Hz]動作周波数
+static const uint32_t &Rate = CyclePWM; //[Hz]動作周波数
 //SCT内部のピン配置
 const uint8_t AH_PIN = 5;
 const uint8_t AL_PIN = 2;
@@ -27,7 +27,6 @@ const uint8_t CH_PIN = 2;
 const uint8_t CL_PIN = 0;
 
 //制御用
-static uint32_t divide=2;//分周率
 static uint32_t counter;
 static callback_t handler;
 //補助関数
@@ -95,22 +94,28 @@ void SetSignal(Signal mode){
 
 
 
-void SetHandler(const callback_t& back,uint32_t div){
+void SetHandler(const callback_t& back){
 	interrupt_disable();
-	if (div!=0){
+	if (back!=nullptr){
 		handler=back;
+		//割り込み開始
 		interrupt_enable();
 	}else{
 		//実行されなくなる。
 		handler=nullptr;
+		counter=0;
 	}
 }
 extern "C"
 void SCT1_IRQHandler(void) {
 	//毎周期呼ばれると仮定する。
-
-
-
+	counter++;
+	if(counter<common::Divider){
+		return;
+	}else {
+		handler();
+		counter=0;
+	}
 }
 
 Signal InvertSignal(Signal mode){
@@ -139,7 +144,6 @@ Signal InvertSignal(Signal mode){
 	}
 	return invSig;
 }
-
 
 }
 }

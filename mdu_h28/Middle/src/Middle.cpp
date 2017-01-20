@@ -5,12 +5,12 @@
  *      Author: hamus
  */
 
-#include <motor.hpp>
 #include "ff.hpp"
 #include "Middle.hpp"
 #include "ControllerBase.hpp"
 #include <cstring>
 #include <HoleSensor.hpp>
+#include <Motor.hpp>
 namespace Middle {
 
 void Init(){
