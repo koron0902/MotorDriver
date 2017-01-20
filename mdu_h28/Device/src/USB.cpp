@@ -12,6 +12,7 @@
 #include <ring_buffer.hpp>
 #include <eeprom.hpp>
 #include <algorithm>
+#include <configuration.hpp>
 
 using namespace std;
 
@@ -121,6 +122,7 @@ void Init() {
 		if (ret == LPC_OK) {
 			msc_init(g_hUsb, &desc, &usb_param);
 			//  enable USB interrupts
+			NVIC_SetPriority(USB0_IRQn,common::PriorityUSB);
 			NVIC_EnableIRQ(USB0_IRQn);
 			// now connect
 			USBD_API->hw->Connect(g_hUsb, 1);

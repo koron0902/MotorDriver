@@ -3,7 +3,7 @@
 #include <unit.hpp>
 #include <Timer.hpp>
 #include <counter.hpp>
-
+#include <configuration.hpp>
 using namespace common;
 
 namespace Device {
@@ -106,6 +106,9 @@ void Init() {
 
 	Chip_ADC_EnableInt(LPC_ADC0, ADC_INTEN_SEQA_ENABLE);
 	Chip_ADC_EnableInt(LPC_ADC1, ADC_INTEN_SEQA_ENABLE);
+
+	NVIC_SetPriority(ADC0_SEQA_IRQn,common::PriorityADC);
+	NVIC_SetPriority(ADC1_SEQB_IRQn,common::PriorityADC+1);
 
 	NVIC_EnableIRQ(ADC0_SEQA_IRQn);
 	NVIC_EnableIRQ(ADC1_SEQA_IRQn);

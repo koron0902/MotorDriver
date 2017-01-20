@@ -1,7 +1,7 @@
 #include <HoleSensor.hpp>
 #include <INT.hpp>
 #include <xport.hpp>
-
+#include <configuration.hpp>
 namespace Middle {
 namespace HoleSensor{
 
@@ -23,9 +23,9 @@ void Init(){
 	SetInt(HoleV, INT_ID::INT1);
 	SetInt(HoleW, INT_ID::INT2);
 	//割り込み先を登録
-	SetHandler(INT_ID::INT0, INTHandler);
-	SetHandler(INT_ID::INT1, INTHandler);
-	SetHandler(INT_ID::INT2, INTHandler);
+	SetHandler(INT_ID::INT0, INTHandler,PriorityHoleSensor);
+	SetHandler(INT_ID::INT1, INTHandler,PriorityHoleSensor);
+	SetHandler(INT_ID::INT2, INTHandler,PriorityHoleSensor);
 
 	handler=nullptr;
 }

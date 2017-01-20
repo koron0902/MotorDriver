@@ -1,6 +1,6 @@
 #include <chip.hpp>
 #include <SysTick.hpp>
-
+#include <configuration.hpp>
 using namespace common;
 
 namespace Device {
@@ -10,9 +10,20 @@ static uint64_t tick;
 static constexpr uint64_t bit24 = (1u << 24);
 static constexpr uint64_t mask = bit24 - 1;
 
+static inline bool interrupt_disable(){
+	NVIC_DisableIRQ(SysTick_IRQn);
+}
+
+static inline bool interrupt_enable(){
+	interrupt_disable();
+	NVIC_SetPriority(SysTick_IRQn,PrioritySysTick);
+	NVIC_EnableIRQ(SysTick_IRQn);
+}
+
+
 //システムモニタ用タイマーの初期化
 void Init() {
-	auto *p = SysTick;
+	interrupt_enable();
 	SysTick_Config(mask);
 	tick = 0;
 }
