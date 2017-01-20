@@ -75,6 +75,34 @@ void SetSignal(Signal mode){
 	Set(PWMBL,port&Bit(1));
 	Set(PWMCH,port&Bit(0));
 }
+
+Signal InvertSignal(Signal mode){
+	Signal invSig;
+	switch(mode){
+		case Signal::AB:
+			invSig = Signal::BA;
+			break;
+		case Signal::AC:
+			invSig = Signal::CA;
+			break;
+		case Signal::BA:
+			invSig = Signal::AB;
+			break;
+		case Signal::BC:
+			invSig = Signal::CB;
+			break;
+		case Signal::CA:
+			invSig = Signal::AC;
+			break;
+		case Signal::CB:
+			invSig = Signal::BC;
+			break;
+		default:
+			invSig = mode;
+	}
+	return invSig;
+}
+
 }
 
 }

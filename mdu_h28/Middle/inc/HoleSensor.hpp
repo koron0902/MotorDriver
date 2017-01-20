@@ -19,9 +19,10 @@ enum class HoleStatus:uint32_t{
 	WU=0b101
 };
 
-using HoleSensorHandler=std::function<void(HoleSensor::HoleStatus)>;
+using HoleSensorHandler=std::function<void(HoleSensor::HoleStatus, bool)>;
 
 void SetHandler(const HoleSensorHandler&func=nullptr);
+void SetDirection(bool direction = true);
 
 
 

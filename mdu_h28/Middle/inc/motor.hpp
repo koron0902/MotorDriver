@@ -67,7 +67,7 @@ public :
 
 class BLDCMotorWithSensor: public IMotor{
 	Mode mMode;
-	std::function<void(HoleSensor::HoleStatus)> HallSensorCallBack;
+	std::function<void(HoleSensor::HoleStatus, bool)> HallSensorCallBack;
 public:
 	bool direction;
 	BLDCMotorWithSensor();

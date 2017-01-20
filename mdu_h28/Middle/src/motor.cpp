@@ -122,7 +122,7 @@ namespace Middle {
 
 		BLDCMotorWithSensor::BLDCMotorWithSensor(){
 			direction = false;
-			HallSensorCallBack = [this](HoleSensor::HoleStatus data)->void{
+			HallSensorCallBack = [](HoleSensor::HoleStatus data, bool direction)->void{
 				using namespace HoleSensor;
 				PWM::Signal nextSignal = PWM::Signal::AB;
 				switch(data){
@@ -153,7 +153,10 @@ namespace Middle {
 					default:
 						break;
 				}
-				PWM::SetSignal(nextSignal);
+				if(direction)
+					PWM::SetSignal(PWM::InvertSignal(nextSignal));
+				else
+					PWM::SetSignal(nextSignal);
 			};
 			HoleSensor::SetHandler(HallSensorCallBack);
 			Free();
@@ -187,12 +190,13 @@ namespace Middle {
 			q32_t q = a.GetRaw() << 16;
 			auto s = sign(c);
 
+			HoleSensor::SetDirection(!s);
 			// モータ始動用に現在の位置から出力を決定する。
 			uint32_t data=0;
 			data |= Port::HoleU.Get()?0b001:0;
 			data |= Port::HoleV.Get()?0b010:0;
 			data |= Port::HoleW.Get()?0b100:0;
-			HallSensorCallBack((HoleSensor::HoleStatus)data);
+			HallSensorCallBack((HoleSensor::HoleStatus)data, !s);
 
 			PWM::SetDuty(q);
 		}
