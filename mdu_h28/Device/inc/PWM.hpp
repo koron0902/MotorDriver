@@ -42,12 +42,11 @@ uint32_t GetCycle();
 void Clear(); //すべてのPWM出力をなくす
 
 void SetSignal(Signal);
-<<<<<<< HEAD
 void SetHandler(const common::callback_t&,uint32_t div=1);
 
-=======
+
 Signal InvertSignal(Signal);
->>>>>>> 189e84bb9515e9af4a65fdb8bfed42904e965e7a
+
 
 
 }
