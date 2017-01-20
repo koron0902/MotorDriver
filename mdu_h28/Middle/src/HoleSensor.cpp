@@ -11,6 +11,8 @@ using namespace Device::Port;
 
 static HoleSensorHandler handler;
 
+static bool mDirection = true;
+
 const IntHandler INTHandler(INT_ID);
 
 void Init(){
@@ -34,6 +36,10 @@ void SetHandler(const HoleSensorHandler& func){
 	handler=func;
 }
 
+void SetDirection(bool direction){
+	mDirection = direction;
+}
+
 const IntHandler INTHandler(INT_ID){
 	uint32_t data=0;
 	data|=HoleU.Get()?0b001:0;
@@ -45,7 +51,7 @@ const IntHandler INTHandler(INT_ID){
 	//Port::LED3.Set((data & 0b100) >> 2);
 
 	if (handler!=nullptr){
-		handler((HoleStatus)data);
+		handler((HoleStatus)data, mDirection);
 	}
 }
 

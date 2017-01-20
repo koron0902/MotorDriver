@@ -93,6 +93,7 @@ void SetSignal(Signal mode){
 	Set(PWMCH,port&Bit(0));
 }
 
+<<<<<<< HEAD
 
 void SetHandler(const callback_t& back,uint32_t div){
 	interrupt_disable();
@@ -111,6 +112,35 @@ void SCT1_IRQHandler(void) {
 
 
 }
+=======
+Signal InvertSignal(Signal mode){
+	Signal invSig;
+	switch(mode){
+		case Signal::AB:
+			invSig = Signal::BA;
+			break;
+		case Signal::AC:
+			invSig = Signal::CA;
+			break;
+		case Signal::BA:
+			invSig = Signal::AB;
+			break;
+		case Signal::BC:
+			invSig = Signal::CB;
+			break;
+		case Signal::CA:
+			invSig = Signal::AC;
+			break;
+		case Signal::CB:
+			invSig = Signal::BC;
+			break;
+		default:
+			invSig = mode;
+	}
+	return invSig;
+}
+
+>>>>>>> 189e84bb9515e9af4a65fdb8bfed42904e965e7a
 }
 
 }
