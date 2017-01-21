@@ -11,7 +11,6 @@
 #include <qmath.hpp>
 #include <stdint.h>
 #include <HoleSensor.hpp>
-
 namespace Middle {
 namespace Motor{
 
@@ -65,9 +64,19 @@ public :
 	virtual void Free();
 };
 
+//ホールセンサーから次の状態を出力するクラス
+class HoleStateGenerator{
+	bool direction;
+public:
+	HoleStateGenerator(bool dir=false):
+		direction(dir){}
+	void operator()(HoleSensor::HoleStatus sta);
+	bool SetDirection(bool dir){direction=dir;}
+};
+
 class BLDCMotorWithSensor: public IMotor{
 	Mode mMode;
-	std::function<void(HoleSensor::HoleStatus, bool)> HallSensorCallBack;
+	HoleStateGenerator state;
 public:
 	bool direction;
 	BLDCMotorWithSensor();

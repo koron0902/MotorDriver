@@ -19,12 +19,11 @@ enum class HoleStatus:uint32_t{
 	WU=0b101
 };
 
-using HoleSensorHandler=std::function<void(HoleSensor::HoleStatus, bool)>;
+using HoleSensorHandler=std::function<void(HoleSensor::HoleStatus)>;
 
 void SetHandler(const HoleSensorHandler&func=nullptr);
-void SetDirection(bool direction = true);
 
-
+HoleStatus GetState();
 
 }
 } /* namespace mid */

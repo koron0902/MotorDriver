@@ -31,7 +31,8 @@ enum class Signal
 	AC_AB = 0b0111,
 	Align = 0b1110,
 	Stop = 0b0000,
-	Halt = Stop
+	Halt = Stop,
+	None= Stop	//HoleStatusとの互換を持たせるため
 };
 
 
