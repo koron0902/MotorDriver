@@ -11,13 +11,13 @@ static constexpr uint64_t bit24 = (1u << 24);
 static constexpr uint64_t mask = bit24 - 1;
 
 static inline void interrupt_disable(){
-	NVIC_DisableIRQ(SysTick_IRQn);
+	//NVIC_DisableIRQ(SysTick_IRQn);エラー発生
 }
 
 static inline void interrupt_enable(){
 	interrupt_disable();
 	NVIC_SetPriority(SysTick_IRQn,PrioritySysTick);
-	NVIC_EnableIRQ(SysTick_IRQn);
+	//NVIC_EnableIRQ(SysTick_IRQn);
 }
 
 

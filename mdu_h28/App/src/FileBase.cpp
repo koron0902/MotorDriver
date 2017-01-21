@@ -112,9 +112,17 @@ std::string FileBase::GetPathName() const {
 }
 
 std::string FileBase::GetChildrenName() const {
-	if (child != nullptr)
-		return child->GetChildrenNameSub();
-	return "";
+	string ans;
+	bool flag=false;
+	for (auto it=this->child;it!=nullptr;it=it->next){
+		if (flag){
+			ans+=comma;
+		}else{
+			flag=true;
+		}
+		ans+=it->name;
+	}
+	return ans;
 }
 
 string FileBase::GetAllName(unsigned int sp) const {
@@ -133,14 +141,6 @@ size_t FileBase::GetMemorySizeUsed() {
 }
 size_t FileBase::GetMemorySizeFree() {
 	return pool.CountFreeByte();
-}
-
-std::string FileBase::GetChildrenNameSub() const {
-	if (next != nullptr) {
-		return next->GetChildrenNameSub() + comma + name;
-	} else {
-		return name;
-	}
 }
 
 size_t FileBase::MaxItemSize(){

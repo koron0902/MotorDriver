@@ -77,10 +77,8 @@ public:
 };
 
 class BLDCMotorWithSensor: public IMotor{
-	Mode mMode;
 	HoleStateGenerator state;
 public:
-	bool direction;
 	BLDCMotorWithSensor();
 	BLDCMotorWithSensor(const BLDCMotorWithSensor&) = default;
 	virtual ~BLDCMotorWithSensor();

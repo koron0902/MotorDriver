@@ -144,8 +144,28 @@ File::FileBase* CreateSet() {
 File::FileBase* CreateLs() {
 	return File::CreateExecute("ls",
 			[](text_iterator begin, text_iterator end) {
-				XPort::WriteLine(current->GetChildrenName());
-				return 0;
+				text_iterator path = begin + 1;
+				FileBase* target;
+				if (std::distance(begin, end) <= 1) {
+					target=File::current;
+				} else if ((*path) == "") {
+					target=File::current;
+					return -1;
+				} else {
+					auto* file = File::current->Search(*path);
+					if (file != nullptr) {
+						if (file->GetFlag() != FileType::Directory) {
+							XPort::WriteLine("ls: not a directory");
+							return -1;
+						} else {
+							target =  file;
+						}
+					} else {
+						XPort::WriteLine("ls: directory not found");
+						return -1;
+					}
+				}
+				XPort::WriteLine(target->GetChildrenName());
 			});
 }
 
@@ -202,7 +222,7 @@ File::FileBase* CreateStmp() {
 				} else {
 					XPort::WriteLine(ToStr(Device::Tick::TickUs()));
 				}
-			}else{
+			} else {
 				XPort::WriteLine(ToStr(Device::Tick::TickUs()));
 			}
 			return 0;
@@ -264,8 +284,8 @@ File::FileBase* CreateTest() {
 			[](text_iterator begin, text_iterator end)->int {
 				//auto a = fix32::CreateFloat(2.75f);
 				XPort::WriteLine("U:" + common::ToStr(Device::Port::HoleU.Get()) +
-								" V:" + common::ToStr(Device::Port::HoleV.Get()) +
-								" W:" + common::ToStr(Device::Port::HoleW.Get())
+						" V:" + common::ToStr(Device::Port::HoleV.Get()) +
+						" W:" + common::ToStr(Device::Port::HoleW.Get())
 				);
 				//XPort::WriteLine(ToStr(a));
 				return 0;

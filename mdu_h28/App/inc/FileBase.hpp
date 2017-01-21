@@ -71,7 +71,7 @@ public:
 	static size_t GetTextSizeFree();
 	static size_t GetTextSizeAll();
 private:
-	std::string GetChildrenNameSub() const;
+
 };
 
 class Directory: public FileBase {
