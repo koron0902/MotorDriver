@@ -39,7 +39,7 @@ void SetDuty(common::fix32);
 void Lock();
 void Free();
 
-std::string SwitchMotorType(Type);
+void SwitchMotorType(Type);
 
 
 class IMotor{

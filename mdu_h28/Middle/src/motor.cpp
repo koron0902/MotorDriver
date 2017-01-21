@@ -6,6 +6,7 @@
 #include <qmath.hpp>
 #include <region.hpp>
 #include <Port.hpp>
+#include <XPort.hpp>
 using namespace common;
 using namespace Device;
 
@@ -38,27 +39,27 @@ namespace Middle {
 			}
 		}
 
-		std::string SwitchMotorType(Motor::Type _type){
+		void SwitchMotorType(Motor::Type _type){
 			if(mType == _type)
-				return "Already set as requested type";
+				XPort::WriteLine( "Already set as requested type");
 
 			Release(action);
-			std::string retStr = "";
+
 			switch(_type){
 			case Type::DCMotor:
 				action = new DCMotor();
-				retStr = "Succeeded in switching DC Motor";
+				XPort::WriteLine( "Succeeded in switching DC Motor");
 				break;
 			case Type::BLDCWithSensor:
 				action = new BLDCMotorWithSensor();
-				retStr = "Succeeded in switching BLDC Motor(No Encoder)";
+				XPort::WriteLine( "Succeeded in switching BLDC Motor(No Encoder)");
 				break;
 			default:
 				action = nullptr;
+				XPort::WriteLine("Released Motor");
 				break;
 			}
 			mType = _type;
-			return retStr;
 		}
 
 		void SetDuty(fix32 fix){
