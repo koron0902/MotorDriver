@@ -14,7 +14,7 @@ namespace Middle {
 namespace Motor {
 
 static IMotor* action = nullptr;
-static Motor::Type mType;
+
 volatile void Wait() {
 	for (volatile int i = 0; i < 180000; i++)
 		;
@@ -25,41 +25,34 @@ void Init() {
 	//ICを1PWMモードに変更する
 	DRV::Init();
 	//制御法を設定する。
-	SwitchMotorType(Type::DCMotor);
+	SwitchMotorType(MotorType::DCMotor);
 }
 
-void ModeAs(Type t) {
-	Release(action);
-	switch (t) {
-	case Type::DCMotor:
-		action = new DCMotor();
-		break;
-	default:
-		action = nullptr;
-		break;
+void SwitchMotorType(Motor::MotorType type) {
+	//すでに実体化していないか確認
+	if (action!=nullptr){
+		if (action->GetType()==type){
+			XPort::WriteLine("No Switch");
+			return;
+		}else{
+			XPort::WriteLine("Release");
+			delete action;
+		}
 	}
-}
-
-void SwitchMotorType(Motor::Type _type) {
-	if (mType == _type) XPort::WriteLine("Already set as requested type");
-
-	Release(action);
-
-	switch (_type) {
-	case Type::DCMotor:
-		action = new DCMotor();
-		XPort::WriteLine("Succeeded in switching DC Motor");
+	//次の状態へ移行
+	switch (type){
+	case MotorType::DCMotor:
+		action =new DCMotor();
+		XPort::WriteLine("Switch to DCMotor");
 		break;
-	case Type::BLDCWithSensor:
-		action = new BLDCMotorWithSensor();
-		XPort::WriteLine("Succeeded in switching BLDC Motor(No Encoder)");
+	case MotorType::BLDCWithSensor:
+		action=new BLDCMotorWithSensor();
+		XPort::WriteLine("Switch to BLDC With Sensor");
 		break;
+	case MotorType::None:
 	default:
-		action = nullptr;
-		XPort::WriteLine("Released Motor");
-		break;
+		XPort::WriteLine("Switch to None");
 	}
-	mType = _type;
 }
 
 void SetDuty(fix32 fix) {
@@ -80,7 +73,7 @@ void Free() {
 	}
 }
 
-DCMotor::DCMotor() {
+DCMotor::DCMotor() :IMotor(MotorType::DCMotor){
 	Free();
 }
 
@@ -170,7 +163,7 @@ void HoleStateGenerator::operator ()(HoleSensor::HoleStatus sta){
 		}
 }
 
-BLDCMotorWithSensor::BLDCMotorWithSensor() {
+BLDCMotorWithSensor::BLDCMotorWithSensor() :IMotor(MotorType::BLDCWithSensor){
 	HoleSensor::SetHandler(state);
 	Free();
 }

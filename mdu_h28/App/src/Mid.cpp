@@ -105,7 +105,7 @@ File::FileBase* CreateSwitch(){
 			XPort::WriteLine(Controller::SwitchControlMode((Controller::ControlMode_e)common::ToInt32(*begin)));
 		}else if((*begin) == "-m"){
 			begin++;
-			Motor::SwitchMotorType((Motor::Type)common::ToInt32(*begin));
+			Motor::SwitchMotorType((Motor::MotorType)common::ToInt32(*begin));
 		}
 		return 0;
 	});

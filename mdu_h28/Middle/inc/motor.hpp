@@ -18,7 +18,7 @@ namespace Motor{
 
 void Init();
 
-enum class Type:uint32_t {
+enum class MotorType:uint32_t {
 	None=0,
 	DCMotor=1,
 	BLDCWithSensor=2,		//ホールセンサで駆動するモード
@@ -32,24 +32,26 @@ enum class Mode{
 	Running
 };
 
-void ModeAs(Type);
-
 void SetDuty(common::fix32);
 void Lock();
 void Free();
 
-void SwitchMotorType(Type);
+void SwitchMotorType(MotorType);
 
 
 class IMotor{
+protected:
+	MotorType type;//識別用
 public:
-	IMotor()=default;
+	IMotor(MotorType t):type(t){}
 	IMotor(const IMotor&)=default;
 	virtual ~IMotor()=default;
 
 	virtual void SetDuty(common::fix32)=0;
 	virtual void Lock()=0;
 	virtual void Free()=0;
+
+	MotorType GetType()const{return type;}
 };
 
 class DCMotor:public IMotor{
@@ -71,7 +73,7 @@ public:
 	HoleStateGenerator(bool dir=false):
 		direction(dir){}
 	void operator()(HoleSensor::HoleStatus sta);
-	bool SetDirection(bool dir){direction=dir;}
+	void SetDirection(bool dir){direction=dir;}
 };
 
 class BLDCMotorWithSensor: public IMotor{
