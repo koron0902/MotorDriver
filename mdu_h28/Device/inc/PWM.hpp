@@ -15,7 +15,7 @@ namespace Device {
 namespace PWM {
 
 //DRVのデータシートを参照のこと。
-enum class Signal
+enum class Pulse
 	:uint32_t {
 	AB = 0b0110,
 	AB_CB = 0b0101,
@@ -42,11 +42,11 @@ void SetDuty(common::q32_t duty);
 uint32_t GetCycle();
 void Clear(); //すべてのPWM出力をなくす
 
-void SetSignal(Signal);
+void SetSignal(Pulse);
 void SetHandler(const common::callback_t&);
 
 
-Signal InvertSignal(Signal);
+Pulse InvertSignal(Pulse);
 
 
 

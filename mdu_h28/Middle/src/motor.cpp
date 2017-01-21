@@ -91,12 +91,12 @@ DCMotor::~DCMotor() {
 void DCMotor::Free() {
 	using namespace PWM;
 	SetDutyRaw(0);
-	SetSignal(Signal::Halt);
+	SetSignal(Pulse::Halt);
 }
 
 void DCMotor::Lock() {
 	using namespace PWM;
-	SetSignal(Signal::CB_CA);
+	SetSignal(Pulse::CB_CA);
 	SetDutyRaw(0);
 }
 
@@ -112,53 +112,53 @@ void DCMotor::SetDuty(fix32 duty) {
 
 	if (!s) {
 		//正転
-		SetSignal(Signal::AB);
+		SetSignal(Pulse::AB);
 	} else {
 		//逆転
-		SetSignal(Signal::BA);
+		SetSignal(Pulse::BA);
 	}
 	PWM::SetDuty(q);
 }
 
-static inline constexpr PWM::Signal previous(HoleSensor::HoleStatus data) {
+static inline constexpr PWM::Pulse previous(HoleSensor::HoleStatus data) {
 	using namespace HoleSensor;
 	switch (data) {
 	case HoleStatus::U:
-		return PWM::Signal::CB;
+		return PWM::Pulse::CB;
 	case HoleStatus::UV:
-		return PWM::Signal::CA;
+		return PWM::Pulse::CA;
 	case HoleStatus::V:
-		return PWM::Signal::BA;
+		return PWM::Pulse::BA;
 	case HoleStatus::VW:
-		return PWM::Signal::BC;
+		return PWM::Pulse::BC;
 	case HoleStatus::W:
-		return PWM::Signal::AC;
+		return PWM::Pulse::AC;
 	case HoleStatus::WU:
-		return PWM::Signal::AB;
+		return PWM::Pulse::AB;
 	case HoleStatus::None:
 	default:
-		return PWM::Signal::None;
+		return PWM::Pulse::None;
 	}
 }
 
-static inline constexpr PWM::Signal next(HoleSensor::HoleStatus data){
+static inline constexpr PWM::Pulse next(HoleSensor::HoleStatus data){
 	using namespace HoleSensor;
 	switch (data) {
 	case HoleStatus::U:
-		return PWM::Signal::BC;
+		return PWM::Pulse::BC;
 	case HoleStatus::UV:
-		return PWM::Signal::AC;
+		return PWM::Pulse::AC;
 	case HoleStatus::V:
-		return PWM::Signal::AB;
+		return PWM::Pulse::AB;
 	case HoleStatus::VW:
-		return PWM::Signal::CB;
+		return PWM::Pulse::CB;
 	case HoleStatus::W:
-		return PWM::Signal::CA;
+		return PWM::Pulse::CA;
 	case HoleStatus::WU:
-		return PWM::Signal::BA;
+		return PWM::Pulse::BA;
 	case HoleStatus::None:
 	default:
-		return PWM::Signal::None;
+		return PWM::Pulse::None;
 	}
 }
 
@@ -183,13 +183,13 @@ BLDCMotorWithSensor::~BLDCMotorWithSensor() {
 void BLDCMotorWithSensor::Free() {
 	using namespace PWM;
 	SetDutyRaw(0);
-	SetSignal(Signal::Halt);
+	SetSignal(Pulse::Halt);
 }
 
 void BLDCMotorWithSensor::Lock() {
 	using namespace PWM;
 	SetDutyRaw(0);
-	SetSignal(Signal::CB_CA);
+	SetSignal(Pulse::CB_CA);
 }
 
 void BLDCMotorWithSensor::SetDuty(fix32 duty) {

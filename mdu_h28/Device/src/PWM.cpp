@@ -78,10 +78,10 @@ uint32_t GetCycle(){
 
 void Clear(){
 	SetDutyRaw(0);
-	SetSignal(Signal::Halt);
+	SetSignal(Pulse::Halt);
 }
 
-void SetSignal(Signal mode){
+void SetSignal(Pulse mode){
 	using namespace Port;
 	using namespace common;
 	uint32_t port=(uint32_t)mode;
@@ -118,26 +118,26 @@ void SCT1_IRQHandler(void) {
 	}
 }
 
-Signal InvertSignal(Signal mode){
-	Signal invSig;
+Pulse InvertSignal(Pulse mode){
+	Pulse invSig;
 	switch(mode){
-		case Signal::AB:
-			invSig = Signal::BA;
+		case Pulse::AB:
+			invSig = Pulse::BA;
 			break;
-		case Signal::AC:
-			invSig = Signal::CA;
+		case Pulse::AC:
+			invSig = Pulse::CA;
 			break;
-		case Signal::BA:
-			invSig = Signal::AB;
+		case Pulse::BA:
+			invSig = Pulse::AB;
 			break;
-		case Signal::BC:
-			invSig = Signal::CB;
+		case Pulse::BC:
+			invSig = Pulse::CB;
 			break;
-		case Signal::CA:
-			invSig = Signal::AC;
+		case Pulse::CA:
+			invSig = Pulse::AC;
 			break;
-		case Signal::CB:
-			invSig = Signal::BC;
+		case Pulse::CB:
+			invSig = Pulse::BC;
 			break;
 		default:
 			invSig = mode;
