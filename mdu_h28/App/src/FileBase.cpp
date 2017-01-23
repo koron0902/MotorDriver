@@ -53,12 +53,7 @@ void FileBase::Add(FileBase* ptr) {
 	child = ptr;
 	ptr->parent = this;
 }
-/*
- string FileBase::operator()(std::vector<std::string>& s) {
- return "NonSupport:Type=[" + ToStr((int) type) + "]+Mode=["
- + ToStr((int) mode) + "]";
- }
- */
+
 int FileBase::operator()(text_iterator begin, text_iterator end) {
 	XPort::WriteLine(
 			"AccessError");
