@@ -13,7 +13,7 @@
 #include <HoleSensor.hpp>
 namespace Middle {
 namespace Motor{
-
+using namespace Device;
 //このファイルはモーターの種類を抽象化することを目的とする。
 
 void Init();
@@ -37,6 +37,8 @@ void Lock();
 void Free();
 
 void SwitchMotorType(MotorType);
+MotorType GetMotorType();
+constexpr const char* const GetName(MotorType);
 
 
 class IMotor{

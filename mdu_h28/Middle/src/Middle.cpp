@@ -14,9 +14,9 @@
 namespace Middle {
 
 void Init(){
-	HoleSensor::Init();
+
 	Motor::Init();
-	Controller::SwitchControlMode(Controller::ControlMode_e::ModePID);
+	Controller::SwitchControlMode(Controller::ControlMode_e::ModeTest);
 }
 
 

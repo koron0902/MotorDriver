@@ -388,7 +388,7 @@ bool IsConnected() {
 	return g_vCOM.tx_flags & VCOM_TX_CONNECTED;
 }
 
-static void ReadUpData() {
+void ReadUpdata() {
 	uint8_t buf[RxTempSize];
 	uint32_t len;
 	//uint32_t idx;
@@ -401,12 +401,12 @@ uint32_t GetDepth() {
 	return RingBuffer_GetCount(&RxBuf);
 }
 bool IsEmpty() {
-	ReadUpData();
+	ReadUpdata();
 	return RingBuffer_IsEmpty(&RxBuf);
 }
 
 char ReadByte() {
-	ReadUpData();
+	ReadUpdata();
 	char c;
 	RingBuffer_Pop(&RxBuf, &c);
 	return c;
@@ -430,7 +430,7 @@ return "";
 string Read() {
 	string s = "";
 	char c;
-	ReadUpData();
+	ReadUpdata();
 	while (!IsEmpty()) {
 		RingBuffer_Pop(&RxBuf, &c);
 		s += c;
@@ -452,7 +452,7 @@ void Write(const uint8_t* byte, size_t size) {
 }
 
 bool IsExist(char c){
-	ReadUpData();
+	ReadUpdata();
 	char* data=(char*)RxRaw;
 	for (unsigned int i=RxBuf.tail;i!=RxBuf.head;i=(i+1)%RxBuf.count){
 		if (data[i]==c)return true;

@@ -14,7 +14,7 @@
 
 namespace Middle {
 	namespace Controller {
-		ControlMode_e mMode;
+		static ControlMode_e mMode;
 
 		ControllerBase::ControllerBase(): mFreq(FREQ_DEFAULT) {
 

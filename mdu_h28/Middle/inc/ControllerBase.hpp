@@ -15,6 +15,7 @@
 namespace Middle {
 	namespace Controller {
 		using namespace common;
+
 		class ControllerBase {
 		private:
 
@@ -36,7 +37,7 @@ namespace Middle {
 			}
 
 			void operator ()(void){
-				if(CallProc)
+				if(CallProc!=nullptr)
 					CallProc();
 			}
 
@@ -47,7 +48,7 @@ namespace Middle {
 			ModeTrapezium = 1,
 			ModePID = 2
 		};
-		extern ControlMode_e mMode;
+
 		std::string SwitchControlMode(ControlMode_e _mode);
 
 	} /* namespace Controller */

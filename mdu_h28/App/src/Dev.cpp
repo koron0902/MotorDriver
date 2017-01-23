@@ -4,6 +4,7 @@
 #include <text.hpp>
 #include <xport.hpp>
 #include <QEI.hpp>
+#include <HoleSensor.hpp>
 using namespace App::File;
 using namespace std;
 using namespace Device;
@@ -17,6 +18,13 @@ Directory* Create() {
 	dir->Add(CreateADC());
 
 	dir->Add(File::Integer::Create("qei", (int32_t*)QEI::QEIVel));
+
+	dir->Add(CreateReadOnlyProperty("hole",[](){
+		auto state = HoleSensor::GetState();
+		return HoleSensor::GetName(state);
+	}));
+
+
 	return dir;
 }
 
@@ -37,7 +45,6 @@ Directory* CreateUart() {
 	return uart;
 }
 
-
 File::Directory* CreateADC() {
 	Directory* dir = Directory::Create("adc");
 	dir->Add(File::CreateReadOnlyProperty("batt", []() {
@@ -45,7 +52,7 @@ File::Directory* CreateADC() {
 	}));
 
 	dir->Add(
-			File::CreateReadOnlyProperty("Volt",
+			File::CreateReadOnlyProperty("volt",
 					[] () {
 						return ToStr(ADC::GetVoltU())+" "+ToStr(ADC::GetVoltV())+" "+ToStr(ADC::GetVoltU());
 					}));

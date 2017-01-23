@@ -86,6 +86,7 @@ bool IsConnected();
 uint32_t GetDepth();//受信文字数
 bool IsEmpty();
 
+void ReadUpdata();
 char ReadByte();
 std::string Read();
 std::string ReadLine();

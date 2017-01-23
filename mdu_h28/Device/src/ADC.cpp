@@ -11,7 +11,7 @@ namespace Device {
 namespace ADC {
 //回路による定数
 static constexpr uint32_t ADCSampleClock = 50_KHz;
-static constexpr uint32_t TriggerRate=50_KHz;
+static constexpr uint32_t TriggerRate=10_KHz;
 static constexpr fix32 ADCRef = fix32::CreateDouble(2.495); //[V] 基準電圧の実測値
 static constexpr fix32 Resistance = fix32::CreateDouble(5); //[mΩ]シャント抵抗値
 static constexpr fix32 VoltGain = fix32::CreateDouble(10.0f); //分圧回路による分圧率

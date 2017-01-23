@@ -33,8 +33,6 @@ namespace common {
 		return c-'0';
 	}
 
-
-
 	static inline char ToChar(int32_t value){
 		return '0'+value;
 	}

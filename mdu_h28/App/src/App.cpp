@@ -59,7 +59,7 @@ void Run() {
 
 		CommandLine();
 		Middle::DRV::Update();
-		//Device::ADC::Trigger();
+		USB::ReadUpdata();
 	}
 	//can't reach here
 }

@@ -33,6 +33,8 @@ void Init(){
 	SPI::Init();
 	INT::Init();
 
+	//複合デバイス
+	HoleSensor::Init();
 }
 
 

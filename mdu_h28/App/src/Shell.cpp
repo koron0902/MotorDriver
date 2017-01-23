@@ -16,6 +16,8 @@ static std::vector<std::string> history; //過去の命令をひとつだけ保�
 
 static std::vector<File::Directory*> path; //省略用
 
+static char line_discard = '#'; //この文字が末尾にあった場合、その行を無視
+
 void Init() {
 	Directory* bin;
 
@@ -38,6 +40,7 @@ int Call(text_iterator begin, text_iterator end) {
 				return (*file)(begin, end);
 			}
 		}
+		XPort::WriteLine("Missing");
 		return -1;
 	} else {
 		return -1;
@@ -49,18 +52,30 @@ int Call(std::vector<std::string>& arg) {
 }
 
 int Call(const string& text) {
-	string buf = "";
-	buf.reserve(64);
 	bool flag = false;
-	auto lst = Split(text, ":");
-	for (auto &commmand : lst) {
-		auto sp = Split(commmand, " ");
-		if (flag)
-			XPort::Write(":");
-		Call(sp);
-		flag = true;
+
+	if (!text.empty()) {
+		//末尾を確認
+		if (text[text.length() - 1] != line_discard) {
+			auto lst = Split(text, ":");
+			for (auto &commmand : lst) {
+				auto sp = Split(commmand, " ");
+				if (flag) XPort::Write(":");
+				int response = Call(sp);
+				if (response < 0) {
+					return response;
+				}
+				flag = true;
+			}
+			return 0;
+		}else{
+			//この行は破棄された
+			return 0;
+		}
+	} else {
+		return 0;
 	}
-	return 0;
+
 }
 
 }

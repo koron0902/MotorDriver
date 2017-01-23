@@ -54,6 +54,26 @@ void SwitchMotorType(Motor::MotorType type) {
 		XPort::WriteLine("Switch to None");
 	}
 }
+MotorType GetMotorType(){
+	if (action!=nullptr){
+		return action->GetType();
+	}else{
+		return MotorType::None;
+	}
+}
+
+constexpr const char* const GetName(MotorType t){
+	switch (t){
+	case MotorType::None:
+		return "None";
+	case MotorType::DCMotor:
+		return "DC-Motor";
+	case MotorType::BLDCWithSensor:
+		return "BLDC With Sensor";
+	default:
+		return "Others";
+	}
+}
 
 void SetDuty(fix32 fix) {
 	if (action != nullptr) {
