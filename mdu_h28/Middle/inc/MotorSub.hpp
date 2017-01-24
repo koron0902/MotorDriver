@@ -42,12 +42,12 @@ class HoleStateGenerator{
 public:
 	HoleStateGenerator(bool dir=false):
 		direction(dir){}
+	HoleStateGenerator(const HoleStateGenerator&)=default;
 	void operator()(HoleSensor::HoleStatus sta);
 	void SetDirection(bool dir){direction=dir;}
 };
 
 class BLDCMotorWithSensor: public IMotor{
-	HoleStateGenerator state;
 public:
 	BLDCMotorWithSensor();
 	BLDCMotorWithSensor(const BLDCMotorWithSensor&) = default;

@@ -16,6 +16,7 @@ namespace Middle {
 void Init(){
 
 	Motor::Init();
+	Motor::SwitchMotorType(Motor::MotorType::BLDCWithSensor);
 	Controller::SwitchControlMode(Controller::ControlMode::Test);
 }
 

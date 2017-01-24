@@ -13,10 +13,13 @@ enum class HoleStatus
 		None = 0b000,//Error
 	U = 0b001,
 	UV = 0b011,
+	VU=UV,
 	V = 0b010,
 	VW = 0b110,
+	WV=VW,
 	W = 0b100,
 	WU = 0b101,
+	UW=WU,
 	Open=0b111//Error
 };
 
