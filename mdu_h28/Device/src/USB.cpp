@@ -242,8 +242,8 @@ uint32_t vcom_bread(uint8_t *pBuf, uint32_t buf_len) {
 	uint16_t cnt = 0;
 	/* read from the default buffer if any data present */
 	if (pVcom->rx_count) {
-		cnt = (pVcom->rx_count < buf_len) ? pVcom->rx_count : buf_len;
-		memcpy(pBuf, pVcom->rx_buff, cnt);
+		cnt = (pVcom->rx_count < (pVcom->rx_rd_count)+buf_len) ? (pVcom->rx_count)-(pVcom->rx_rd_count) : buf_len;
+		memcpy(pBuf, (pVcom->rx_buff)+(pVcom->rx_rd_count), cnt);
 		pVcom->rx_rd_count += cnt;
 
 		/* enter critical section */
@@ -415,6 +415,7 @@ char ReadByte() {
 std::string ReadLine(){
 	if (IsLine()){
 		string text;
+		text.reserve(128);
 		char c;
 		c=ReadByte();
 		while (c!=common::newline){
