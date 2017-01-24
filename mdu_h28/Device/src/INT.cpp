@@ -56,6 +56,16 @@ void ModeChanged(INT_ID id) {
 	ModeLow(id);
 }
 
+void ModeEdgeLow(INT_ID id){
+	ModeEdge(id);
+	ModeLow(id);
+}
+
+void ModeEdgeHigh(INT_ID id){
+	ModeEdge(id);
+	ModeHigh(id);
+}
+
 static inline IRQn GetIRQ(INT_ID id) {
 	//失敗すると深刻なエラーになるので値域を確認する。
 	long t = (long) id;

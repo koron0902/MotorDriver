@@ -58,7 +58,7 @@ void Run() {
 	forever() {
 
 		CommandLine();
-		Middle::DRV::Update();
+		//Middle::DRV::Update();
 		USB::ReadUpdata();
 	}
 	//can't reach here

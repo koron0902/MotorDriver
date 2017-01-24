@@ -16,7 +16,7 @@ namespace Middle {
 void Init(){
 
 	Motor::Init();
-	Controller::SwitchControlMode(Controller::ControlMode_e::ModeTest);
+	Controller::SwitchControlMode(Controller::ControlMode::Test);
 }
 
 

@@ -10,48 +10,52 @@
 
 #include <fix.hpp>
 #include <unit.hpp>
-#include <functional>
+#include <type.hpp>
 
 namespace Middle {
-	namespace Controller {
-		using namespace common;
+namespace Controller {
+using namespace common;
 
-		class ControllerBase {
-		private:
+enum class ControlMode
+	:uint32_t {
+		Test = 0, Trapezium = 1, PID = 2
+};
 
-		protected:
-			fix32 mFreq;
-			static constexpr fix32 FREQ_DEFAULT = (10_KHz << fix32::shift);
-			static constexpr fix32 STEP_DEFAULT = (0.002 * fix32::gain);
+void SwitchControlMode(ControlMode _mode);
+ControlMode GetMode();
+const char *const GetName(ControlMode);
+static inline const char* const GetModeName(){
+	return GetName(GetMode());
+}
 
-			std::function<void(void)> CallProc = nullptr;
 
-		public:
-			static constexpr uint32_t mControllerTaskPriority = 1;
-			ControllerBase();
-			ControllerBase(const ControllerBase&) = default;
-			virtual ~ControllerBase();
+class ControllerBase {
+private:
 
-			uint32_t GetFreq(){
-				return (int32_t)mFreq;
-			}
+protected:
+	fix32 mFreq;
+	static constexpr fix32 FREQ_DEFAULT = (10_KHz << fix32::shift);
+	static constexpr fix32 STEP_DEFAULT = (0.002 * fix32::gain);
 
-			void operator ()(void){
-				if(CallProc!=nullptr)
-					CallProc();
-			}
+	std::function<void(void)> CallProc = nullptr;
 
-		};
+public:
+	static constexpr uint32_t mControllerTaskPriority = 1;
+	ControllerBase();
+	ControllerBase(const ControllerBase&) = default;
+	virtual ~ControllerBase();
 
-		enum class ControlMode_e:uint32_t{
-			ModeTest = 0,
-			ModeTrapezium = 1,
-			ModePID = 2
-		};
+	uint32_t GetFreq() {
+		return (int32_t) mFreq;
+	}
 
-		std::string SwitchControlMode(ControlMode_e _mode);
+	void operator ()(void) {
+		if (CallProc != nullptr) CallProc();
+	}
 
-	} /* namespace Controller */
+};
+
+} /* namespace Controller */
 } /* namespace Middle */
 
 #endif /* MIDDLE_INC_CONTROLLERBASE_HPP_ */

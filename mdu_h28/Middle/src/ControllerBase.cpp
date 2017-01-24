@@ -11,55 +11,78 @@
 #include <Timer.hpp>
 #include <motor.hpp>
 #include <Port.hpp>
-
+#include <XPort.hpp>
 namespace Middle {
-	namespace Controller {
-		static ControlMode_e mMode;
+namespace Controller {
+static ControlMode Mode;
 
-		ControllerBase::ControllerBase(): mFreq(FREQ_DEFAULT) {
+void SwitchControlMode(ControlMode m) {
+	if (Mode != m) {
 
+		switch (m) {
+		case ControlMode::Test: {
+			Device::Port::Set(Device::Port::PWMEN, true);
+			Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, 1,
+					nullptr);
+			XPort::WriteLine("Succeeded in switching test mode");
+			break;
 		}
+		case ControlMode::Trapezium: {
+			Trapezium* trap = new Trapezium();
+			Device::Port::Set(Device::Port::PWMEN, true);
 
-		ControllerBase::~ControllerBase() {
-
+			Controller::Trapezium::Reset();
+			Device::Timer::SetAction(ControllerBase::mControllerTaskPriority,
+					trap->GetFreq(), std::move(*trap));
+			XPort::WriteLine("Succeeded in switching trap. control");
+			break;
 		}
-
-		std::string SwitchControlMode(ControlMode_e _mode){
-			if(mMode == _mode)
-				return "Already running as requested mode";
-
-			std::string retStr = "";
-			switch(_mode){
-				case ControlMode_e::ModeTest:{
-					Device::Port::Set(Device::Port::PWMEN, true);
-					//Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
-					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, 1, nullptr);
-					retStr = "Succeeded in switching test mode";
-					break;
-				}
-				case ControlMode_e::ModeTrapezium:{
-					Trapezium* trap = new Trapezium();
-					Device::Port::Set(Device::Port::PWMEN, true);
-					//Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
-					Controller::Trapezium::Reset();
-					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, trap->GetFreq(), std::move(*trap));
-					retStr = "Succeeded in switching trap. control";
-					break;
-				}case ControlMode_e::ModePID:{
-					PID* pid = new PID();
-					Device::Port::Set(Device::Port::PWMEN, true);
-					//Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
-					Controller::PID::Reset();
-					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, pid->GetFreq(), std::move(*pid));
-					retStr = "Succeeded in switching pid control";
-					break;
-				}default :{
-					return "No such as control mode";
-				}
-			}
-			mMode = _mode;
-			return retStr;
+		case ControlMode::PID: {
+			PID* pid = new PID();
+			Device::Port::Set(Device::Port::PWMEN, true);
+			Controller::PID::Reset();
+			Device::Timer::SetAction(ControllerBase::mControllerTaskPriority,
+					pid->GetFreq(), std::move(*pid));
+			XPort::WriteLine("Succeeded in switching pid control");
+			break;
 		}
-	
-	} /* namespace Controller */
+		default: {
+			XPort::WriteLine("No such as control mode");
+			return;
+		}
+		}
+		Mode = m;
+	} else {
+		XPort::WriteLine("Already running as requested mode");
+	}
+
+}
+
+ControlMode GetMode() {
+	return Mode;
+}
+
+const char * const GetName(ControlMode c) {
+	switch (c) {
+	case ControlMode::Test:
+		return "Test";
+	case ControlMode::PID:
+		return "PID";
+	case ControlMode::Trapezium:
+		return "Trapezium";
+	default:
+		return "Error";
+	}
+}
+
+ControllerBase::ControllerBase() :
+		mFreq(FREQ_DEFAULT) {
+
+}
+
+ControllerBase::~ControllerBase() {
+
+}
+
+} /* namespace Controller */
 } /* namespace Middle */

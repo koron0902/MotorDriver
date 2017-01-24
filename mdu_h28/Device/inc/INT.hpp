@@ -34,8 +34,10 @@ void ModeHigh(INT_ID id);
 void ModeLow(INT_ID id);
 //状態変化割り込みに設定する
 void ModeChanged(INT_ID id);
-
-
+//立ち下がりに設定する
+void ModeEdgeLow(INT_ID id);
+//立ち上がりに設定する
+void ModeEdgeHigh(INT_ID id);
 }
 }
 

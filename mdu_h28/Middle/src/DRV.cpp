@@ -10,6 +10,9 @@
 #include <string>
 #include <cstdlib>
 #include <text.hpp>
+#include <configuration.hpp>
+#include <INT.hpp>
+#include <Port.hpp>
 
 #define WRITE		(0 << 15)
 #define READ		(1 << 15)
@@ -73,6 +76,18 @@ namespace Middle {
 			VDS_SENSE_CTRL_T vdsSenseCtrl;
 			vdsSenseCtrl.VDS_LEVEL = THRESHOLD_2V131;
 			SetConfiguration(DRVRegName::VDS_SENSE_CTRL, vdsSenseCtrl);
+
+			/*Join interrupt pin*/{
+			using namespace Device;
+				using namespace Device::INT;
+				auto id=INT_ID::INT3;
+				auto handler=[](INT_ID id)->void{
+					Update();
+				};
+				SetInt(Port::FALUT,id);
+				ModeEdgeLow(id);
+				SetHandler(id,handler,PriorityDRVFault);
+			}
 		}
 
 		bool SetConfiguration(const DRVRegName reg, const uint16_t data) {

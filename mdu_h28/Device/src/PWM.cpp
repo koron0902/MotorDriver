@@ -57,6 +57,8 @@ void Init() {
 	Clear();
 	Chip_SCTPWM_Start(LPC_SCT1);
 
+	interrupt_enable();
+
 	//制御用
 	counter=0;
 	handler=nullptr;
