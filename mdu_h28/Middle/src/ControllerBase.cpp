@@ -12,8 +12,13 @@
 #include <motor.hpp>
 #include <Port.hpp>
 #include <XPort.hpp>
+#include <configuration.hpp>
+#include <QEI.hpp>
+
 namespace Middle {
 namespace Controller {
+using namespace Device;
+
 static ControlMode Mode;
 
 void SwitchControlMode(ControlMode m) {
@@ -24,6 +29,8 @@ void SwitchControlMode(ControlMode m) {
 			Device::Port::Set(Device::Port::PWMEN, true);
 			Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, 1,
 					nullptr);
+			//Device::QEI::SetHandler(nullptr,PriorityControl);
+
 			XPort::WriteLine("Succeeded in switching test mode");
 			break;
 		}
@@ -34,6 +41,7 @@ void SwitchControlMode(ControlMode m) {
 			Controller::Trapezium::Reset();
 			Device::Timer::SetAction(ControllerBase::mControllerTaskPriority,
 					trap->GetFreq(), std::move(*trap));
+			//QEI::SetHandler(std::move(*trap),PriorityControl);
 			XPort::WriteLine("Succeeded in switching trap. control");
 			break;
 		}
@@ -43,6 +51,7 @@ void SwitchControlMode(ControlMode m) {
 			Controller::PID::Reset();
 			Device::Timer::SetAction(ControllerBase::mControllerTaskPriority,
 					pid->GetFreq(), std::move(*pid));
+			//QEI::SetHandler(std::move(*pid),PriorityControl);
 			XPort::WriteLine("Succeeded in switching pid control");
 			break;
 		}

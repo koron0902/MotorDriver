@@ -39,12 +39,14 @@ public :
 //ホールセンサーから次の状態を出力するクラス
 class HoleStateGenerator{
 	bool direction;
+	bool enable;
 public:
-	HoleStateGenerator(bool dir=false):
+	HoleStateGenerator(bool dir=false,bool enable=false):
 		direction(dir){}
 	HoleStateGenerator(const HoleStateGenerator&)=default;
 	void operator()(HoleSensor::HoleStatus sta);
 	void SetDirection(bool dir){direction=dir;}
+	void SetEnable(bool f){enable=f;}
 };
 
 class BLDCMotorWithSensor: public IMotor{

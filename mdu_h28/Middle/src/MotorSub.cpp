@@ -1,6 +1,8 @@
 #include <MotorSub.hpp>
 #include <PWM.hpp>
 #include <region.hpp>
+#include <Port.hpp>
+#include <XPort.hpp>
 namespace Middle {
 namespace Motor {
 
@@ -45,10 +47,10 @@ void DCMotor::SetDuty(fix32 duty) {
 
 	if (!s) {
 		//正転
-		SetSignal(Pulse::AB);
+		SetSignal(Pulse::UV);
 	} else {
 		//逆転
-		SetSignal(Pulse::BA);
+		SetSignal(Pulse::VU);
 	}
 	PWM::SetDuty(q);
 }
@@ -57,17 +59,17 @@ static inline constexpr PWM::Pulse previous(HoleSensor::HoleStatus data) {
 	using namespace HoleSensor;
 	switch (data) {
 	case HoleStatus::U:
-		return PWM::Pulse::CB;
+		return PWM::Pulse::WV;
 	case HoleStatus::UV:
-		return PWM::Pulse::CA;
+		return PWM::Pulse::WU;
 	case HoleStatus::V:
-		return PWM::Pulse::BA;
+		return PWM::Pulse::VU;
 	case HoleStatus::VW:
-		return PWM::Pulse::BC;
+		return PWM::Pulse::VW;
 	case HoleStatus::W:
-		return PWM::Pulse::AC;
-	case HoleStatus::WU:
-		return PWM::Pulse::AB;
+		return PWM::Pulse::UW;
+	case HoleStatus::UW:
+		return PWM::Pulse::UV;
 	case HoleStatus::None:
 	default:
 		return PWM::Pulse::None;
@@ -77,22 +79,25 @@ static inline constexpr PWM::Pulse previous(HoleSensor::HoleStatus data) {
 static inline constexpr PWM::Pulse next(HoleSensor::HoleStatus data) {
 	using namespace HoleSensor;
 	using namespace PWM;
-
-
-
 	switch (data) {
 	case HoleStatus::U:
-		return Pulse::AC;
+		//return Pulse::AC;
+		return Pulse::UW;
 	case HoleStatus::W:
-		return Pulse::BC;
+		//return Pulse::BC;
+		return Pulse::VW;
 	case HoleStatus::UW:
-		return Pulse::BA;
+		//return Pulse::BA;
+		return Pulse::VU;
 	case HoleStatus::V:
-		return Pulse::AB;
+		//return Pulse::AB;
+		return Pulse::UV;
 	case HoleStatus::VU:
-		return Pulse::CB;
+		//return Pulse::CB;
+		return Pulse::WV;
 	case HoleStatus::VW:
-		return Pulse::BC;
+		//return Pulse::BC;
+		return Pulse::VW;
 	case HoleStatus::None:
 	default:
 		return PWM::Pulse::None;
@@ -100,10 +105,15 @@ static inline constexpr PWM::Pulse next(HoleSensor::HoleStatus data) {
 }
 
 void HoleStateGenerator::operator ()(HoleSensor::HoleStatus sta) {
-	if (direction) {
-		PWM::SetSignal(next(sta));
-	} else {
-		PWM::SetSignal(previous(sta));
+	if (enable) {
+		if (direction) {
+			PWM::SetSignal(next(sta));
+		} else {
+			PWM::SetSignal(previous(sta));
+		}
+
+	}else{
+		PWM::SetSignal(PWM::Pulse::None);//Free
 	}
 }
 
@@ -144,8 +154,13 @@ void BLDCMotorWithSensor::SetDuty(fix32 duty) {
 	auto s = duty.GetRaw()<0;
 	// モータ始動用に現在の位置から出力を決定する。
 	state.SetDirection(s);
-	state.operator ()(HoleSensor::GetState());
-	PWM::SetDuty(q);
+	if (duty.GetRaw() != 0) {
+		state.operator ()(HoleSensor::GetState());
+		state.SetEnable(true);
+		PWM::SetDuty(q);
+	}else{
+		state.SetEnable(false);
+	}
 }
 
 }

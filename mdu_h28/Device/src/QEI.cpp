@@ -2,6 +2,7 @@
 #include <QEI.hpp>
 #include <QEISub.hpp>
 #include <configuration.hpp>
+#include <Port.hpp>
 #define __USED __attribute__((used))
 
 using namespace std;
@@ -46,8 +47,27 @@ void SetFilter(uint32_t clock) {
 	QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = clock;
 }
 
+uint32_t GetPosition(){
+	return QEI->POS;
+}
+
 uint32_t GetVelcoity() {
 	return QEI->CAP;
+}
+
+std::string GetPulseName(){
+	constexpr auto mark=[](bool f)->char{
+		return f?'1':'0';
+	};
+
+	bool x=Port::QEI_X.Get();
+	bool y=Port::QEI_Y.Get();
+	//bool z=Port::QEI_Z.Get();
+	string s;
+	s+=mark(x);
+	s+=mark(y);
+	//s+=mark(z);
+	return s;
 }
 
 void SetHandler(const callback_t& func, uint8_t Priority) {

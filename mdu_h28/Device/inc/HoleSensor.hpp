@@ -32,6 +32,11 @@ void SetHandler(const HoleSensorHandler&func = nullptr);
 HoleStatus GetState();
 
 const char* const GetName(HoleStatus);
+
+static inline const char* const GetStateName(){
+	return GetName(GetState());
+}
+
 }
 } /* namespace mid */
 

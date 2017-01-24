@@ -21,7 +21,7 @@ bool GetDirection();
 
 void SetFilter(uint32_t clock);
 
-void SetHandler(const callback_t&,uint8_t Priority=254);
+
 
 void SetPosition(uint32_t);
 uint32_t GetPosition();
@@ -30,7 +30,18 @@ uint32_t GetIndex();
 void SetTimer(uint32_t clock);
 uint32_t GetVelcoity();
 
-extern volatile uint32_t* QEIVel;
+//extern volatile uint32_t* QEIVel;
+
+//QEIの信号線の状態に関して(接続確認用)
+std::string GetPulseName();
+
+void SetHandler(const callback_t&,uint8_t Priority=254);
+
+
+
+
+
+
 
 }
 

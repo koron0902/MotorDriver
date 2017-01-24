@@ -36,7 +36,7 @@ static inline void interrupt_disable(){
 
 static inline void interrupt_enable(){
 	interrupt_disable();
-	NVIC_SetPriority(SCT1_IRQn,PriorityCycle);
+	NVIC_SetPriority(SCT1_IRQn,PriorityControl);
 	NVIC_EnableIRQ(SCT1_IRQn);
 }
 
@@ -123,23 +123,23 @@ void SCT1_IRQHandler(void) {
 Pulse InvertSignal(Pulse mode){
 	Pulse invSig;
 	switch(mode){
-		case Pulse::AB:
-			invSig = Pulse::BA;
+		case Pulse::UV:
+			invSig = Pulse::VU;
 			break;
-		case Pulse::AC:
-			invSig = Pulse::CA;
+		case Pulse::UW:
+			invSig = Pulse::WU;
 			break;
-		case Pulse::BA:
-			invSig = Pulse::AB;
+		case Pulse::VU:
+			invSig = Pulse::UV;
 			break;
-		case Pulse::BC:
-			invSig = Pulse::CB;
+		case Pulse::VW:
+			invSig = Pulse::WV;
 			break;
-		case Pulse::CA:
-			invSig = Pulse::AC;
+		case Pulse::WU:
+			invSig = Pulse::UW;
 			break;
-		case Pulse::CB:
-			invSig = Pulse::BC;
+		case Pulse::WV:
+			invSig = Pulse::VW;
 			break;
 		default:
 			invSig = mode;

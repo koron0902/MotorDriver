@@ -17,8 +17,24 @@ Directory* Create() {
 	dir->Add(CreateUart());
 	dir->Add(CreateADC());
 
-	dir->Add(File::Integer::Create("qei", (int32_t*)QEI::QEIVel));
+	//モーターの値に関するもの
 
+	//モーター速度(単位制御時間あたい)
+	dir->Add(CreateReadOnlyProperty("vel",[](){
+		return ToStr(QEI::GetVelcoity());
+	}));
+
+	//モーター位置
+	dir->Add(CreateReadOnlyProperty("pos",[](){
+		return ToStr(QEI::GetPosition());
+	}));
+
+	//エンコーダの状態
+	dir->Add(CreateReadOnlyProperty("encoder",[](){
+		return QEI::GetPulseName();
+	}));
+
+	//ホールセンサの状態
 	dir->Add(CreateReadOnlyProperty("hole",[](){
 		auto state = HoleSensor::GetState();
 		return HoleSensor::GetName(state);

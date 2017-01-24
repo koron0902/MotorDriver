@@ -23,7 +23,7 @@ extern const uint8_t PrioritySysTick;
 //角度制御
 extern const uint8_t PriorityHoleSensor;
 //周期制御
-extern const uint8_t PriorityCycle;
+extern const uint8_t PriorityControl;
 
 //通信系
 extern const uint8_t PriorityUart;

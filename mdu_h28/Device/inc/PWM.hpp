@@ -17,17 +17,17 @@ namespace PWM {
 //DRVのデータシートを参照のこと。
 enum class Pulse
 	:uint32_t {
-	AB = 0b0110,
+	UV = 0b0110,
 	AB_CB = 0b0101,
-	CB = 0b0100,
+	WV = 0b0100,
 	CB_CA = 0b1101,
-	CA = 0b1100,
+	WU = 0b1100,
 	CA_BA = 0b1001,
-	BA = 0b1000,
+	VU = 0b1000,
 	BA_BC = 0b1011,
-	BC = 0b1010,
+	VW = 0b1010,
 	BC_AC = 0b0011,
-	AC = 0b0010,
+	UW = 0b0010,
 	AC_AB = 0b0111,
 	Align = 0b1110,
 	Stop = 0b0000,
