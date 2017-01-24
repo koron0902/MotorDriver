@@ -55,7 +55,7 @@ public:
 		return name;
 	}
 	FileBase* SearchChilren(const std::string& name);
-	FileBase* Search(const text_vector&);
+	FileBase* Search(const text_vector&, bool);
 	FileBase* Search(const std::string&);
 	virtual std::string GetData();
 	virtual int SetData(const std::string&);

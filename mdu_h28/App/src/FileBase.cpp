@@ -78,8 +78,8 @@ FileBase* FileBase::SearchChilren(const string& name) {
 	return nullptr;
 }
 
-FileBase* FileBase::Search(const text_vector& lst) {
-	FileBase* it = this;
+FileBase* FileBase::Search(const text_vector& lst, bool absflag) {
+	FileBase* it = absflag?(File::root):this;
 	for (const string& cmp : lst) {
 		if (cmp == "..") {
 			it = it->parent;
@@ -95,7 +95,7 @@ FileBase* FileBase::Search(const text_vector& lst) {
 }
 
 FileBase* FileBase::Search(const string& path) {
-	return Search(Split(path, "/"));
+	return Search(Split(path, "/"), path[0]=='/');
 }
 
 std::string FileBase::GetPathName() const {

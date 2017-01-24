@@ -63,7 +63,7 @@ void SetPort(PortFlag);
 bool IsEnableUSB();
 
 constexpr size_t TxBufferSize=256;//書き込みバッファー
-constexpr size_t TxBufferLimit=196;//Flushサイズ
+constexpr size_t TxBufferLimit=16;//Flushサイズ
 constexpr size_t RxBufferSize=256;//読み込みバッファのサイズ
 constexpr size_t RxBufferLimit=16;//読み取りサイズ
 
