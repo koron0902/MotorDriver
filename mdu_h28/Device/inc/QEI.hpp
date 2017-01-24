@@ -8,15 +8,12 @@
 #ifndef DRIVER_QEI_H_
 #define DRIVER_QEI_H_
 
-#include <stdint.h>
 #include <type.hpp>
-#include <functional>
-
 
 namespace Device {
 namespace QEI{
 
-
+using namespace common;
 
 void Init();
 void DirInv(bool dir=false);
@@ -24,7 +21,7 @@ bool GetDirection();
 
 void SetFilter(uint32_t clock);
 
-void SetCallBack();//実装予定
+void SetHandler(const callback_t&,uint8_t Priority=254);
 
 void SetPosition(uint32_t);
 uint32_t GetPosition();
