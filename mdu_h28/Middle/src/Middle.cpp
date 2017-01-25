@@ -17,7 +17,7 @@ void Init(){
 
 	Motor::Init();
 	Motor::SwitchMotorType(Motor::MotorType::BLDCWithSensor);
-	Controller::SwitchControlMode(Controller::ControlMode::Test);
+	Controller::SwitchControlMode(Controller::ControlMode::None);
 }
 
 

@@ -1,7 +1,7 @@
 #include <Motor.hpp>
 #include <MotorSub.hpp>
-#include "DRV.hpp"
 #include <XPort.hpp>
+#include "DRV.hpp"
 
 using namespace common;
 using namespace Device;
@@ -58,7 +58,7 @@ MotorType GetMotorType(){
 	}
 }
 
-constexpr const char* const GetName(MotorType t){
+const char* const GetName(MotorType t){
 	switch (t){
 	case MotorType::None:
 		return "None";
@@ -66,6 +66,10 @@ constexpr const char* const GetName(MotorType t){
 		return "DC-Motor";
 	case MotorType::BLDCWithSensor:
 		return "BLDC With Sensor";
+	case MotorType::BLDCWithoutSensor:
+		return "BLDC With Voltage";
+	case MotorType::BLDCWtihAmp:
+		return "BLDC With Vector";
 	default:
 		return "Others";
 	}

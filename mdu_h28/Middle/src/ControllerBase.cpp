@@ -11,9 +11,9 @@
 #include <Timer.hpp>
 #include <motor.hpp>
 #include <Port.hpp>
-#include <XPort.hpp>
 #include <configuration.hpp>
 #include <QEI.hpp>
+#include <XPort.hpp>
 
 namespace Middle {
 namespace Controller {
@@ -23,15 +23,12 @@ static ControlMode Mode;
 
 void SwitchControlMode(ControlMode m) {
 	if (Mode != m) {
-
 		switch (m) {
-		case ControlMode::Test: {
+		case ControlMode::None: {
 			Device::Port::Set(Device::Port::PWMEN, true);
 			Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, 1,
 					nullptr);
-			//Device::QEI::SetHandler(nullptr,PriorityControl);
-
-			XPort::WriteLine("Succeeded in switching test mode");
+			XPort::WriteLine("Switch to None");
 			break;
 		}
 		case ControlMode::Trapezium: {
@@ -73,8 +70,8 @@ ControlMode GetMode() {
 
 const char * const GetName(ControlMode c) {
 	switch (c) {
-	case ControlMode::Test:
-		return "Test";
+	case ControlMode::None:
+		return "None";
 	case ControlMode::PID:
 		return "PID";
 	case ControlMode::Trapezium:

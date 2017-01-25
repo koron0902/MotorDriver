@@ -18,7 +18,7 @@ using namespace common;
 
 enum class ControlMode
 	:uint32_t {
-		Test = 0, Trapezium = 1, PID = 2
+		None , Trapezium , PID ,Error
 };
 
 void SwitchControlMode(ControlMode _mode);

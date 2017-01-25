@@ -1,9 +1,9 @@
 #include <HoleSensor.hpp>
 #include <INT.hpp>
-#include <xport.hpp>
 #include <configuration.hpp>
 #include <bits.hpp>
 #include <math.h>
+#include <XPort.hpp>
 
 namespace Device {
 namespace HoleSensor {

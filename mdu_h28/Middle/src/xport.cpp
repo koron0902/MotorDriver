@@ -1,9 +1,9 @@
-#include <XPort.hpp>
 #include <USB.hpp>
 #include <Uart.hpp>
 #include <simple_buffer.hpp>
 #include <error.hpp>
 #include <ring_buffer.hpp>
+#include <XPort.hpp>
 
 using namespace Device;
 using namespace common;

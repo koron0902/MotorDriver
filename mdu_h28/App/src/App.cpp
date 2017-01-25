@@ -12,8 +12,8 @@
 #include <PIDControl.hpp>
 #include <Trapezium.hpp>
 #include <Timer.hpp>
-#include <XPort.hpp>
 #include <error.hpp>
+#include <XPort.hpp>
 
 #define forever() for(;;)
 

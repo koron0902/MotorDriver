@@ -23,7 +23,8 @@ enum class MotorType:uint32_t {
 	DCMotor=1,
 	BLDCWithSensor=2,		//ホールセンサで駆動するモード
 	BLDCWithoutSensor=3,	//コンパレータで
-	BLDCWtihAmp=4			//電流センサーで駆動する
+	BLDCWtihAmp=4,			//電流センサーで駆動する
+	Error,//末尾
 };
 
 
@@ -34,7 +35,7 @@ void Free();
 
 void SwitchMotorType(MotorType);
 MotorType GetMotorType();
-constexpr const char* const GetName(MotorType);
+ const char* const GetName(MotorType);
 
 
 }
