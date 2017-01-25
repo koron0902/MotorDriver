@@ -29,7 +29,7 @@ const uint8_t PriorityUart=0xAF;
 
 //周期
 const uint32_t CyclePWM	= 30_KHz;
-const uint32_t CycleControl = 15_KHz;
+const uint32_t CycleControl = 10_KHz;
 const uint32_t Divider=CyclePWM/CycleControl;
 
 }

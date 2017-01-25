@@ -3,6 +3,7 @@
 #include <QEISub.hpp>
 #include <configuration.hpp>
 #include <Port.hpp>
+#include <bits.hpp>
 #define __USED __attribute__((used))
 
 using namespace std;
@@ -13,13 +14,10 @@ namespace QEI {
 
 static QEI_T* QEI = (QEI_T*) LPC_QEI_BASE;
 static callback_t Handler = nullptr;
-//static constexpr uint32_t FilterFrequency=1_MHz;//デジタルフィルタの周波数
-//static constexpr uint32_t MeasureFrequency=100_Hz;//速度を計測する周波数
 volatile uint32_t* QEIVel;
 
-void WaitForZero(volatile uint32_t* reg) {
-	while (*reg != 0)
-		;
+static void WaitForZero(volatile uint32_t* reg) {
+	while (*reg != 0);
 }
 
 void Init() {
@@ -37,17 +35,18 @@ void Init() {
 	//while(QEI->CAP != 0);
 	WaitForZero(&(QEI->CAP));
 	QEIVel = &(QEI->CAP);
+
 }
 
 void SetTimer(uint32_t clock) {
-	QEI->LOAD = (/*(double)*/SystemCoreClock / clock) + 1;
+	QEI->LOAD = (SystemCoreClock /clock)+1;
 }
 
 void SetFilter(uint32_t clock) {
 	QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = clock;
 }
 
-uint32_t GetPosition(){
+uint32_t GetPosition() {
 	return QEI->POS;
 }
 
@@ -55,17 +54,17 @@ uint32_t GetVelcoity() {
 	return QEI->CAP;
 }
 
-std::string GetPulseName(){
-	constexpr auto mark=[](bool f)->char{
+std::string GetPulseName() {
+	constexpr auto mark = [](bool f)->char {
 		return f?'1':'0';
 	};
 
-	bool x=Port::QEI_X.Get();
-	bool y=Port::QEI_Y.Get();
+	bool x = Port::QEI_X.Get();
+	bool y = Port::QEI_Y.Get();
 	//bool z=Port::QEI_Z.Get();
 	string s;
-	s+=mark(x);
-	s+=mark(y);
+	s += mark(x);
+	s += mark(y);
 	//s+=mark(z);
 	return s;
 }
@@ -73,7 +72,7 @@ std::string GetPulseName(){
 void SetHandler(const callback_t& func, uint8_t Priority) {
 	if (func != nullptr) {
 		NVIC_DisableIRQ(QEI_IRQn);
-		Handler=func;
+		Handler = func;
 		NVIC_SetPriority(QEI_IRQn, Priority);
 		NVIC_EnableIRQ(QEI_IRQn);
 	} else {
@@ -81,16 +80,14 @@ void SetHandler(const callback_t& func, uint8_t Priority) {
 	}
 }
 
-extern "C"
-void  QEI_IRQHandler(){
-	if (Handler!=nullptr){
+extern "C" void QEI_IRQHandler() {
+	if (Handler != nullptr) {
 		Handler();
-	}else{
+	} else {
 		//呼ばれることがすでにおかしい
 		NVIC_DisableIRQ(QEI_IRQn);
 	}
 }
-
 
 }
 }

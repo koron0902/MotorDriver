@@ -149,8 +149,8 @@ void BLDCMotorWithSensor::SetDuty(fix32 duty) {
 	// モータ始動用に現在の位置から出力を決定する。
 	state.SetDirection(s);
 	if (duty.GetRaw() != 0) {
-		state.operator ()(HoleSensor::GetState());
 		state.SetEnable(true);
+		PWM::SetSignal(PWM::Pulse::WV_WU);//適当に値を入れる
 		PWM::SetDuty(q);
 	}else{
 		state.SetEnable(false);
