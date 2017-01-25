@@ -22,6 +22,16 @@ Directory* Create() {
 	mid->Add(CreateTrap());
 	mid->Add(CreatePID());
 	mid->Add(CreateSwitch());
+
+	//今の状態について
+	mid->Add(CreateReadOnlyProperty("type",[](){
+		return Motor::GetMotorTypeName();
+	}));
+
+	mid->Add(CreateReadOnlyProperty("mode",[](){
+		return Controller::GetModeName();
+	}));
+
 	return mid;
 }
 
