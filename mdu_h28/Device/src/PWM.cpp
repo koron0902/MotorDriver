@@ -120,32 +120,5 @@ void SCT1_IRQHandler(void) {
 	}
 }
 
-Pulse InvertSignal(Pulse mode){
-	Pulse invSig;
-	switch(mode){
-		case Pulse::UV:
-			invSig = Pulse::VU;
-			break;
-		case Pulse::UW:
-			invSig = Pulse::WU;
-			break;
-		case Pulse::VU:
-			invSig = Pulse::UV;
-			break;
-		case Pulse::VW:
-			invSig = Pulse::WV;
-			break;
-		case Pulse::WU:
-			invSig = Pulse::UW;
-			break;
-		case Pulse::WV:
-			invSig = Pulse::VW;
-			break;
-		default:
-			invSig = mode;
-	}
-	return invSig;
-}
-
 }
 }

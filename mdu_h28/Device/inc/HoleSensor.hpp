@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <stdint.h>
+#include <fix.hpp>
 
 namespace Device {
 namespace HoleSensor {
@@ -36,6 +37,8 @@ const char* const GetName(HoleStatus);
 static inline const char* const GetStateName(){
 	return GetName(GetState());
 }
+
+common::fix32 GetRad(HoleStatus);
 
 }
 } /* namespace mid */

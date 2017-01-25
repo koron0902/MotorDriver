@@ -28,7 +28,7 @@ void DCMotor::Free() {
 
 void DCMotor::Lock() {
 	using namespace PWM;
-	SetSignal(Pulse::CB_CA);
+	SetSignal(Pulse::WV_WU);
 	SetDutyRaw(0);
 }
 
@@ -81,23 +81,17 @@ static inline constexpr PWM::Pulse next(HoleSensor::HoleStatus data) {
 	using namespace PWM;
 	switch (data) {
 	case HoleStatus::U:
-		//return Pulse::AC;
 		return Pulse::UW;
 	case HoleStatus::W:
-		//return Pulse::BC;
 		return Pulse::VW;
 	case HoleStatus::UW:
-		//return Pulse::BA;
 		return Pulse::VU;
 	case HoleStatus::V:
-		//return Pulse::AB;
 		return Pulse::UV;
 	case HoleStatus::VU:
-		//return Pulse::CB;
 		return Pulse::WV;
 	case HoleStatus::VW:
-		//return Pulse::BC;
-		return Pulse::VW;
+		return Pulse::WV;
 	case HoleStatus::None:
 	default:
 		return PWM::Pulse::None;
@@ -139,7 +133,7 @@ void BLDCMotorWithSensor::Free() {
 void BLDCMotorWithSensor::Lock() {
 	using namespace PWM;
 	SetDutyRaw(0);
-	SetSignal(Pulse::CB_CA);
+	SetSignal(Pulse::WV_WU);
 }
 
 void BLDCMotorWithSensor::SetDuty(fix32 duty) {

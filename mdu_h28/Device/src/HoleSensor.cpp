@@ -3,6 +3,8 @@
 #include <xport.hpp>
 #include <configuration.hpp>
 #include <bits.hpp>
+#include <math.h>
+
 namespace Device {
 namespace HoleSensor {
 
@@ -69,5 +71,29 @@ const char* const GetName(HoleStatus s) {
 		return "Error";
 	}
 }
+
+common::fix32 GetRad(HoleStatus s) {
+	static constexpr double R=M_PI/3;
+	switch (s) {
+	case HoleStatus::U:
+		return fix32::CreateDouble(R*0);
+	case HoleStatus::UV:
+		return fix32::CreateDouble(R*1);
+	case HoleStatus::V:
+		return fix32::CreateDouble(R*2);
+	case HoleStatus::VW:
+		return fix32::CreateDouble(R*3);
+	case HoleStatus::W:
+		return fix32::CreateDouble(R*4);
+	case HoleStatus::WU:
+		return fix32::CreateDouble(R*5);
+	case HoleStatus::Open:
+	case HoleStatus::None:
+	default:
+		return fix32::CreateRaw(0);
+	}
+
+}
+
 }
 } /* namespace mid */

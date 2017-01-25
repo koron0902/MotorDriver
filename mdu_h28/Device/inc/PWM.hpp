@@ -18,17 +18,17 @@ namespace PWM {
 enum class Pulse
 	:uint32_t {
 	UV = 0b0110,
-	AB_CB = 0b0101,
+	UV_WV = 0b0101,
 	WV = 0b0100,
-	CB_CA = 0b1101,
+	WV_WU = 0b1101,
 	WU = 0b1100,
-	CA_BA = 0b1001,
+	WU_VU = 0b1001,
 	VU = 0b1000,
-	BA_BC = 0b1011,
+	VU_VW = 0b1011,
 	VW = 0b1010,
-	BC_AC = 0b0011,
+	VW_UW = 0b0011,
 	UW = 0b0010,
-	AC_AB = 0b0111,
+	UW_UV = 0b0111,
 	Align = 0b1110,
 	Stop = 0b0000,
 	Halt = Stop,
@@ -46,7 +46,6 @@ void SetSignal(Pulse);
 void SetHandler(const common::callback_t&);
 
 
-Pulse InvertSignal(Pulse);
 
 
 
