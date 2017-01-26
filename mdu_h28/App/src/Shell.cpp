@@ -1,6 +1,6 @@
 #include <Bin.hpp>
 #include <Dev.hpp>
-#include <Mid.hpp>
+#include <EntryMiddle.hpp>
 #include <Shell.hpp>
 #include <XPort.hpp>
 using namespace std;
@@ -24,7 +24,7 @@ void Init() {
 	current = root = Directory::Create("root");
 	root->Add(bin = Bin::Create());
 	root->Add(Dev::Create());
-	root->Add(Mid::Create());
+	root->Add(Middle::Create());
 	path.push_back(bin);
 }
 

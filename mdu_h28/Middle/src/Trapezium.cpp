@@ -8,7 +8,7 @@
 #include <Motor.hpp>
 #include <Trapezium.hpp>
 #include <Port.hpp>
-
+#if 0
 namespace Middle {
 	namespace Controller {
 		Trapezium::MotorInfo_t Trapezium::mMotorState;
@@ -53,3 +53,4 @@ namespace Middle {
 
 	} /* namespace Controller */
 } /* namespace Middle */
+#endif

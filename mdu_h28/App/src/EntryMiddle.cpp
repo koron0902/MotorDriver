@@ -1,20 +1,21 @@
-#include <Mid.hpp>
+#include <Control.hpp>
 #include <Motor.hpp>
 #include <text.hpp>
 #include <DRV.hpp>
+#include <EntryMiddle.hpp>
 #include <Trapezium.hpp>
 #include <PIDControl.hpp>
-#include <ControllerBase.hpp>
 #include <type.hpp>
 #include<File.hpp>
 #include <XPort.hpp>
 
+#include <EntryControl.h>
 using namespace Middle;
 using namespace App::File;
 using namespace common;
 
 namespace App {
-namespace Mid {
+namespace Middle {
 Directory* Create() {
 	auto *mid = Directory::Create("mid");
 	mid->Add(CreateBasic());
@@ -29,8 +30,10 @@ Directory* Create() {
 	}));
 
 	mid->Add(CreateReadOnlyProperty("mode",[](){
-		return Controller::GetModeName();
+		return Control::GetModeName();
 	}));
+
+	mid->Add(CreateControl());
 
 	return mid;
 }
@@ -43,17 +46,19 @@ Directory* CreateDRV() {
 
 Directory* CreateTrap() {
 	auto* trap = Directory::Create("trap");
+#if 0
 	trap->Add(
 			File::Fix::Create("tDuty",
-					&(Controller::Trapezium::mMotorState.mTargetDuty)));
+					&(Control::Trapezium::mMotorState.mTargetDuty)));
 	trap->Add(
 			File::Fix::Create("nDuty",
-					&(Controller::Trapezium::mMotorState.mLastDuty)));
+					&(Control::Trapezium::mMotorState.mLastDuty)));
 	trap->Add(
 			File::Fix::Create("step",
-					&(Controller::Trapezium::mMotorState.mStep)));
+					&(Control::Trapezium::mMotorState.mStep)));
 
 	return trap;
+#endif
 }
 
 Directory* CreatePID() {
@@ -131,7 +136,7 @@ File::FileBase* CreateSwitch() {
 					}
 					//モーターの制御方法に関する出力
 					{
-						using namespace Controller;
+						using namespace Control;
 						const int begin =(int)ControlMode::None;
 						const int end=(int)ControlMode::Error;
 						bool flag=false;
@@ -165,7 +170,7 @@ File::FileBase* CreateSwitch() {
 							value=0;
 						}
 						if((*it) == "-c") {
-							Controller::SwitchControlMode((Controller::ControlMode)value);
+							Control::SwitchControlMode((Control::ControlMode)value);
 						} else if((*it) == "-m") {
 							Motor::SwitchMotorType((Motor::MotorType)value);
 						}else{

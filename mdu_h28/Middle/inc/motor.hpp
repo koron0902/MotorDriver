@@ -35,7 +35,12 @@ void Free();
 
 void SwitchMotorType(MotorType);
 MotorType GetMotorType();
- const char* const GetName(MotorType);
+const char* const GetName(MotorType);
+
+static inline const char * const GetMotorTypeName(){
+	return GetName(GetMotorType());
+}
+
 
 
 }

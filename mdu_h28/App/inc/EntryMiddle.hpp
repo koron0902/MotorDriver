@@ -6,7 +6,7 @@
 
 
 namespace App {
-namespace Mid{
+namespace Middle{
 File::Directory* Create();
 
 File::Directory* CreateDRV();

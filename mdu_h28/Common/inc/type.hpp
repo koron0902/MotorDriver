@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+
 //よく使うテンプレートクラスを実体化する。
 extern template class std::vector<std::string>;
 extern template class std::vector<uint8_t>;

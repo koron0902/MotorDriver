@@ -84,6 +84,9 @@ public:
 	//virtual std::string operator()(std::vector<std::string>&);
 };
 
+static inline Directory* CreateDirectory(const std::string& name){
+	return Directory::Create(name);
+}
 
 extern Directory *root, *current;
 

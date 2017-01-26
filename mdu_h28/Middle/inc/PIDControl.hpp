@@ -8,11 +8,11 @@
 #ifndef MIDDLE_INC_PIDCONTROL_HPP_
 #define MIDDLE_INC_PIDCONTROL_HPP_
 
+#include <Control.hpp>
 #include <fix.hpp>
 #include <unit.hpp>
 #include <text.hpp>
-#include <ControllerBase.hpp>
-
+#if 0
 namespace Middle{
 	namespace Controller{
 		using namespace common;
@@ -75,6 +75,6 @@ private:
 		};
 	}
 }
-
+#endif
 
 #endif /* MIDDLE_INC_PIDCONTROL_HPP_ */

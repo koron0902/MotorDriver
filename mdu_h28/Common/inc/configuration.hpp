@@ -32,8 +32,10 @@ extern const uint8_t PriorityUSB;
 
 //制御周期
 extern const uint32_t CyclePWM;//PWM周期
-extern const uint32_t CycleControl;//制御周期
+extern const uint32_t CycleControlDefault;//制御周期
 extern const uint32_t Divider;//調整用分周器
+
+
 
 }
 

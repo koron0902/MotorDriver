@@ -118,7 +118,7 @@ void Init() {
 	Chip_ADC_EnableSequencer(LPC_ADC1, ADC_SEQA_IDX);
 
 	//周期的に呼び出されるようにTimerに登録する。
-	Timer::SetAction(2,TriggerRate,Trigger);
+//	Timer::SetAction(2,TriggerRate,Trigger);//TODO タイマーに登録すること
 
 }
 

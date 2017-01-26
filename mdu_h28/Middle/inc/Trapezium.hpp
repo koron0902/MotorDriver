@@ -7,8 +7,8 @@
 
 #ifndef MIDDLE_INC_TRAPEZIUM_HPP_
 #define MIDDLE_INC_TRAPEZIUM_HPP_
-
-#include <ControllerBase.hpp>
+#if 0
+#include <Control.hpp>
 #include <stdint.h>
 #include <fix.hpp>
 #include <unit.hpp>
@@ -41,5 +41,5 @@ namespace Middle {
 		};
 	}
 }
-
+#endif
 #endif /* MIDDLE_INC_TRAPEZIUM_HPP_ */

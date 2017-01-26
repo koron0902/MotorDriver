@@ -27,7 +27,7 @@ void Init() {
 	QEI->MAXPOS = 40;
 	QEI->SIGMODE = 0;
 	//QEI->LOAD = 0xFFFFFFFF - ((0xFFFFFFFF) * (1.0 * 30_KHz / SystemCoreClock));
-	SetTimer(CycleControl);
+	SetTimer(CycleControlDefault);
 	//QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = 500;
 	SetFilter(0);
 	QEI->CAPMODE = true;

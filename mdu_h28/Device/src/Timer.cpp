@@ -1,7 +1,7 @@
 #include <chip.hpp>
 #include <Timer.hpp>
 #include <array>
-
+#include <configuration.hpp>
 using namespace std;
 
 namespace Device {
@@ -18,19 +18,66 @@ void Init() {
 		Chip_MRT_SetDisabled(Chip_MRT_GetRegPtr(ch));
 		lstAction[ch] = nullptr;
 	}
-
 	ResetSystemTimer();
 	//Allow interrupt by timer
 	NVIC_EnableIRQ(MRT_IRQn);
 }
 
+void SetHandler(const callback_t& callback, TimerID id, uint32_t period) {
+	uint32_t n = (uint32_t) id;
+	auto* p = Chip_MRT_GetRegPtr(n);
+	lstAction[n] = callback;
+	if (callback != nullptr) {
+		Chip_MRT_SetDisabled(p); //一回動作を止める。
+		Chip_MRT_SetInterval(p, period | MRT_INTVAL_LOAD); //強制書き換え
+		Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
+		Chip_MRT_SetEnabled(p);
+	} else {
+		Chip_MRT_SetDisabled(p);
+	}
+}
+
+void SetHandler(callback_t&& callback, TimerID id, uint32_t period) {
+	uint32_t n = (uint32_t) id;
+	auto* p = Chip_MRT_GetRegPtr(n);
+	lstAction[n] = move(callback);
+	if (callback != nullptr) {
+		Chip_MRT_SetDisabled(p); //一回動作を止める。
+		Chip_MRT_SetInterval(p, period | MRT_INTVAL_LOAD); //強制書き換え
+		Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
+		Chip_MRT_SetEnabled(p);
+	} else {
+		Chip_MRT_SetDisabled(p);
+	}
+}
+
+void KillHandler(TimerID id) {
+	uint32_t n = (uint32_t) id;
+	auto* p = Chip_MRT_GetRegPtr(n);
+	//実際に無効化する
+	Chip_MRT_SetDisabled(p);
+	lstAction[n] = nullptr;
+}
+
+void ChangePeriod(TimerID id, uint32_t period) {
+	uint32_t n = (uint32_t) id;
+	auto* p = Chip_MRT_GetRegPtr(n);
+	bool boot=lstAction[n]!=nullptr;
+	//周期を変更
+	Chip_MRT_SetInterval(p, period | MRT_INTVAL_LOAD); //強制書き換え
+	Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
+	if (boot){
+		Chip_MRT_SetEnabled(p);
+	}
+}
+#if 0
 void SetAction(uint8_t ch, uint32_t hz, const function<void(void)>& action) {
 	//hzに0を入れる馬鹿はいないと信じている。
 	auto* p = Chip_MRT_GetRegPtr(ch);
 	lstAction[ch] = action;
 	if (action != nullptr) {
 		Chip_MRT_SetDisabled(p); //一回動作を止める。
-		Chip_MRT_SetInterval(p, (SystemCoreClock / hz) | MRT_INTVAL_LOAD); //強制書き換え
+		Chip_MRT_SetInterval(p, (SystemCoreClock / hz) | MRT_INTVAL_LOAD);//強制書き換え
 		Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
 		Chip_MRT_SetEnabled(p);
 	} else {
@@ -44,13 +91,14 @@ void SetAction(uint8_t ch, uint32_t hz, function<void(void)> && action) {
 	//lstAction[ch]=move(action);
 	if ((lstAction[ch] = move(action)) != nullptr) {
 		Chip_MRT_SetDisabled(p); //一回動作を止める。
-		Chip_MRT_SetInterval(p, (SystemCoreClock / hz) | MRT_INTVAL_LOAD); //強制書き換え
+		Chip_MRT_SetInterval(p, (SystemCoreClock / hz) | MRT_INTVAL_LOAD);//強制書き換え
 		Chip_MRT_SetMode(p, MRT_MODE_REPEAT);
 		Chip_MRT_SetEnabled(p);
 	} else {
 		Chip_MRT_SetDisabled(p);
 	}
 }
+#endif
 
 void ResetSystemTimer() {
 	Chip_RIT_Disable(LPC_RITIMER);
@@ -80,8 +128,7 @@ extern "C" void MRT_IRQHandler(void) {
 	for (int ch = 0; ch < MRT_CHANNELS_NUM; ch++) {
 		if (int_pend & MRTn_INTFLAG(ch)) {
 			auto& func = lstAction[ch];
-			if (func != nullptr)
-				func();
+			if (func != nullptr) func();
 		}
 	}
 }
