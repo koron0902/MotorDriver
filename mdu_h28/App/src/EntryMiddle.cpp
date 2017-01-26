@@ -21,7 +21,7 @@ Directory* Create() {
 	mid->Add(CreateBasic());
 	mid->Add(CreateDRV());
 	mid->Add(CreateTrap());
-	mid->Add(CreatePID());
+
 	mid->Add(CreateSwitch());
 
 	//今の状態について
@@ -56,17 +56,11 @@ Directory* CreateTrap() {
 	trap->Add(
 			File::Fix::Create("step",
 					&(Control::Trapezium::mMotorState.mStep)));
-
-	return trap;
 #endif
+	return trap;
+
 }
 
-Directory* CreatePID() {
-	auto* pid = Directory::Create("pid");
-	//pid->Add(File::Fix::Create("duty", &(Controller::PID::LastDuty)));
-
-	return pid;
-}
 
 Directory* CreateBasic() {
 	auto* basic = Directory::Create("basic");
