@@ -131,22 +131,22 @@ namespace Middle {
 				 * https://toshiba.semicon-storage.com/jp/design-support/e-learning/brushless_motor/chap4/1274636.html
 				 */
 					case HoleStatus::U:
-						nextSignal = PWM::Signal::CB;
-						break;
-					case HoleStatus::UV:
 						nextSignal = PWM::Signal::CA;
 						break;
-					case HoleStatus::V:
+					case HoleStatus::UV:
 						nextSignal = PWM::Signal::BA;
 						break;
-					case HoleStatus::VW:
+					case HoleStatus::V:
 						nextSignal = PWM::Signal::BC;
 						break;
-					case HoleStatus::W:
+					case HoleStatus::VW:
 						nextSignal = PWM::Signal::AC;
 						break;
-					case HoleStatus::WU:
+					case HoleStatus::W:
 						nextSignal = PWM::Signal::AB;
+						break;
+					case HoleStatus::WU:
+						nextSignal = PWM::Signal::CB;
 						break;
 					case HoleStatus::None:
 						break;
@@ -190,13 +190,13 @@ namespace Middle {
 			q32_t q = a.GetRaw() << 16;
 			auto s = sign(c);
 
-			HoleSensor::SetDirection(!s);
+			HoleSensor::SetDirection(s);
 			// モータ始動用に現在の位置から出力を決定する。
 			uint32_t data=0;
 			data |= Port::HoleU.Get()?0b001:0;
 			data |= Port::HoleV.Get()?0b010:0;
 			data |= Port::HoleW.Get()?0b100:0;
-			HallSensorCallBack((HoleSensor::HoleStatus)data, !s);
+			HallSensorCallBack((HoleSensor::HoleStatus)data, s);
 
 			PWM::SetDuty(q);
 		}

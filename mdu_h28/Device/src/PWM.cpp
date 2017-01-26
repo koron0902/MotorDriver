@@ -80,22 +80,22 @@ Signal InvertSignal(Signal mode){
 	Signal invSig;
 	switch(mode){
 		case Signal::AB:
-			invSig = Signal::BA;
-			break;
-		case Signal::AC:
 			invSig = Signal::CA;
 			break;
-		case Signal::BA:
-			invSig = Signal::AB;
-			break;
-		case Signal::BC:
+		case Signal::AC:
 			invSig = Signal::CB;
 			break;
-		case Signal::CA:
+		case Signal::BA:
 			invSig = Signal::AC;
 			break;
-		case Signal::CB:
+		case Signal::BC:
+			invSig = Signal::AB;
+			break;
+		case Signal::CA:
 			invSig = Signal::BC;
+			break;
+		case Signal::CB:
+			invSig = Signal::BA;
 			break;
 		default:
 			invSig = mode;
