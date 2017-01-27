@@ -27,7 +27,7 @@ Timer3,
 void Init();
 //割り込みハンドラに関する関数
 void SetHandler(const callback_t& callback,TimerID id,uint32_t period);
-void SetHandler(callback_t&& callback,TimerID id,uint32_t period);
+//void SetHandler(callback_t&& callback,TimerID id,uint32_t period);
 void KillHandler(TimerID id);
 void ChangePeriod(TimerID id,uint32_t period);
 //void SetAction(uint8_t ch,uint32_t hz,const std::function<void(void)>& action=nullptr);

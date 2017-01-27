@@ -22,7 +22,7 @@ enum class FileType
 
 class FileBase {
 public:
-	static constexpr uint32_t MaxNumber = 64; //ファイルの最大数
+	static constexpr uint32_t MaxNumber =128; //ファイルの最大数
 	static constexpr size_t MaxSize = 32; //派生先を含むクラスの最大サイズ[Byte]
 	static constexpr size_t MaxText=256;//ファイルシステムで使う文字列の合計数[Byte]
 private:

@@ -20,8 +20,9 @@ extern const uint8_t PriorityADC;
 //システム系
 extern const uint8_t PriorityDRVFault;
 extern const uint8_t PrioritySysTick;
-//角度制御
+//角度制御(制御に必ず必要なもの)
 extern const uint8_t PriorityHoleSensor;
+extern const uint8_t PriorityQEI;
 //周期制御
 extern const uint8_t PriorityControl;
 

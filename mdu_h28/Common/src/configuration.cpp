@@ -20,12 +20,12 @@ const uint8_t PriorityDRVFault=0x0E;
 const uint8_t PrioritySysTick=0x0F;
 //角度制御関係
 const uint8_t PriorityHoleSensor=0x10;
+const uint8_t PriorityQEI=0x11;
 //周期制御
 const uint8_t PriorityControl=0x20;
 //通信系
 const uint8_t PriorityUSB=0xA0;
 const uint8_t PriorityUart=0xAF;
-
 
 //周期
 const uint32_t CyclePWM	= 30_KHz;

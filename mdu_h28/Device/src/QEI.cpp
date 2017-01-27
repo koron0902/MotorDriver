@@ -4,6 +4,7 @@
 #include <configuration.hpp>
 #include <Port.hpp>
 #include <bits.hpp>
+#include <Timer.hpp>
 #define __USED __attribute__((used))
 
 using namespace std;
@@ -13,18 +14,43 @@ namespace Device {
 namespace QEI {
 
 static QEI_T* QEI = (QEI_T*) LPC_QEI_BASE;
-static callback_t Handler = nullptr;
-volatile uint32_t* QEIVel;
+static callback_t Handler;
+static void SetTimer(uint32_t clock);
+
+static int64_t position; //速度の積分と思ってほしい。
+static int64_t velcoity;
 
 static void WaitForZero(volatile uint32_t* reg) {
-	while (*reg != 0);
+	while (*reg != 0)
+		;
+}
+
+static inline void Reset() {
+	QEI->RESP = true;
+	QEI->RESPI = true;
+	QEI->RESV = true;
+	QEI->RESI = true;
+}
+
+void QEI_Handler() {
+	bool dir = QEI->DIR;
+	int32_t value = QEI->POS;
+
+	if (dir) {
+		value=-(~value+1);
+	}
+	position += value;
+	velcoity = value;
+
+	QEI->RESP = true;
 }
 
 void Init() {
 	//clock supply
 	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_QEI);
 	Chip_SYSCTL_PeriphReset(RESET_QEI0);
-	QEI->MAXPOS = 40;
+	Reset();
+	QEI->MAXPOS = UINT32_MAX;
 	QEI->SIGMODE = 0;
 	//QEI->LOAD = 0xFFFFFFFF - ((0xFFFFFFFF) * (1.0 * 30_KHz / SystemCoreClock));
 	SetTimer(CycleControlDefault);
@@ -32,26 +58,45 @@ void Init() {
 	SetFilter(0);
 	QEI->CAPMODE = true;
 	QEI->CON = 0b1111;
-	//while(QEI->CAP != 0);
-	WaitForZero(&(QEI->CAP));
-	QEIVel = &(QEI->CAP);
 
+	position = 0;
+	velcoity = 0;
+
+	Timer::SetHandler(QEI_Handler, Timer::TimerID::Timer3,
+			SystemCoreClock / CycleControlDefault);
+	//Interrupt Setting
+	/*
+	 NVIC_DisableIRQ(QEI_IRQn);
+	 QEI->IE.DIR = true;
+	 QEI->IE.MAXPOS=true;
+
+	 Handler = nullptr;
+	 NVIC_SetPriority(QEI_IRQn, PriorityQEI);
+	 NVIC_EnableIRQ(QEI_IRQn);
+	 */
 }
 
-void SetTimer(uint32_t clock) {
-	QEI->LOAD = (SystemCoreClock /clock)+1;
+static void SetTimer(uint32_t clock) {
+	QEI->LOAD = (SystemCoreClock / clock) + 1;
 }
 
 void SetFilter(uint32_t clock) {
 	QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = clock;
 }
 
-uint32_t GetPosition() {
-	return QEI->POS;
+bool GetDirection() {
+	return QEI->DIR;
 }
 
-uint32_t GetVelcoity() {
-	return QEI->CAP;
+int64_t GetPosition() {
+	return position;
+}
+int32_t GetPositionRaw() {
+	return GetDirection() ? QEI->POS : -QEI->POS;
+}
+
+int32_t GetVelcoity() {
+	return velcoity;
 }
 
 std::string GetPulseName() {
@@ -68,26 +113,18 @@ std::string GetPulseName() {
 	//s+=mark(z);
 	return s;
 }
-
-void SetHandler(const callback_t& func, uint8_t Priority) {
-	if (func != nullptr) {
-		NVIC_DisableIRQ(QEI_IRQn);
-		Handler = func;
-		NVIC_SetPriority(QEI_IRQn, Priority);
-		NVIC_EnableIRQ(QEI_IRQn);
-	} else {
-		NVIC_DisableIRQ(QEI_IRQn);
-	}
-}
-
-extern "C" void QEI_IRQHandler() {
-	if (Handler != nullptr) {
-		Handler();
-	} else {
-		//呼ばれることがすでにおかしい
-		NVIC_DisableIRQ(QEI_IRQn);
-	}
-}
+/*
+ void SetHandler(const callback_t& func, uint8_t Priority) {
+ if (func != nullptr) {
+ NVIC_DisableIRQ(QEI_IRQn);
+ Handler = func;
+ NVIC_SetPriority(QEI_IRQn, Priority);
+ NVIC_EnableIRQ(QEI_IRQn);
+ } else {
+ NVIC_DisableIRQ(QEI_IRQn);
+ }
+ }
+ */
 
 }
 }

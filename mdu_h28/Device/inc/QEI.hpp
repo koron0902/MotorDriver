@@ -24,11 +24,14 @@ void SetFilter(uint32_t clock);
 
 
 void SetPosition(uint32_t);
-uint32_t GetPosition();
-uint32_t GetIndex();
+int32_t GetPositionRaw();
+int64_t GetPosition();
+int32_t GetIndex();
+int32_t GetVelcoity();
 
-void SetTimer(uint32_t clock);
-uint32_t GetVelcoity();
+
+
+
 
 //extern volatile uint32_t* QEIVel;
 

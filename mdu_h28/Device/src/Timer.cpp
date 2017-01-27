@@ -36,7 +36,7 @@ void SetHandler(const callback_t& callback, TimerID id, uint32_t period) {
 		Chip_MRT_SetDisabled(p);
 	}
 }
-
+/*
 void SetHandler(callback_t&& callback, TimerID id, uint32_t period) {
 	uint32_t n = (uint32_t) id;
 	auto* p = Chip_MRT_GetRegPtr(n);
@@ -50,7 +50,7 @@ void SetHandler(callback_t&& callback, TimerID id, uint32_t period) {
 		Chip_MRT_SetDisabled(p);
 	}
 }
-
+*/
 void KillHandler(TimerID id) {
 	uint32_t n = (uint32_t) id;
 	auto* p = Chip_MRT_GetRegPtr(n);

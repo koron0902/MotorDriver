@@ -138,7 +138,13 @@ public:
 
 };
 
+//テキスト用動的メモリ
+template <size_t size>class TextPool{
+	char buffer[size];
 
+
+
+};
 
 } /* namespace common */
 
