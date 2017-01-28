@@ -19,6 +19,7 @@ namespace QEI{
 
 
 void Init();
+void Init(uint32_t clock);
 void DirInv(bool dir=false);
 bool GetDirection();
 
@@ -32,7 +33,8 @@ uint32_t GetIndex();
 
 void SetTimer(uint32_t clock);
 uint32_t GetVelcoity();
-
+int32_t GetPulseCount();
+void EnableInt();
 extern volatile uint32_t* QEIVel;
 
 }
