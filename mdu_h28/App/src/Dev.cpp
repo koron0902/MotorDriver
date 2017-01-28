@@ -15,8 +15,7 @@ Directory* Create() {
 	Directory* dir = Directory::Create("dev");
 	dir->Add(CreateUart());
 	dir->Add(CreateADC());
-
-	dir->Add(File::Integer::Create("qei", (int32_t*)QEI::QEIVel));
+	dir->Add(CreateQEI());
 	return dir;
 }
 
@@ -62,6 +61,25 @@ File::Directory* CreateADC() {
 
 	return dir;
 }
+
+File::Directory* CreateQEI(){
+	auto* qei = Directory::Create("qei");
+
+	qei->Add(File::CreateExecute("count", [](text_iterator, text_iterator)->int{
+		Middle::XPort::WriteLine(common::ToStr(QEI::GetPulseCount()));
+
+		return 0;
+	}));
+
+	qei->Add(File::CreateExecute("dir", [](text_iterator, text_iterator)->int{
+		Middle::XPort::WriteLine(common::ToStr((uint32_t)QEI::GetDirection()));
+		return 0;
+	}));
+
+	return qei;
+}
+
+
 
 }
 } /* namespace Device */
