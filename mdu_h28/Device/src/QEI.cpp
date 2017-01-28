@@ -113,21 +113,23 @@ namespace Device {
 			while(*reg != 0);
 		}
 
-		void Init() {
+		void Init(uint32_t clock){
 			//clock supply
 			Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_QEI);
 			Chip_SYSCTL_PeriphReset(RESET_QEI0);
 			QEI->MAXPOS = 40;
 			QEI->SIGMODE = 0;
-			//QEI->LOAD = 0xFFFFFFFF - ((0xFFFFFFFF) * (1.0 * 30_KHz / SystemCoreClock));
-			SetTimer(10000);
-			//QEI->FILTERINX = QEI->FILTERPHA = QEI->FILTERPHB = 500;
+			SetTimer(clock);
 			SetFilter(0);
 			QEI->CAPMODE = true;
 			QEI->CON = 0b1111;
 			//while(QEI->CAP != 0);
 			WaitForZero(&(QEI->CAP));
 			QEIVel = &(QEI->CAP);
+		}
+
+		void Init() {
+			Init(10000);
 		}
 
 		void SetTimer(uint32_t clock){
@@ -142,6 +144,21 @@ namespace Device {
 			return QEI->CAP;
 		}
 
+		bool GetDirection(){
+			return QEI->DIR == 0 ? false: true;
+		}
+
+		int32_t GetPulseCount(){
+			return GetDirection() ? -GetVelcoity() : GetVelcoity();
+		}
+
+		void EnableInt(){
+
+		}
+
+		extern "C" void QEI_IRQHandler(void){
+
+		}
 	}
 }
 
