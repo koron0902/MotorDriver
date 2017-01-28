@@ -23,7 +23,7 @@ namespace Middle {
 			//ICを1PWMモードに変更する
 			DRV::Init();
 			//制御法を設定する。
-			SwitchMotorType(Type::DCMotor);
+			SwitchMotorType(Type::BLDCWithSensor);
 		}
 
 		void ModeAs(Type t) {

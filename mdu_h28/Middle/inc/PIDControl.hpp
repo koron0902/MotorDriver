@@ -30,7 +30,7 @@ namespace Middle{
 			static constexpr float FREQUENCY_DEFAULT = 10_KHz;
 			static constexpr float GEAR_RATE_DEFAULT = 1;
 			static constexpr float RADIUS_DEFAULT = 1;
-			static constexpr float ENCODER_RESOLUTION_DEFAULT = 400;
+			static constexpr float ENCODER_RESOLUTION_DEFAULT = 4000;
 			static constexpr float K_P_DEFAULT = 0.02819;
 			static constexpr float K_I_DEFAULT = 0.00242;
 			static constexpr float K_D_DEFAULT = 0;

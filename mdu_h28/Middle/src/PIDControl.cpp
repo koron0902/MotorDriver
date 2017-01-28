@@ -28,6 +28,7 @@ namespace Middle{
 				mKe(K_E_DEFAULT){
 			CallProc = [this](){
 				this->Proc(mLastState, mNextState);
+				mLastState = mNextState;
 			};
 
 			//Device::Port::Set(Device::Port::PWMEN, true);
@@ -43,8 +44,6 @@ namespace Middle{
 		void PID::Proc(MotorState_t& last, MotorState_t& next){
 			static const float gains[] = {mKp, mKi, mKd, mKe};
 			static const Matrix<float, 1, 4> GainMatrix(gains);
-			//for(int i = 0;i < 4;i++)
-				//GainMatrix(0, i) = gains[i];
 			static Matrix<float, 4, 1> in_vector;
 
 
@@ -52,9 +51,9 @@ namespace Middle{
 			static const auto Volt2Duty = 4096 * 6.25f / (BatteryVoltage / 16);
 			static const auto Pulse2RPS = (float)mFreq / mEncoderResolution;
 
-			next.mRealSpeed = Device::QEI::GetVelcoity() * Pulse2RPS;
+			next.mRealSpeed = -Device::QEI::GetPulseCount() * Pulse2RPS;
 
-			next.mTargetSpeed = next.mRealSpeed;
+			next.mTargetSpeed = 70;//next.mRealSpeed;
 			static const auto error = next.mTargetSpeed - next.mRealSpeed;
 			static auto integ = last.mIntegration + error;
 			static constexpr auto min = -10.0f ;//<< fix32::shift;
@@ -78,8 +77,6 @@ namespace Middle{
 			next.mDuty = duty;
 
 			Middle::Motor::SetDuty(regions::one.Fit(fix32::CreateFloat(duty)));
-			last = next;
-			LastDuty = last.mDuty;
 		}
 
 		void PID::SetFreq(fix32 freq){
