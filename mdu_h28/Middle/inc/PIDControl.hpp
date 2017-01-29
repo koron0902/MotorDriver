@@ -31,8 +31,8 @@ namespace Middle{
 			static constexpr float GEAR_RATE_DEFAULT = 1;
 			static constexpr float RADIUS_DEFAULT = 1;
 			static constexpr float ENCODER_RESOLUTION_DEFAULT = 4090;
-			static constexpr float K_P_DEFAULT = 0.09830;
-			static constexpr float K_I_DEFAULT = 0.01427;
+			static constexpr float K_P_DEFAULT = 0.09414;
+			static constexpr float K_I_DEFAULT = 0.00897;
 			static constexpr float K_D_DEFAULT = 0.005;
 			static constexpr float K_E_DEFAULT = 60 / 285;	// モータの速度定数の逆数[V/rps]
 public:

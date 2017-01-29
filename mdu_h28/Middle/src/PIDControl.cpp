@@ -47,15 +47,15 @@ namespace Middle{
 			static Matrix<float, 4, 1> in_vector;
 
 
-			static const auto BatteryVoltage = (float)Device::ADC::GetVolt() * 100;
-			static const auto Volt2Duty = 4096 * 6.25f / (BatteryVoltage / 16);
-			static const auto Pulse2RPS = (float)mFreq / mEncoderResolution;
+			auto BatteryVoltage = (float)Device::ADC::GetVolt() * 100;
+			auto Volt2Duty = 4096 * 6.25f / (BatteryVoltage / 16);
+			auto Pulse2RPS = (float)mFreq / mEncoderResolution;
 
 			next.mRealSpeed = -Device::QEI::GetPulseCount() * Pulse2RPS;
 
 			next.mTargetSpeed = 30;//next.mRealSpeed;
-			static const auto error = next.mTargetSpeed - next.mRealSpeed;
-			static auto integ = last.mIntegration + error;
+			auto error = next.mTargetSpeed - next.mRealSpeed;
+			auto integ = last.mIntegration + error;
 			static constexpr auto min = -150.0f ;//<< fix32::shift;
 			static constexpr auto max = 150.0f;// << fix32::shift;
 			integ = (integ < min ? min : (integ > max ? max : integ));
