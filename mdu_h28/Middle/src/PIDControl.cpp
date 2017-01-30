@@ -53,7 +53,7 @@ namespace Middle{
 
 			next.mRealSpeed = -Device::QEI::GetPulseCount() * Pulse2RPS;
 
-			next.mTargetSpeed = 30;//next.mRealSpeed;
+			//next.mTargetSpeed = 30;//next.mRealSpeed;
 			auto error = next.mTargetSpeed - next.mRealSpeed;
 			auto integ = last.mIntegration + error;
 			static constexpr auto min = -150.0f ;//<< fix32::shift;

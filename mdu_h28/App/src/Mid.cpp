@@ -86,7 +86,11 @@ File::FileBase* CreateLock(){
 
 File::FileBase* CreateSwitch(){
 	return CreateExecute("switch", [](text_iterator begin, text_iterator end)->int{
-		if(std::distance(begin, end) <= 2){
+		uint32_t index;
+		cmdParser.Parse(begin, end - 1); // 構文解析
+
+		// 引数なしで叩かれた場合にはヘルプを表示
+		if(cmdParser.IsOptionNull()){
 			std::string comment = "";
 			comment += "switch [-c controller_type] | [-m motor_type]\n";
 			comment += " -c | controller mode\n";
@@ -99,13 +103,14 @@ File::FileBase* CreateSwitch(){
 			return 0;
 		}
 
-		begin++;
-		if((*begin) == "-c"){
-			begin++;
-			XPort::WriteLine(Controller::SwitchControlMode((Controller::ControlMode_e)common::ToInt32(*begin)));
-		}else if((*begin) == "-m"){
-			begin++;
-			XPort::WriteLine(Motor::SwitchMotorType((Motor::Type)common::ToInt32(*begin)));
+		// -cオプションが存在した場合にはコントローラの変更
+		if(cmdParser.Search("-c", &index)){
+			XPort::WriteLine(Controller::SwitchControlMode((Controller::ControlMode_e)common::ToInt32(cmdParser.GetOptionArg(index))));
+		}
+
+		// -mオプションが存在した場合にはモータタイプを変更
+		if(cmdParser.Search("-m", &index)){
+			XPort::WriteLine(Motor::SwitchMotorType((Motor::Type)common::ToInt32(cmdParser.GetOptionArg(index))));
 		}
 		return 0;
 	});
