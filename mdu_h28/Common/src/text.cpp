@@ -293,4 +293,69 @@ bool IsOptionPattern(const std::string& text) {
 	return true;
 }
 
+CmdParser cmdParser;
+
+CmdParser::CmdParser(){
+	this->Clear();
+}
+
+bool CmdParser::Parse(text_iterator begin, text_iterator end){
+	this->Clear();
+
+	if(*begin ==  "")
+		return false;
+
+	this->cmd = *begin;
+
+	while(begin != end){
+		begin++;
+		if(IsOptionPattern(*begin)){
+			this->option[this->len++] = *begin;
+			if(begin == end)
+				break;
+			if(!IsOptionPattern(*(begin + 1))){
+				begin++;
+				this->value[this->len - 1] = *begin;
+			}
+		}
+	}
+	return true;
+}
+
+bool CmdParser::Search(const std::string& opt, uint32_t* index){
+	if(index == nullptr)
+		return false;
+	if(opt == "")
+		return false;
+	if(IsEnd(*(opt.begin())))
+		return false;
+	if(this->option[0] == "")
+		return false;
+
+	for(uint i = 0; i < OptionSize; i++){
+		if(option[i] == opt){
+			*index = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+void CmdParser::Clear(){
+	this->cmd = "";
+	this->len = 0;
+	for(uint i = 0; i < OptionSize; i++){
+		this->option[i] = "";
+		this->value[i] = "";
+	}
+}
+
+bool CmdParser::IsOptionNull(){
+	return (this->len == 0);
+}
+
+const std::string CmdParser::GetOptionArg(uint32_t index){
+	return this->value[index];
+}
+
 } /* namespace common */

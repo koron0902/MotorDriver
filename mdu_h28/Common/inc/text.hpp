@@ -56,6 +56,23 @@ namespace common {
 	  * '-'C#
 	 */
 
+	class CmdParser{
+	private:
+		static constexpr uint32_t OptionSize = 16;
+		std::string cmd;
+		std::string option[OptionSize];
+		std::string value[OptionSize];
+		uint32_t len;
+	public:
+		CmdParser();
+		virtual ~CmdParser() = default;
+		bool Parse(text_iterator begin, text_iterator);
+		bool Search(const std::string&, uint32_t* index = nullptr);
+		void Clear();
+		bool IsOptionNull();
+		const std::string GetOptionArg(uint32_t index = 0);
+	};
+	extern CmdParser cmdParser;
 
 } /* namespace common */
 
