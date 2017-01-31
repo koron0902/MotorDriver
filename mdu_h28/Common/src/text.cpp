@@ -75,7 +75,7 @@ string ToStr(int64_t value) {
 
 std::string ToStr(fix32 value) {
 	constexpr static int32_t d[]{(1 << 16) / 10, (1 << 16) / 100, (1 << 16)
-			/ 1000, (1 << 16) / 10000 };
+			/ 1000, (1 << 16) / 10000 , (1 << 16) / 100000, (1 << 16) / 1000000};
 
 	int32_t num, point;
 	fix32 a = abs(value);
@@ -84,7 +84,7 @@ std::string ToStr(fix32 value) {
 
 	string ans = ToStr(num) + ".";
 	uint idx;
-	for (idx = 0; idx < 4 - 1; idx++) {
+	for (idx = 0; idx < 6 - 1; idx++) {
 		ans += ToChar(point / d[idx]);
 		point %= d[idx];
 	}

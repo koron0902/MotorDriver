@@ -25,25 +25,17 @@ namespace Middle {
 			CallProc = nullptr;
 			this->count = 0;
 			this->time = _time;
-			this->speed = _speed;
 
-			this->mPID.SetTargetSpeed(_speed / 2);
+			this->mPID.SetTargetSpeed(_speed);
 
 			CallProc = [this]()->auto{
-				std::string out = "";
 				this->count++;
 				if(this->count > (this->time * (float)(this->mFreq) / 1000 * 3.0)){
 					StopImpulse();
-				}else if((this->count) > (this->time * (float)(this->mFreq) / 1000 * 1.5)){
+				}else if((this->count) > (this->time * (float)(this->mFreq) / 1000)){
 					this->mPID.SetTargetSpeed(0);
-				}else if((this->count) > (this->time * (float)(this->mFreq) / 1000 * 1.25)){
-					this->mPID.SetTargetSpeed(this->speed / 2);
-				}else if(this->count > (this->time * (float)(this->mFreq) / 1000 * 0.5)){
-					this->mPID.SetTargetSpeed(this->speed);
 				}
 				this->mPID();
-
-				XPort::WriteLine(out);
 			};
 		}
 

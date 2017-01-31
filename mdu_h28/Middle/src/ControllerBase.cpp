@@ -58,7 +58,7 @@ namespace Middle {
 					ImpulseGenerator* generator = new ImpulseGenerator();
 					Device::Port::Set(Device::Port::PWMEN, true);
 					Middle::Motor::SwitchMotorType(Middle::Motor::Type::BLDCWithSensor);
-					generator->Generate(40, 100);
+					generator->Generate(50, 200);
 					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, generator->GetFreq(), std::move(*generator));
 					generator->StartImpulse();
 					retStr = "Succeeded in switching impulse generator";

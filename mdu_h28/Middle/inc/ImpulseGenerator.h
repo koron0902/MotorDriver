@@ -20,7 +20,6 @@ namespace Middle {
 			PID mPID;
 			uint64_t count;
 			uint64_t time;
-			float speed;
 			static bool enable;
 		public:
 			ImpulseGenerator();
