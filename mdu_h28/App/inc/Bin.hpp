@@ -31,6 +31,7 @@ File::FileBase* CreateRepeat();
 File::FileBase* CreateTest();
 File::FileBase* CreateReboot();
 File::FileBase* CreateDelay();
+File::FileBase* CreateMkfs();
 }
 } /* namespace Device */
 

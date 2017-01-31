@@ -322,20 +322,18 @@ uint32_t vcom_write(const uint8_t *pBuf, uint32_t len) {
 }
 
 /* Mass storage device init routine */
-ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
-		USBD_API_INIT_PARAM_T *pUsbParam) {
+ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc, USBD_API_INIT_PARAM_T *pUsbParam){
 	USBD_MSC_INIT_PARAM msc_param;
 	ErrorCode_t ret = LPC_OK;
 
 	/* init MSC params */
 	msc_param.mem_base = pUsbParam->mem_base;
 	msc_param.mem_size = pUsbParam->mem_size;
-	msc_param.intf_desc = (uint8_t*) find_IntfDesc(pDesc->high_speed_desc,
-	USB_DEVICE_CLASS_STORAGE);
+	msc_param.intf_desc = (uint8_t*) find_IntfDesc(pDesc->high_speed_desc, USB_DEVICE_CLASS_STORAGE);
 	msc_param.InquiryStr = MSC_SCSI_InquiryString;
-	msc_param.BlockCount = 8;
+	msc_param.BlockCount = 32;
 	msc_param.BlockSize = 512;
-	msc_param.MemorySize = 4096;
+	msc_param.MemorySize = 16384;
 	/* user defined functions */
 	msc_param.MSC_Write = msc_write;
 	msc_param.MSC_Read = msc_read;
@@ -346,40 +344,60 @@ ErrorCode_t msc_init(USBD_HANDLE_T hUsb, USB_CORE_DESCS_T *pDesc,
 	return ret;
 }
 
-void msc_write(uint32_t offset, uint8_t** src, uint32_t length,
-		uint32_t high_offset) {
+void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_offset){
 	//TODO: msc write stub
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Write(offset, *src, length * sizeof(uint8_t));
+
+	uint8_t* tmp;
+	uint8_t buf[256];
+
+	for(uint32_t i = 0; i * 256 < length; i++){
+		tmp = (uint8_t*)((uint32_t)0x0003C000+(offset&0xFFFFFF00)+i*0x100);
+		memcpy(buf, tmp, 256); //copy page data
+		if(offset%0x100+length-i*0x100>=0x100){
+			if(i==0) memcpy(&buf[offset%256], *src, (256-(offset%256))*sizeof(uint8_t)); //insert source data
+			else memcpy(buf, *src+(256-offset%256)+256*(i-1), 256*sizeof(uint8_t));
+		}else{
+			if(i==0) memcpy(&buf[offset%256], *src, length*sizeof(uint8_t)); //insert source data
+			else memcpy(buf, *src+(256-offset%256)+256*(i-1), ((length-256*(i-1))-(offset%256))*sizeof(uint8_t));
+		}
+
+		Chip_IAP_PreSectorForReadWrite(0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000, 0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000);
+		Chip_IAP_ErasePage(0x3C0+((offset&0xFFFFFF00)+i*0x100)/0x100, 0x3C0+((offset&0xFFFFFF00)+i*0x100)/0x100);
+		Chip_IAP_PreSectorForReadWrite(0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000, 0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000);
+		Chip_IAP_CopyRamToFlash(0x0003C000+((offset&0xFFFFFF00)+i*0x100),(uint32_t*)buf,256);
+	}
+
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
-
 }
 
-void msc_read(uint32_t offset, uint8_t** dst, uint32_t length,
-		uint32_t high_offset) {
+void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_offset){
 	//TODO: msc read stub
+	void* src;
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Read(offset, *dst, length * sizeof(uint8_t));
+
+	src = (void*)((uint32_t)0x0003C000+offset);
+	memcpy(*dst, src, length*sizeof(uint8_t));
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
 }
 
-ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length,
-		uint32_t high_offset) {
+ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length, uint32_t high_offset){
 	//TODO msc verify stub
 	uint8_t tmp[length];
+	void* src;
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	Chip_EEPROM_Read(offset, tmp, length * sizeof(uint8_t));
+
+	src = (void*)((uint32_t)0x0003C000+offset);
+	memcpy(tmp, src, length*sizeof(uint8_t));
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
-	if (memcmp(buf, tmp, length * sizeof(uint8_t)) == 0)
-		return LPC_OK;
-	else
-		return ERR_FAILED;
+	if(memcmp(buf, tmp, length*sizeof(uint8_t))==0) return LPC_OK;
+	else return ERR_FAILED;
 }
 
 bool IsConnected() {

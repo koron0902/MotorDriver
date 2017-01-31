@@ -32,6 +32,7 @@ Directory* Create() {
 	bin->Add(CreateTest());
 	bin->Add(CreateReboot());
 	bin->Add(CreateDelay());
+	bin->Add(CreateMkfs());
 	return bin;
 }
 
@@ -325,5 +326,16 @@ File::FileBase* CreateDelay() {
 
 			});
 }
+
+File::FileBase* CreateMkfs(){
+	return File::CreateExecute("mkfs", [](text_iterator, text_iterator)->auto{
+		uint8_t work[1024];
+		Chip_IAP_PreSectorForReadWrite(0x3C,0x3F);
+		Chip_IAP_EraseSector(0x3C,0x3F);
+		Middle::FatFs::f_mkfs("0", (FM_FAT | FM_SFD), 0, work, 1024);
+		return 0;
+	});
+}
+
 }
 } /* namespace Device */
