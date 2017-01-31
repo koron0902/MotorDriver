@@ -18,6 +18,7 @@ File::FileBase* CreateSwitch();
 File::FileBase* CreateDuty();
 File::FileBase* CreateFree();
 File::FileBase* CreateLock();
+File::FileBase* CreateParam();
 
 }
 } /* namespace App */
