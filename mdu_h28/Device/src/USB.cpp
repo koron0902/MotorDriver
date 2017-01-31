@@ -336,30 +336,11 @@ void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_of
 	//TODO: msc write stub
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	/*
-	if(length<256){ //small length (64, 128)
-		uint8_t* tmp;
-		uint8_t buf[256];
-		tmp = (uint8_t*)((uint32_t)0x0003C000+(offset&0xFFFFFF00));
-		memcpy(buf, tmp, 256); //copy page data
-		memcpy(&buf[offset%256], *src, length*sizeof(uint8_t)); //insert source data
-		//Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
-		Chip_IAP_PreSectorForReadWrite(0x3C+(offset&0xFFFFFF00)/0x1000, 0x3C+(offset+length-1)/0x1000);
-		Chip_IAP_ErasePage(0x3C0+(offset&0xFFFFFF00)/0x100, 0x3C0+((offset+length-1)&0xFFFFFF00)/0x100);
-		Chip_IAP_PreSectorForReadWrite(0x3C+(offset&0xFFFFFF00)/0x1000, 0x3C+(offset+length-1)/0x1000);
-		Chip_IAP_CopyRamToFlash(0x0003C000+(offset&0xFFFFFF00),(uint32_t*)buf,256);
-	}else{ //large length(256, 512, 1024)
-		//Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
-		Chip_IAP_PreSectorForReadWrite(0x3C+offset/0x1000, 0x3C+(offset+length-1)/0x1000);
-		Chip_IAP_ErasePage(0x3C0+(offset&0xFFFFFF00)/0x100, 0x3C0+((offset+length-1)&0xFFFFFF00)/0x100);
-		Chip_IAP_PreSectorForReadWrite(0x3C+offset/0x1000, 0x3C+(offset+length-1)/0x1000);
-		Chip_IAP_CopyRamToFlash(0x0003C000+offset,(uint32_t*)*src,length*sizeof(uint8_t));
-	}
-	*/
+
 	uint8_t* tmp;
 	uint8_t buf[256];
-	Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
-	for(uint32_t i=0;i*256<length;i++){
+
+	for(uint32_t i = 0; i * 256 < length; i++){
 		tmp = (uint8_t*)((uint32_t)0x0003C000+(offset&0xFFFFFF00)+i*0x100);
 		memcpy(buf, tmp, 256); //copy page data
 		if(offset%0x100+length-i*0x100>=0x100){
@@ -369,12 +350,13 @@ void msc_write(uint32_t offset, uint8_t** src, uint32_t length, uint32_t high_of
 			if(i==0) memcpy(&buf[offset%256], *src, length*sizeof(uint8_t)); //insert source data
 			else memcpy(buf, *src+(256-offset%256)+256*(i-1), ((length-256*(i-1))-(offset%256))*sizeof(uint8_t));
 		}
-		//Chip_EEPROM_Write(offset, *src, length*sizeof(uint8_t));
+
 		Chip_IAP_PreSectorForReadWrite(0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000, 0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000);
 		Chip_IAP_ErasePage(0x3C0+((offset&0xFFFFFF00)+i*0x100)/0x100, 0x3C0+((offset&0xFFFFFF00)+i*0x100)/0x100);
 		Chip_IAP_PreSectorForReadWrite(0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000, 0x3C+((offset&0xFFFFFF00)+i*0x100)/0x1000);
 		Chip_IAP_CopyRamToFlash(0x0003C000+((offset&0xFFFFFF00)+i*0x100),(uint32_t*)buf,256);
 	}
+
 	/* exit critical section */
 	NVIC_EnableIRQ(USB0_IRQn);
 }
@@ -384,8 +366,7 @@ void msc_read(uint32_t offset, uint8_t** dst, uint32_t length, uint32_t high_off
 	void* src;
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	//Chip_EEPROM_Read(offset, *dst, length*sizeof(uint8_t));
-	//Chip_IAP_PreSectorForReadWrite(0x3C+offset/0x1000, 0x3C+(offset+length)/0x1000);
+
 	src = (void*)((uint32_t)0x0003C000+offset);
 	memcpy(*dst, src, length*sizeof(uint8_t));
 	/* exit critical section */
@@ -398,8 +379,7 @@ ErrorCode_t msc_verify(uint32_t offset, uint8_t buf[], uint32_t length, uint32_t
 	void* src;
 	/* enter critical section */
 	NVIC_DisableIRQ(USB0_IRQn);
-	//Chip_EEPROM_Read(offset, tmp, length*sizeof(uint8_t));
-	//Chip_IAP_PreSectorForReadWrite(0x3C+offset/0x1000, 0x3C+(offset+length)/0x1000);
+
 	src = (void*)((uint32_t)0x0003C000+offset);
 	memcpy(tmp, src, length*sizeof(uint8_t));
 	/* exit critical section */

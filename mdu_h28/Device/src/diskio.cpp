@@ -129,8 +129,9 @@ DRESULT disk_write (
 		//result = RAM_disk_write(buff, sector, count);
 
 		// translate the reslut code here
-		if(sector+count>32)return RES_PARERR;
-		USB::msc_write((uint32_t)512*sector, (uint8_t**)&buff, (uint32_t)512*count, 0);
+		if(sector+count>32)
+			return RES_PARERR;
+		Device::USB::msc_write((uint32_t)512*sector, (uint8_t**)&buff, (uint32_t)512*count, 0);
 
 		return RES_OK;
 
