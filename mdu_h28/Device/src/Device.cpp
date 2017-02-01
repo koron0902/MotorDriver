@@ -22,6 +22,7 @@ void Init(){
 	Tick::Init();
 	//Each Function Initialize
 	Port::Init();
+	USB::Init();
 
 	Storage::Init();
 	Timer::Init();
@@ -29,7 +30,6 @@ void Init(){
 	Uart::Init();
 	QEI::Init(1000);
 	ADC::Init();
-	USB::Init();
 	SPI::Init();
 	INT::Init();
 

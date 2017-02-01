@@ -45,7 +45,8 @@ namespace Middle {
 		enum class ControlMode_e:uint32_t{
 			ModeTest = 0,
 			ModeTrapezium = 1,
-			ModePID = 2
+			ModePID = 2,
+			ModeImpulse = 3
 		};
 		extern ControlMode_e mMode;
 		std::string SwitchControlMode(ControlMode_e _mode);

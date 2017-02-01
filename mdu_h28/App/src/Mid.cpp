@@ -43,7 +43,7 @@ Directory* CreateTrap(){
 Directory* CreatePID(){
 	auto* pid = Directory::Create("pid");
 	//pid->Add(File::Fix::Create("duty", &(Controller::PID::LastDuty)));
-
+	pid->Add(CreateParam());
 	return pid;
 }
 
@@ -87,6 +87,7 @@ File::FileBase* CreateLock(){
 File::FileBase* CreateSwitch(){
 	return CreateExecute("switch", [](text_iterator begin, text_iterator end)->int{
 		uint32_t index;
+
 		cmdParser.Parse(begin, end - 1); // 構文解析
 
 		// 引数なしで叩かれた場合にはヘルプを表示
@@ -94,11 +95,11 @@ File::FileBase* CreateSwitch(){
 			std::string comment = "";
 			comment += "switch [-c controller_type] | [-m motor_type]\n";
 			comment += " -c | controller mode\n";
-			comment += "   0: test, 1: trapeziom, 2: pid\n";
+			comment += "   0: test, 1: trapeziom, 2: pid, 3: impulse\n";
 			comment += " -m | motor type\n";
 			comment += "   0: none, 1: DC, 2: BLDC(Hall-Sensor)\n";
 			comment += "ex. switch -c 0 | change to test mode";
-			//XPort::WriteLine("switch [-c controller_type] | [-m motor_type]\n -c | controller mode\n   0: test, 1: trapeziom, 2: pid\n -m | motor type\n   0: none, 1: DC, 2: BLDC(Hall-Sensor)\nex. switch -c 0 | change to test mode");
+
 			XPort::WriteLine(comment);
 			return 0;
 		}
@@ -111,6 +112,52 @@ File::FileBase* CreateSwitch(){
 		// -mオプションが存在した場合にはモータタイプを変更
 		if(cmdParser.Search("-m", &index)){
 			XPort::WriteLine(Motor::SwitchMotorType((Motor::Type)common::ToInt32(cmdParser.GetOptionArg(index))));
+		}
+
+		return 0;
+	});
+}
+
+File::FileBase* CreateParam(){
+	return CreateExecute("param", [](text_iterator begin, text_iterator end)->auto{
+		uint32_t index;
+		cmdParser.Parse(begin, end - 1);
+		if(cmdParser.IsOptionNull()){
+			XPort::WriteLine("Option Null");
+			return 0;
+		}
+
+		if(cmdParser.Search("-s", &index) && cmdParser.Search("-g", &index)){
+
+		}else if(cmdParser.Search("-s", &index)){
+			if(cmdParser.Search("-p", &index)){
+				Controller::PID::SetGainP(common::ToFloat(cmdParser.GetOptionArg(index)));
+			}
+
+			if(cmdParser.Search("-i", &index)){
+				Controller::PID::SetGainI(common::ToFloat(cmdParser.GetOptionArg(index)));
+			}
+
+			if(cmdParser.Search("-d", &index)){
+				Controller::PID::SetGainD(common::ToFloat(cmdParser.GetOptionArg(index)));
+			}
+
+			if(cmdParser.Search("-speed", &index)){
+				Controller::PID::SetTargetSpeed(common::ToFloat(cmdParser.GetOptionArg(index)));
+			}
+
+		}else if(cmdParser.Search("-g", &index)){
+			if(cmdParser.Search("-p", &index)){
+				XPort::WriteLine(Controller::PID::GetGainP());
+			}
+
+			if(cmdParser.Search("-i", &index)){
+				XPort::WriteLine(Controller::PID::GetGainI());
+			}
+
+			if(cmdParser.Search("-d", &index)){
+				XPort::WriteLine(Controller::PID::GetGainD());
+			}
 		}
 		return 0;
 	});

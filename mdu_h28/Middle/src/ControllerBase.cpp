@@ -8,6 +8,7 @@
 #include <ControllerBase.hpp>
 #include <Trapezium.hpp>
 #include <PIDControl.hpp>
+#include <ImpulseGenerator.h>
 #include <Timer.hpp>
 #include <motor.hpp>
 #include <Port.hpp>
@@ -52,6 +53,15 @@ namespace Middle {
 					Controller::PID::Reset();
 					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, pid->GetFreq(), std::move(*pid));
 					retStr = "Succeeded in switching pid control";
+					break;
+				}case ControlMode_e::ModeImpulse:{
+					ImpulseGenerator* generator = new ImpulseGenerator();
+					Device::Port::Set(Device::Port::PWMEN, true);
+					Middle::Motor::SwitchMotorType(Middle::Motor::Type::BLDCWithSensor);
+					generator->Generate(50, 200);
+					Device::Timer::SetAction(ControllerBase::mControllerTaskPriority, generator->GetFreq(), std::move(*generator));
+					generator->StartImpulse();
+					retStr = "Succeeded in switching impulse generator";
 					break;
 				}default :{
 					return "No such as control mode";

@@ -19,21 +19,21 @@ namespace Middle{
 		class PID: public ControllerBase{
 		private:
 			//fix32 mFreq;
-			float mGearRate;	// モータ側 /　タイヤ側
-			float mRadius;		// タイヤ半径
-			float mEncoderResolution;	// エンコーダの分解能 [ppr]
-			float mKp;	// 比例ゲイン
-			float mKi;	// 積分ゲイン
-			float mKd;	// 微分ゲイン
-			float mKe;	// 逆起電力ゲイン
+			static float mGearRate;	// モータ側 /　タイヤ側
+			static float mRadius;		// タイヤ半径
+			static float mEncoderResolution;	// エンコーダの分解能 [ppr]
+			static float mKp;	// 比例ゲイン
+			static float mKi;	// 積分ゲイン
+			static float mKd;	// 微分ゲイン
+			static float mKe;	// 逆起電力ゲイン
 
-			static constexpr float FREQUENCY_DEFAULT = 10_KHz;
+			static constexpr float FREQUENCY_DEFAULT = 1_KHz;
 			static constexpr float GEAR_RATE_DEFAULT = 1;
 			static constexpr float RADIUS_DEFAULT = 1;
 			static constexpr float ENCODER_RESOLUTION_DEFAULT = 4090;
 			static constexpr float K_P_DEFAULT = 0.09414;
-			static constexpr float K_I_DEFAULT = 0.00897;
-			static constexpr float K_D_DEFAULT = 0.005;
+			static constexpr float K_I_DEFAULT = 0;//0.00897;
+			static constexpr float K_D_DEFAULT = 0.001;
 			static constexpr float K_E_DEFAULT = 60 / 285;	// モータの速度定数の逆数[V/rps]
 public:
 			struct MotorState_t{
@@ -62,16 +62,16 @@ private:
 				mNextState = mLastState = reset;
 			}
 
-			void SetGainP(fix32 p);
-			void SetGainP(float p);
-			void SetGainI(fix32 i);
-			void SetGainI(float i);
-			void SetGainD(fix32 d);
-			void SetGainD(float d);
-			void SetGearRate(fix32 g);
-			void SetGearRate(uint32_t g);
-			void SetTargetSpeed(fix32 speed);
-			void SetTargetSpeed(float speed);
+			static void SetGainP(float p);
+			static void SetGainI(float i);
+			static void SetGainD(float d);
+			static void SetGearRate(float g);
+			static void SetTargetSpeed(float speed);
+			static std::string GetGainP();
+			static std::string GetGainI();
+			static std::string GetGainD();
+			static std::string GetGearRate();
+			static std::string GetSpeed();
 		};
 	}
 }
