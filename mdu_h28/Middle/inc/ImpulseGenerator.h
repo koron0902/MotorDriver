@@ -11,6 +11,9 @@
 #include <ControllerBase.hpp>
 #include <PIDControl.hpp>
 #include <stdint.h>
+#include <CSVGenerator.hpp>
+#include <string>
+#include <xport.hpp>
 
 namespace Middle {
 	namespace Controller {
@@ -20,8 +23,10 @@ namespace Middle {
 			PID mPID;
 			uint64_t count;
 			uint64_t time;
-			static bool enable;
+			std::string buf;
+			float speed;
 		public:
+			static bool enable;
 			ImpulseGenerator();
 			ImpulseGenerator(const ImpulseGenerator&) = default;
 			virtual ~ImpulseGenerator();
@@ -30,14 +35,13 @@ namespace Middle {
 			static void StopImpulse();
 
 			void operator ()(void){
-				if(!enable)
+				if(!enable && count == 0)
 					return;
+				else if(!enable && count != 0)
+					CallProc = nullptr;
 
 				if(CallProc)
 					CallProc();
-
-				if(!enable)
-					CallProc = nullptr;
 			}
 		};
 
