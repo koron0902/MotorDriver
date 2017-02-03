@@ -5,6 +5,8 @@
 #include <Trapezium.hpp>
 #include <PIDControl.hpp>
 #include <ControllerBase.hpp>
+#include <ImpulseGenerator.h>
+#include <CSVGenerator.hpp>
 #include <type.hpp>
 #include<File.hpp>
 #include <xport.hpp>
@@ -22,6 +24,7 @@ Directory* Create(){
 	mid->Add(CreateTrap());
 	mid->Add(CreatePID());
 	mid->Add(CreateSwitch());
+	mid->Add(CreateImpulse());
 	return mid;
 }
 
@@ -107,6 +110,7 @@ File::FileBase* CreateSwitch(){
 		// -cオプションが存在した場合にはコントローラの変更
 		if(cmdParser.Search("-c", &index)){
 			XPort::WriteLine(Controller::SwitchControlMode((Controller::ControlMode_e)common::ToInt32(cmdParser.GetOptionArg(index))));
+
 		}
 
 		// -mオプションが存在した場合にはモータタイプを変更
@@ -158,6 +162,42 @@ File::FileBase* CreateParam(){
 			if(cmdParser.Search("-d", &index)){
 				XPort::WriteLine(Controller::PID::GetGainD());
 			}
+		}
+		return 0;
+	});
+}
+File::FileBase* CreateImpulse(){
+	return CreateExecute("impulse", [](text_iterator begin, text_iterator end)->auto{
+		uint32_t index;
+		float speed = 0;
+		uint64_t time = 0;
+		std::string path;
+		//path.reserve(32);
+		cmdParser.Parse(begin, end - 1);
+		// impulse -generate -t 300 -rps 30 -out aaa
+
+
+		if(cmdParser.Search("-gen", &index)){
+			if(cmdParser.Search("-rps", &index))
+				speed = common::ToFloat(cmdParser.GetOptionArg(index));
+			if(cmdParser.Search("-t", &index))
+				time = common::ToInt64(cmdParser.GetOptionArg(index));
+			if(cmdParser.Search("-o", &index))
+				path = cmdParser.GetOptionArg(index);
+			XPort::WriteLine(common::ToStrF(speed) + "," + common::ToStr(time) + "," + path);
+			Controller::ImpulseGenerator* generator = new Controller::ImpulseGenerator();
+			generator->Generate(speed != 0 ? speed : 0,
+								time != 0 ? time : 0,
+								path != "" ? path : "impulseinput");
+			Controller::SwitchControlMode(Controller::ControlMode_e::ModeImpulse);
+		}
+		if(cmdParser.Search("-start", &index)){
+			Middle::CSV::Init();
+			Middle::CSV::Add2Buf(",Target[rps],Real[rps]\n");
+			Controller::SwitchControlMode(Controller::ControlMode_e::ModeTest);
+			Controller::SwitchControlMode(Controller::ControlMode_e::ModeImpulse);
+			Controller::ImpulseGenerator* generator = new Controller::ImpulseGenerator();
+			generator->StartImpulse();
 		}
 		return 0;
 	});

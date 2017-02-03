@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <qmath.hpp>
 #include <token.hpp>
+#include <xport.hpp>
 using namespace std;
 
 namespace common {
@@ -297,6 +298,10 @@ CmdParser cmdParser;
 
 CmdParser::CmdParser(){
 	this->Clear();
+	for(uint i = 0;i < this->OptionSize; i++){
+		this->option[i].reserve(16);
+		this->value[i].reserve(16);
+	}
 }
 
 bool CmdParser::Parse(text_iterator begin, text_iterator end){
@@ -318,6 +323,9 @@ bool CmdParser::Parse(text_iterator begin, text_iterator end){
 				this->value[this->len - 1] = *begin;
 			}
 		}
+	}
+	for(uint i = 0;i < this->len; i++){
+		Middle::XPort::WriteLine(this->option[i] + "," + this->value[i]);
 	}
 	return true;
 }
@@ -342,11 +350,11 @@ bool CmdParser::Search(const std::string& opt, uint32_t* index){
 }
 
 void CmdParser::Clear(){
-	this->cmd = "";
+	this->cmd.clear();
 	this->len = 0;
 	for(uint i = 0; i < OptionSize; i++){
-		this->option[i] = "";
-		this->value[i] = "";
+		this->option[i].clear();
+		this->value[i].clear();
 	}
 }
 

@@ -20,25 +20,31 @@ namespace Middle {
 
 		class ImpulseGenerator: public ControllerBase {
 		private:
-			PID mPID;
-			uint64_t count;
-			uint64_t time;
-			std::string buf;
-			float speed;
+			static PID mPID;
+			static uint64_t count;
+			static uint64_t time;
+			static std::string buf;
+			static float speed;
+			static std::string path;
+			static bool createCSV;
 		public:
 			static bool enable;
 			ImpulseGenerator();
 			ImpulseGenerator(const ImpulseGenerator&) = default;
 			virtual ~ImpulseGenerator();
-			void Generate(float _speed = 0, uint64_t _time = 0);
+			void Dummy(){
+				this->Generate(speed, time, path);
+			}
+			void Generate(float _speed = 0, uint64_t _time = 0, const std::string& _path = "impulse");
 			static void StartImpulse();
 			static void StopImpulse();
 
 			void operator ()(void){
 				if(!enable && count == 0)
 					return;
-				else if(!enable && count != 0)
+				else if(!enable && count != 0){
 					CallProc = nullptr;
+				}
 
 				if(CallProc)
 					CallProc();

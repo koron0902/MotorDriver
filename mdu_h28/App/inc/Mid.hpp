@@ -19,6 +19,7 @@ File::FileBase* CreateDuty();
 File::FileBase* CreateFree();
 File::FileBase* CreateLock();
 File::FileBase* CreateParam();
+File::FileBase* CreateImpulse();
 
 }
 } /* namespace App */

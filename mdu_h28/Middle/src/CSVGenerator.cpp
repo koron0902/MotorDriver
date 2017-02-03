@@ -9,6 +9,7 @@
 #include <ff.hpp>
 #include <string>
 #include <xport.hpp>
+#include <Port.hpp>
 
 namespace Middle{
 	namespace CSV{
@@ -19,6 +20,7 @@ namespace Middle{
 		constexpr uint32_t MaxSize = 10240;
 
 		void Init(){
+			buf.clear();
 			buf.reserve(MaxSize);
 		}
 
@@ -30,15 +32,13 @@ namespace Middle{
 
 		void Generate(const std::string& _path){
 			std::string path = "0:/" + _path + ".csv";
-			XPort::WriteLine("Create Work Space");
 			FatFs::f_mount(&mFatFs, "0:", 0);
-			XPort::WriteLine("Create " + path);
 			FatFs::f_open(&mFil, path.c_str(), FA_CREATE_ALWAYS | FA_WRITE);
-			XPort::WriteLine("Write to");
 			FatFs::f_write(&mFil, buf.c_str(), buf.length(), &bw);
-			XPort::WriteLine("Write Completed");
 			FatFs::f_close(&mFil);
 			FatFs::f_mount(NULL, "0:", 0);
+			XPort::WriteLine(_path + ".csv is generated");
+			Device::Port::Set(Device::Port::LED2, false);
 		}
 	}
 }
