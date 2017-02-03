@@ -20,7 +20,7 @@ namespace Middle {
 
 		protected:
 			fix32 mFreq;
-			static constexpr fix32 FREQ_DEFAULT = (10_KHz << fix32::shift);
+			static constexpr fix32 FREQ_DEFAULT = (1_KHz << fix32::shift);
 			static constexpr fix32 STEP_DEFAULT = (0.002 * fix32::gain);
 
 			std::function<void(void)> CallProc = nullptr;
@@ -45,7 +45,8 @@ namespace Middle {
 		enum class ControlMode_e:uint32_t{
 			ModeTest = 0,
 			ModeTrapezium = 1,
-			ModePID = 2
+			ModePID = 2,
+			ModeImpulse = 3
 		};
 		extern ControlMode_e mMode;
 		std::string SwitchControlMode(ControlMode_e _mode);

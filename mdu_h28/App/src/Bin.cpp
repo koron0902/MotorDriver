@@ -8,6 +8,7 @@
 #include <core_cm3.h>
 #include <iap.h>
 #include <ff.hpp>
+#include <Port.hpp>
 using namespace std;
 using namespace App::File;
 using namespace common;
@@ -31,6 +32,7 @@ Directory* Create() {
 	bin->Add(CreateTest());
 	bin->Add(CreateReboot());
 	bin->Add(CreateDelay());
+	bin->Add(CreateMkfs());
 	return bin;
 }
 
@@ -261,8 +263,12 @@ File::FileBase* CreateRepeat() {
 File::FileBase* CreateTest() {
 	return File::CreateExecute("test",
 			[](text_iterator begin, text_iterator end)->int {
-				auto a = fix32::CreateFloat(2.75f);
-				XPort::WriteLine(ToStr(a));
+				//auto a = fix32::CreateFloat(2.75f);
+				XPort::WriteLine("U:" + common::ToStr(Device::Port::HoleU.Get()) +
+								" V:" + common::ToStr(Device::Port::HoleV.Get()) +
+								" W:" + common::ToStr(Device::Port::HoleW.Get())
+				);
+				//XPort::WriteLine(ToStr(a));
 				return 0;
 			});
 }
@@ -320,5 +326,16 @@ File::FileBase* CreateDelay() {
 
 			});
 }
+
+File::FileBase* CreateMkfs(){
+	return File::CreateExecute("mkfs", [](text_iterator, text_iterator)->auto{
+		uint8_t work[1024];
+		Chip_IAP_PreSectorForReadWrite(0x3C,0x3F);
+		Chip_IAP_EraseSector(0x3C,0x3F);
+		Middle::FatFs::f_mkfs("0", (FM_FAT | FM_SFD), 0, work, 1024);
+		return 0;
+	});
+}
+
 }
 } /* namespace Device */

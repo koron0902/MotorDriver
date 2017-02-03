@@ -13,52 +13,48 @@
 #include <PWM.hpp>
 #include <motor.hpp>
 #include <region.hpp>
+#include <text.hpp>
 
 namespace Middle{
 	namespace Controller{
 	fix32 PID::LastDuty;
 	PID::MotorState_t PID::mNextState, PID::mLastState;
-		PID::PID()://mFreq(FREQUENCY_DEFAULT),
-				mGearRate(GEAR_RATE_DEFAULT),
-				mRadius(RADIUS_DEFAULT),
-				mEncoderResolution(ENCODER_RESOLUTION_DEFAULT),
-				mKp(K_P_DEFAULT),
-				mKi(K_I_DEFAULT),
-				mKd(K_D_DEFAULT),
-				mKe(K_E_DEFAULT){
+	float PID::mGearRate, PID::mRadius, PID::mEncoderResolution, PID::mKp, PID::mKi, PID::mKd, PID::mKe;
+		PID::PID(){
+			mGearRate = GEAR_RATE_DEFAULT;
+			mRadius = RADIUS_DEFAULT;
+			mEncoderResolution = ENCODER_RESOLUTION_DEFAULT;
+			mKp = K_P_DEFAULT;
+			mKi = K_I_DEFAULT;
+			mKd = K_D_DEFAULT;
+			mKe = K_E_DEFAULT;
 			CallProc = [this](){
 				this->Proc(mLastState, mNextState);
+				mLastState = mNextState;
 			};
-
-			//Device::Port::Set(Device::Port::PWMEN, true);
-			//Middle::Motor::ModeAs(Middle::Motor::Type::DCMotor);
 		}
 
 		PID::~PID(){
-			//Device::Timer::SetAction(1, mFreq.word, nullptr);
-			//Middle::Motor::ModeAs(Middle::Motor::Type::None);
-			//Device::Port::Set(Device::Port::PWMEN, false);
 		}
 
 		void PID::Proc(MotorState_t& last, MotorState_t& next){
-			static const float gains[] = {mKp, mKi, mKd, mKe};
-			static const Matrix<float, 1, 4> GainMatrix(gains);
-			//for(int i = 0;i < 4;i++)
-				//GainMatrix(0, i) = gains[i];
-			static Matrix<float, 4, 1> in_vector;
+			float gains[] = {mKp, mKi, mKd, mKe};
+			Matrix<float, 1, 4> GainMatrix(gains); // フィードバックゲイン行列
+			static Matrix<float, 4, 1> in_vector;	// 偏差等格納行列
 
 
-			static const auto BatteryVoltage = (float)Device::ADC::GetVolt() * 100;
-			static const auto Volt2Duty = 4096 * 6.25f / (BatteryVoltage / 16);
-			static const auto Pulse2RPS = (float)mFreq / mEncoderResolution;
+			auto BatteryVoltage = (float)Device::ADC::GetVolt() * 100;	// 電源電圧
+			auto Volt2Duty = 4096 * 6.25f / (BatteryVoltage / 16);		// 出力->duty変換係数(4096倍)
+			auto Pulse2RPS = (float)mFreq / mEncoderResolution;			// パルス->速度変換係数
 
-			next.mRealSpeed = Device::QEI::GetVelcoity() * Pulse2RPS;
+			// 観測パルス数よりモータの回転速度を算出
+			next.mRealSpeed = -Device::QEI::GetPulseCount() * Pulse2RPS;
 
-			next.mTargetSpeed = next.mRealSpeed;
-			static const auto error = next.mTargetSpeed - next.mRealSpeed;
-			static auto integ = last.mIntegration + error;
-			static constexpr auto min = -10.0f ;//<< fix32::shift;
-			static constexpr auto max = 10.0f;// << fix32::shift;
+			//next.mTargetSpeed = 30;//next.mRealSpeed;
+			auto error = next.mTargetSpeed - next.mRealSpeed;
+			auto integ = last.mIntegration + error;
+			static constexpr auto min = -150.0f ;//<< fix32::shift;
+			static constexpr auto max = 150.0f;// << fix32::shift;
 			integ = (integ < min ? min : (integ > max ? max : integ));
 
 			in_vector(0, 0) = error;
@@ -66,6 +62,7 @@ namespace Middle{
 			in_vector(2, 0) = error - last.mError;
 			in_vector(3, 0) = next.mRealSpeed;
 
+			// ゲイン行列と偏差・積分値等の行列の内積
 			auto output = GainMatrix * in_vector;
 
 			output(0, 0) *= Volt2Duty;
@@ -78,8 +75,6 @@ namespace Middle{
 			next.mDuty = duty;
 
 			Middle::Motor::SetDuty(regions::one.Fit(fix32::CreateFloat(duty)));
-			last = next;
-			LastDuty = last.mDuty;
 		}
 
 		void PID::SetFreq(fix32 freq){
@@ -92,44 +87,41 @@ namespace Middle{
 			//Device::Timer::SetAction(1, mFreq.word, this);
 		}
 
-		void PID::SetGainP(fix32 p){
+
+		void PID::SetGainP(float p){
 			mKp = p;
 		}
 
-		void PID::SetGainP(float p){
-			mKp = fix32::CreateFloat(p);
-		}
-
-		void PID::SetGainI(fix32 i){
+		void PID::SetGainI(float i){
 			mKi = i;
 		}
 
-		void PID::SetGainI(float i){
-			mKi = fix32::CreateFloat(i);
-		}
-
-		void PID::SetGainD(fix32 d){
+		void PID::SetGainD(float d){
 			mKd = d;
 		}
-
-		void PID::SetGainD(float d){
-			mKd = fix32::CreateFloat(d);
-		}
-
-		void PID::SetGearRate(fix32 g){
+		void PID::SetGearRate(float g){
 			mGearRate = g;
 		}
 
-		void PID::SetGearRate(uint32_t g){
-			mGearRate = fix32::CreateInt(g);
-		}
-
-		void PID::SetTargetSpeed(fix32 speed){
+		void PID::SetTargetSpeed(float speed){
 			mNextState.mTargetSpeed = speed;
 		}
 
-		void PID::SetTargetSpeed(float speed){
-			mNextState.mTargetSpeed = fix32::CreateFloat(speed);
+		std::string PID::GetGainP(){
+			return common::ToStrF(PID::mKp);
+		}
+
+		std::string PID::GetGainI(){
+			return common::ToStrF(PID::mKi);
+		}
+		std::string PID::GetGainD(){
+			return common::ToStrF(PID::mKd);
+		}
+		std::string PID::GetGearRate(){
+			return common::ToStrF(PID::mGearRate);
+		}
+		std::string PID::GetSpeed(){
+			return common::ToStrF(PID::mLastState.mRealSpeed);
 		}
 	}
 }

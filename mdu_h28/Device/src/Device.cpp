@@ -10,6 +10,8 @@
 #include <USB.hpp>
 #include <SPI.hpp>
 #include <SysTick.hpp>
+#include <HoleSensor.hpp>
+#include <INT.hpp>
 
 namespace Device {
 
@@ -20,15 +22,17 @@ void Init(){
 	Tick::Init();
 	//Each Function Initialize
 	Port::Init();
+	USB::Init();
 
 	Storage::Init();
 	Timer::Init();
 	PWM::Init();
 	Uart::Init();
-	QEI::Init();
+	QEI::Init(1000);
 	ADC::Init();
-	USB::Init();
 	SPI::Init();
+	INT::Init();
+
 }
 
 

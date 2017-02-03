@@ -52,12 +52,12 @@ const PortData Rx{0, 13 };
 //QEI
 const PortData QEI_X{0, 15 };
 const PortData QEI_Y{0, 16 };
-const PortData QEI_Z{1, 7 };
+const PortData QEI_Z{0, 24 };
 
 //Hole Sensor
 const PortData HoleU{0, 22 };
 const PortData HoleV{0, 23 };
-const PortData HoleW{0, 24 };
+const PortData HoleW{1, 7 };
 
 //USB
 const PortData UID{1, 6 };

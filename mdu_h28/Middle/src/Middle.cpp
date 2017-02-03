@@ -10,11 +10,13 @@
 #include "Middle.hpp"
 #include "ControllerBase.hpp"
 #include <cstring>
+#include <HoleSensor.hpp>
 namespace Middle {
 
 void Init(){
-	Controller::SwitchControlMode(Controller::ControlMode_e::ModePID);
+	HoleSensor::Init();
 	Motor::Init();
+	Controller::SwitchControlMode(Controller::ControlMode_e::ModePID);
 }
 
 

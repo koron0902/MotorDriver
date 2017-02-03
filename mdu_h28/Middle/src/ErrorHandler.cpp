@@ -13,6 +13,7 @@ namespace Middle {
 namespace Error {
 
 extern "C" void HardFault_Handler(void) {
+	Port::Set(Port::PWMEN, false);
 	//大抵NULLの参照ミスである。
 	volatile uint32_t cnt;
 	//目でわかるようにLEDを点滅させる。

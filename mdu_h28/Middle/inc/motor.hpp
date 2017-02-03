@@ -10,6 +10,7 @@
 
 #include <qmath.hpp>
 #include <stdint.h>
+#include <HoleSensor.hpp>
 
 namespace Middle {
 namespace Motor{
@@ -38,7 +39,7 @@ void SetDuty(common::fix32);
 void Lock();
 void Free();
 
-
+std::string SwitchMotorType(Type);
 
 
 class IMotor{
@@ -59,6 +60,19 @@ public :
 	DCMotor ();
 	DCMotor(const DCMotor&)=default;
 	virtual ~DCMotor();
+	virtual void SetDuty(common::fix32);
+	virtual void Lock();
+	virtual void Free();
+};
+
+class BLDCMotorWithSensor: public IMotor{
+	Mode mMode;
+	std::function<void(HoleSensor::HoleStatus, bool)> HallSensorCallBack;
+public:
+	bool direction;
+	BLDCMotorWithSensor();
+	BLDCMotorWithSensor(const BLDCMotorWithSensor&) = default;
+	virtual ~BLDCMotorWithSensor();
 	virtual void SetDuty(common::fix32);
 	virtual void Lock();
 	virtual void Free();

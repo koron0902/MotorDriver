@@ -96,7 +96,7 @@ DRESULT disk_read (
 
 		// translate the reslut code here
 
-		if(sector+count>8)return RES_PARERR;
+		if(sector+count>32)return RES_PARERR;
 		USB::msc_read((uint32_t)512*sector, &buff, (uint32_t)512*count, 0);
 
 		return RES_OK;
@@ -129,7 +129,8 @@ DRESULT disk_write (
 		//result = RAM_disk_write(buff, sector, count);
 
 		// translate the reslut code here
-		if(sector+count>8)return RES_PARERR;
+		if(sector+count>32)
+			return RES_PARERR;
 		Device::USB::msc_write((uint32_t)512*sector, (uint8_t**)&buff, (uint32_t)512*count, 0);
 
 		return RES_OK;
@@ -158,7 +159,7 @@ DRESULT disk_ioctl (
 	case DEV_RAM :
 
 		// Process of the command for the RAM drive
-		const DWORD sectorCount = 8;
+		const DWORD sectorCount = 32;
 		const WORD sectorSize = 512;
 		const DWORD blockSize = 1;
 		switch(cmd){

@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <qmath.hpp>
 #include <token.hpp>
+#include <xport.hpp>
 using namespace std;
 
 namespace common {
@@ -75,7 +76,7 @@ string ToStr(int64_t value) {
 
 std::string ToStr(fix32 value) {
 	constexpr static int32_t d[]{(1 << 16) / 10, (1 << 16) / 100, (1 << 16)
-			/ 1000, (1 << 16) / 10000 };
+			/ 1000, (1 << 16) / 10000 , (1 << 16) / 100000, (1 << 16) / 1000000};
 
 	int32_t num, point;
 	fix32 a = abs(value);
@@ -84,7 +85,7 @@ std::string ToStr(fix32 value) {
 
 	string ans = ToStr(num) + ".";
 	uint idx;
-	for (idx = 0; idx < 4 - 1; idx++) {
+	for (idx = 0; idx < 6 - 1; idx++) {
 		ans += ToChar(point / d[idx]);
 		point %= d[idx];
 	}
@@ -291,6 +292,78 @@ bool IsOptionPattern(const std::string& text) {
 		}
 	}
 	return true;
+}
+
+CmdParser cmdParser;
+
+CmdParser::CmdParser(){
+	this->Clear();
+	for(uint i = 0;i < this->OptionSize; i++){
+		this->option[i].reserve(16);
+		this->value[i].reserve(16);
+	}
+}
+
+bool CmdParser::Parse(text_iterator begin, text_iterator end){
+	this->Clear();
+
+	if(*begin ==  "")
+		return false;
+
+	this->cmd = *begin;
+
+	while(begin != end){
+		begin++;
+		if(IsOptionPattern(*begin)){
+			this->option[this->len++] = *begin;
+			if(begin == end)
+				break;
+			if(!IsOptionPattern(*(begin + 1))){
+				begin++;
+				this->value[this->len - 1] = *begin;
+			}
+		}
+	}
+	for(uint i = 0;i < this->len; i++){
+		Middle::XPort::WriteLine(this->option[i] + "," + this->value[i]);
+	}
+	return true;
+}
+
+bool CmdParser::Search(const std::string& opt, uint32_t* index){
+	if(index == nullptr)
+		return false;
+	if(opt == "")
+		return false;
+	if(IsEnd(*(opt.begin())))
+		return false;
+	if(this->option[0] == "")
+		return false;
+
+	for(uint i = 0; i < OptionSize; i++){
+		if(option[i] == opt){
+			*index = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+void CmdParser::Clear(){
+	this->cmd.clear();
+	this->len = 0;
+	for(uint i = 0; i < OptionSize; i++){
+		this->option[i].clear();
+		this->value[i].clear();
+	}
+}
+
+bool CmdParser::IsOptionNull(){
+	return (this->len == 0);
+}
+
+const std::string CmdParser::GetOptionArg(uint32_t index){
+	return this->value[index];
 }
 
 } /* namespace common */
